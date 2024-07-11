@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui";
-import { ConnectModal } from "@/components/modals";
+import {AcceptModal, ConnectModal} from "@/components/modals";
 
 export default function Home() {
   return (
@@ -131,7 +131,7 @@ export default function Home() {
                   </div>
                 </div>
                 <>
-                  <Button className={"bg-white text-black w-20"}>Buy</Button>
+                  <AcceptModal />
                 </>
               </div>
             ))}
@@ -165,9 +165,7 @@ export default function Home() {
                     <span>0x71...976f</span>
                     <span>0.22 SOL</span>
                     <span>11.865 ETH (Base)</span>
-                    <Button className={"border bg-white text-black"}>
-                      Accept
-                    </Button>
+                    <AcceptModal />
                   </div>
                 </div>
               </>

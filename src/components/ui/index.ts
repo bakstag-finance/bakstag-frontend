@@ -27,6 +27,7 @@ import {
 } from "./dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./tabs";
 import { VisuallyHidden } from "./visually-hidden";
+import { Copy } from "./copy";
 
 export {
   Button,
@@ -58,4 +59,5 @@ export {
   TabsTrigger,
   TabsContent,
   VisuallyHidden,
+    Copy
 };
