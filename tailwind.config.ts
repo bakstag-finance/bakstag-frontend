@@ -53,7 +53,9 @@ const config = {
           foreground: "hsl(var(--card-foreground))",
         },
         gray: {
+          100: "#FAFAFA",
           700: "#A1A1AA",
+          800: "#3F3F46",
         },
       },
       keyframes: {
