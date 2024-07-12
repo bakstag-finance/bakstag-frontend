@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui";
-import {AcceptModal, ConnectModal} from "@/components/modals";
+import { AcceptModal, ConnectModal } from "@/components/modals";
 
 export default function Home() {
   return (

@@ -324,9 +324,9 @@ export const ConnectModal = () => {
             </div>
           </TabsContent>
           <TabsContent value={"tron"} className={"w-full"}>
-            <div className="border border-gray-800 text-gray-800 rounded-xl flex w-full p-3 mt-5 justify-between items-center px-5 cursor-not-allowed">
-              In development
-            </div>
+            <span className={"mt-5 text-gray-800"}>
+              Tron and USDT (TRC-20) coming soon. <br/> Currently in development
+            </span>
           </TabsContent>
         </Tabs>
       </>

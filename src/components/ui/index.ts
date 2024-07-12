@@ -59,5 +59,5 @@ export {
   TabsTrigger,
   TabsContent,
   VisuallyHidden,
-    Copy
+  Copy,
 };

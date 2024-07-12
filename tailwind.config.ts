@@ -57,6 +57,14 @@ const config = {
           700: "#A1A1AA",
           800: "#3F3F46",
         },
+        blue: {
+          200: "#90D7FF",
+          500: "#1D567F"
+        },
+        red: {
+          200: "#FF857D",
+          500: "#7F1D1D"
+        }
       },
       keyframes: {
         "accordion-down": {
