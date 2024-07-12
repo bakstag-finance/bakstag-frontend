@@ -1,20 +1,31 @@
+"use client";
+
 import {
   Button,
   Input,
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectSeparator,
-  SelectTrigger,
-  SelectValue,
+  SelectCoin,
 } from "@/components/ui";
-import { AcceptModal, ConnectModal } from "@/components/modals";
+import {AcceptModal, ConnectModal} from "@/components/modals";
+import {useQuery} from "@tanstack/react-query";
+import {Clock10} from "lucide-react";
+import {cn} from "@/lib/utils";
 
 export default function Home() {
+
+  const { data: tableData, isError, isLoading, refetch } = useQuery<any[]>({
+    queryKey: ["ads"],
+    queryFn: () => {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const result = Array.from(Array(10));
+          resolve(result);
+        }, 3000);
+      });
+    }
+  });
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-black text-white py-10 lg:py-12 px-5 lg:px-0">
+    <main className="flex min-h-screen flex-col items-center justify-start bg-black text-white py-10 lg:py-12 px-5 lg:px-0">
       <div className={"w-full max-w-[785px]"}>
         <div
           className={
@@ -28,35 +39,7 @@ export default function Home() {
           >
             <div className={"flex flex-col w-full mt-5 lg:mt-0"}>
               <label>Token to Buy</label>
-              <Select>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Token to buy" />
-                </SelectTrigger>
-                <SelectContent className={"bg-black text-white p-2"}>
-                  <SelectGroup>
-                    <SelectLabel>Optimism Tokens</SelectLabel>
-                    <SelectItem value="eth-opt">ETH (Optimism)</SelectItem>
-                    <SelectItem value="op-opt">OP (Optimism)</SelectItem>
-                    <SelectItem value="usdc-opt">USDC (Optimism)</SelectItem>
-                    <SelectItem value="usdt-opt">USDC (Optimism)</SelectItem>
-                  </SelectGroup>
-                  <SelectSeparator className={"bg-white"} />
-                  <SelectGroup>
-                    <SelectLabel className={"text-gray-700"}>
-                      Solana Tokens
-                    </SelectLabel>
-                    <SelectItem value="sol-sol">SOL (Solana)</SelectItem>
-                    <SelectItem value="usdc-sol">USDC (Solana)</SelectItem>
-                    <SelectItem value="usdt-sol">USDT (Solana)</SelectItem>
-                  </SelectGroup>
-                  <SelectSeparator className={"bg-white"} />
-                  <SelectGroup>
-                    <SelectLabel>Base Tokens</SelectLabel>
-                    <SelectItem value="eth-base">ETH (Base)</SelectItem>
-                    <SelectItem value="usdc-base">USDC (Base)</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+            <SelectCoin placeholder={"Token to Buy"}/>
             </div>
             <div className={"flex flex-col w-full lg:pl-5"}>
               <label>Exchange Rate</label>
@@ -68,35 +51,7 @@ export default function Home() {
           >
             <div className={"flex flex-col w-full lg:pl-5 mt-5 lg:mt-0"}>
               <label>Token to Sell</label>
-              <Select>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Token to buy" />
-                </SelectTrigger>
-                <SelectContent className={"bg-black text-white p-2"}>
-                  <SelectGroup>
-                    <SelectLabel>Optimism Tokens</SelectLabel>
-                    <SelectItem value="eth-opt">ETH (Optimism)</SelectItem>
-                    <SelectItem value="op-opt">OP (Optimism)</SelectItem>
-                    <SelectItem value="usdc-opt">USDC (Optimism)</SelectItem>
-                    <SelectItem value="usdt-opt">USDC (Optimism)</SelectItem>
-                  </SelectGroup>
-                  <SelectSeparator className={"bg-white"} />
-                  <SelectGroup>
-                    <SelectLabel className={"text-gray-700"}>
-                      Solana Tokens
-                    </SelectLabel>
-                    <SelectItem value="sol-sol">SOL (Solana)</SelectItem>
-                    <SelectItem value="usdc-sol">USDC (Solana)</SelectItem>
-                    <SelectItem value="usdt-sol">USDT (Solana)</SelectItem>
-                  </SelectGroup>
-                  <SelectSeparator className={"bg-white"} />
-                  <SelectGroup>
-                    <SelectLabel>Base Tokens</SelectLabel>
-                    <SelectItem value="eth-base">ETH (Base)</SelectItem>
-                    <SelectItem value="usdc-base">USDC (Base)</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+            <SelectCoin placeholder={"Token to Sell"} />
             </div>
             <div
               className={
@@ -108,37 +63,15 @@ export default function Home() {
           </div>
         </div>
         <div
-          className={
-            "mt-5 w-full min-h-screen border border-gray-800 rounded-xl flex justify-center items-start"
+          className={cn(
+              `mt-5 w-full min-h-screen border border-gray-800 rounded-xl flex justify-center items-start`,
+              (isLoading || isError) && "h-[425px]",
+          )
           }
         >
-          <div className={"lg:hidden w-full"}>
-            {Array.from(Array(10)).map((_, i) => (
-              <div
-                className={
-                  "flex flex-row items-end justify-center text-white h-32 border-b  border-gray-800 px-5 py-3"
-                }
-                key={`offer-mb-${i}`}
-              >
-                <div className={"flex w-full h-full flex-col justify-between"}>
-                  <span className={"text-sm"}>0x71...976f</span>
-                  <span className={"font-semibold"}>
-                    0.22 <span className={"text-gray-700"}>SOL</span>
-                  </span>
-                  <div className={"flex flex-col"}>
-                    <span className={"text-sm text-gray-700"}>Max Amount:</span>
-                    <span>11.865 ETH (Base)</span>
-                  </div>
-                </div>
-                <>
-                  <AcceptModal />
-                </>
-              </div>
-            ))}
-          </div>
-          <div className={"hidden lg:block w-full"}>
+          <div className={"w-full h-full"}>
             <div
-              className={"border-b border-gray-800 w-full flex justify-center"}
+              className={"hidden border-b border-gray-800 w-full lg:flex justify-center"}
             >
               <div
                 className={
@@ -151,24 +84,70 @@ export default function Home() {
                 <span>Trade</span>
               </div>
             </div>
-            {Array.from(Array(10)).map((_, i) => (
-              <>
-                <div
-                  className={"flex justify-around items-center h-20"}
-                  key={`offer-${i}`}
-                >
-                  <div
-                    className={
-                      "p-5 w-[95%] flex justify-around items-center border-b border-gray-800"
-                    }
-                  >
-                    <span>0x71...976f</span>
-                    <span>0.22 SOL</span>
-                    <span>11.865 ETH (Base)</span>
-                    <AcceptModal />
+            {
+              isLoading && (
+                    <div className={"flex justify-center items-center h-full my-full"}>
+                      <Button variant={"secondary"}>
+                        <Clock10 className={"w-5 h-5 mr-2"}/> Fetching Ads
+                      </Button>
+                    </div>
+                )
+            }
+
+            {
+              isError && (
+                    <div className={"flex justify-center items-center h-full my-full"}>
+                      <Button variant={"destructive"} onClick={() => refetch()}>
+                        Fatching Failed (Retry)
+                      </Button>
+                    </div>
+                )
+            }
+
+            {tableData && tableData.map((_: any, i: number) => (
+                <>
+                  <div className={"lg:hidden"}>
+                    <div
+                        className={
+                          "flex flex-row items-end justify-center text-white h-32 border-b  border-gray-800 px-5 py-3"
+                        }
+                        key={`offer-mb-${i}`}
+                    >
+                      <div className={"flex w-full h-full flex-col justify-between"}>
+                        <span className={"text-sm"}>0x71...976f</span>
+                        <span className={"font-semibold"}>
+                    0.22 <span className={"text-gray-700"}>SOL</span>
+                  </span>
+                        <div className={"flex flex-col"}>
+                          <span className={"text-sm text-gray-700"}>Max Amount:</span>
+                          <span>11.865 ETH (Base)</span>
+                        </div>
+                      </div>
+                      <>
+                        <AcceptModal/>
+                      </>
+                    </div>
                   </div>
-                </div>
-              </>
+
+                  <div className={"hidden lg:block"}>
+                    <div
+                        className={"flex justify-around items-center h-20"}
+                        key={`offer-${i}`}
+                    >
+                      <div
+                          className={
+                            "p-5 w-[95%] flex justify-around items-center border-b border-gray-800"
+                          }
+                      >
+                        <span>0x71...976f</span>
+                        <span>0.22 SOL</span>
+                        <span>11.865 ETH (Base)</span>
+                        <AcceptModal/>
+                      </div>
+                    </div>
+                  </div>
+
+                </>
             ))}
           </div>
         </div>

@@ -28,6 +28,7 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./tabs";
 import { VisuallyHidden } from "./visually-hidden";
 import { Copy } from "./copy";
+import { SelectCoin } from "./select-coin";
 
 export {
   Button,
@@ -60,4 +61,5 @@ export {
   TabsContent,
   VisuallyHidden,
   Copy,
+  SelectCoin
 };

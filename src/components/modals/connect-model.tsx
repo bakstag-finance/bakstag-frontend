@@ -7,12 +7,9 @@ import {
   DialogDescription,
   DialogTitle,
   DialogTrigger,
-  Select,
+  Select, SelectCoin,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
-  SelectSeparator,
   SelectTrigger,
   SelectValue,
   Tabs,
@@ -190,35 +187,7 @@ export const ConnectModal = () => {
           <TabsContent value="ads" className="w-full">
             <div className="w-full flex flex-col">
               <div className="w-full flex flex-row justify-between mt-2">
-                <Select>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Token to buy" />
-                  </SelectTrigger>
-                  <SelectContent className={"bg-black text-white p-2"}>
-                    <SelectGroup>
-                      <SelectLabel>Optimism Tokens</SelectLabel>
-                      <SelectItem value="eth-opt">ETH (Optimism)</SelectItem>
-                      <SelectItem value="op-opt">OP (Optimism)</SelectItem>
-                      <SelectItem value="usdc-opt">USDC (Optimism)</SelectItem>
-                      <SelectItem value="usdt-opt">USDC (Optimism)</SelectItem>
-                    </SelectGroup>
-                    <SelectSeparator className={"bg-white"} />
-                    <SelectGroup>
-                      <SelectLabel className={"text-gray-700"}>
-                        Solana Tokens
-                      </SelectLabel>
-                      <SelectItem value="sol-sol">SOL (Solana)</SelectItem>
-                      <SelectItem value="usdc-sol">USDC (Solana)</SelectItem>
-                      <SelectItem value="usdt-sol">USDT (Solana)</SelectItem>
-                    </SelectGroup>
-                    <SelectSeparator className={"bg-white"} />
-                    <SelectGroup>
-                      <SelectLabel>Base Tokens</SelectLabel>
-                      <SelectItem value="eth-base">ETH (Base)</SelectItem>
-                      <SelectItem value="usdc-base">USDC (Base)</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+                <SelectCoin placeholder={"Token to buy"}/>
                 <Select>
                   <SelectTrigger className="w-full ml-2" defaultValue={"most"}>
                     <SelectValue placeholder="Most Recent" />
@@ -273,10 +242,10 @@ export const ConnectModal = () => {
           className="w-full flex flex-col items-center text-white"
         >
           <TabsList className={"w-full"}>
-            <TabsTrigger value="ethereum" className={"w-full"}>
+            <TabsTrigger value="ethereum" className={"w-full"} disabled={isWalletConnected}>
               Ethereum
             </TabsTrigger>
-            <TabsTrigger value="solana" className={"w-full"}>
+            <TabsTrigger value="solana" className={"w-full"} disabled={isSolanaWalletConnected}>
               Solana
             </TabsTrigger>
             <TabsTrigger value="tron" className={"w-full"}>
@@ -325,7 +294,8 @@ export const ConnectModal = () => {
           </TabsContent>
           <TabsContent value={"tron"} className={"w-full"}>
             <span className={"mt-5 text-gray-800"}>
-              Tron and USDT (TRC-20) coming soon. <br/> Currently in development
+              Tron and USDT (TRC-20) coming soon. <br /> Currently in
+              development
             </span>
           </TabsContent>
         </Tabs>

@@ -59,12 +59,12 @@ const config = {
         },
         blue: {
           200: "#90D7FF",
-          500: "#1D567F"
+          500: "#1D567F",
         },
         red: {
           200: "#FF857D",
-          500: "#7F1D1D"
-        }
+          500: "#7F1D1D",
+        },
       },
       keyframes: {
         "accordion-down": {

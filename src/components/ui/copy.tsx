@@ -21,7 +21,9 @@ export const Copy = ({ textToCopy }: Props) => {
             <Check className={"w-3 h-3 text-green-300"} />
           </div>
         ) : (
-          <CopyIcon className={"w-4 h-4 text-gray-700 cursor-pointer hover:text-white"} />
+          <CopyIcon
+            className={"w-4 h-4 text-gray-700 cursor-pointer hover:text-white"}
+          />
         )}
       </div>
     </>
