@@ -1,18 +1,18 @@
 "use client";
 
-import {
-  Button,
-  Input,
-  SelectCoin,
-} from "@/components/ui";
-import {AcceptModal, ConnectModal} from "@/components/modals";
-import {useQuery} from "@tanstack/react-query";
-import {Clock10} from "lucide-react";
-import {cn} from "@/lib/utils";
+import { Button, Input, SelectCoin } from "@/components/ui";
+import { AcceptModal, ConnectModal, CreateModal } from "@/components/modals";
+import { useQuery } from "@tanstack/react-query";
+import { Clock10 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function Home() {
-
-  const { data: tableData, isError, isLoading, refetch } = useQuery<any[]>({
+  const {
+    data: tableData,
+    isError,
+    isLoading,
+    refetch,
+  } = useQuery<any[]>({
     queryKey: ["ads"],
     queryFn: () => {
       return new Promise((resolve) => {
@@ -21,7 +21,7 @@ export default function Home() {
           resolve(result);
         }, 3000);
       });
-    }
+    },
   });
 
   return (
@@ -39,7 +39,11 @@ export default function Home() {
           >
             <div className={"flex flex-col w-full mt-5 lg:mt-0"}>
               <label>Token to Buy</label>
-            <SelectCoin placeholder={"Token to Buy"}/>
+              <SelectCoin
+                placeholder={"Token to Buy"}
+                value={""}
+                setValue={(s) => {}}
+              />
             </div>
             <div className={"flex flex-col w-full lg:pl-5"}>
               <label>Exchange Rate</label>
@@ -51,7 +55,11 @@ export default function Home() {
           >
             <div className={"flex flex-col w-full lg:pl-5 mt-5 lg:mt-0"}>
               <label>Token to Sell</label>
-            <SelectCoin placeholder={"Token to Sell"} />
+              <SelectCoin
+                placeholder={"Token to Sell"}
+                value={""}
+                setValue={(s) => {}}
+              />
             </div>
             <div
               className={
@@ -64,14 +72,15 @@ export default function Home() {
         </div>
         <div
           className={cn(
-              `mt-5 w-full min-h-screen border border-gray-800 rounded-xl flex justify-center items-start`,
-              (isLoading || isError) && "h-[425px]",
-          )
-          }
+            `mt-5 w-full min-h-screen border border-gray-800 rounded-xl flex justify-center items-start`,
+            (isLoading || isError) && "h-[425px]",
+          )}
         >
           <div className={"w-full h-full"}>
             <div
-              className={"hidden border-b border-gray-800 w-full lg:flex justify-center"}
+              className={
+                "hidden border-b border-gray-800 w-full lg:flex justify-center"
+              }
             >
               <div
                 className={
@@ -84,71 +93,77 @@ export default function Home() {
                 <span>Trade</span>
               </div>
             </div>
-            {
-              isLoading && (
-                    <div className={"flex justify-center items-center h-full my-full"}>
-                      <Button variant={"secondary"}>
-                        <Clock10 className={"w-5 h-5 mr-2"}/> Fetching Ads
-                      </Button>
-                    </div>
-                )
-            }
+            {isLoading && (
+              <div
+                className={"flex justify-center items-center h-full my-full"}
+              >
+                <Button variant={"secondary"}>
+                  <Clock10 className={"w-5 h-5 mr-2"} /> Fetching Ads
+                </Button>
+              </div>
+            )}
 
-            {
-              isError && (
-                    <div className={"flex justify-center items-center h-full my-full"}>
-                      <Button variant={"destructive"} onClick={() => refetch()}>
-                        Fatching Failed (Retry)
-                      </Button>
-                    </div>
-                )
-            }
+            {isError && (
+              <div
+                className={"flex justify-center items-center h-full my-full"}
+              >
+                <Button variant={"destructive"} onClick={() => refetch()}>
+                  Fatching Failed (Retry)
+                </Button>
+              </div>
+            )}
 
-            {tableData && tableData.map((_: any, i: number) => (
+            {tableData &&
+              tableData.map((_: any, i: number) => (
                 <>
                   <div className={"lg:hidden"}>
                     <div
-                        className={
-                          "flex flex-row items-end justify-center text-white h-32 border-b  border-gray-800 px-5 py-3"
-                        }
-                        key={`offer-mb-${i}`}
+                      className={
+                        "flex flex-row items-end justify-center text-white h-32 border-b  border-gray-800 px-5 py-3"
+                      }
+                      key={`offer-mb-${i}`}
                     >
-                      <div className={"flex w-full h-full flex-col justify-between"}>
+                      <div
+                        className={
+                          "flex w-full h-full flex-col justify-between"
+                        }
+                      >
                         <span className={"text-sm"}>0x71...976f</span>
                         <span className={"font-semibold"}>
-                    0.22 <span className={"text-gray-700"}>SOL</span>
-                  </span>
+                          0.22 <span className={"text-gray-700"}>SOL</span>
+                        </span>
                         <div className={"flex flex-col"}>
-                          <span className={"text-sm text-gray-700"}>Max Amount:</span>
+                          <span className={"text-sm text-gray-700"}>
+                            Max Amount:
+                          </span>
                           <span>11.865 ETH (Base)</span>
                         </div>
                       </div>
                       <>
-                        <AcceptModal/>
+                        <AcceptModal />
                       </>
                     </div>
                   </div>
 
                   <div className={"hidden lg:block"}>
                     <div
-                        className={"flex justify-around items-center h-20"}
-                        key={`offer-${i}`}
+                      className={"flex justify-around items-center h-20"}
+                      key={`offer-${i}`}
                     >
                       <div
-                          className={
-                            "p-5 w-[95%] flex justify-around items-center border-b border-gray-800"
-                          }
+                        className={
+                          "p-5 w-[95%] flex justify-around items-center border-b border-gray-800"
+                        }
                       >
                         <span>0x71...976f</span>
                         <span>0.22 SOL</span>
                         <span>11.865 ETH (Base)</span>
-                        <AcceptModal/>
+                        <AcceptModal />
                       </div>
                     </div>
                   </div>
-
                 </>
-            ))}
+              ))}
           </div>
         </div>
       </div>

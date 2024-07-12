@@ -10,10 +10,12 @@ import {
   Input,
   VisuallyHidden,
   Copy,
+  SelectCoin,
 } from "@/components/ui";
 import { addressFormat, isValidCryptoAddress } from "@/lib/helpers";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { ArrowUpRight, Clock10, Clock11, Redo2 } from "lucide-react";
+import { useAccount } from "wagmi";
 
 type CreateModalStep = "main" | "transaction";
 
@@ -21,18 +23,23 @@ export const CreateModal = () => {
   const [openModal, setOpenModal] = useState(false);
   const [step, setStep] = useState<CreateModalStep>("main");
 
-  const [amountToPay, setAmountToPay] = useState(0);
+  const [tokenToSell, setTokenToSell] = useState("");
+  const [amountToSell, setAmountToSell] = useState(0);
+
+  const [tokenToReceive, setTokenToReceive] = useState("");
   const [amountToReceive, setAmountToReceive] = useState(0);
-  const [addressInput, setAddressInput] = useState("");
+  const [destinationAddress, setDestinationAddress] = useState("");
+
+  const { address } = useAccount();
 
   const solanaWallet = useWallet();
 
   const isSolanaWalletConneceted = solanaWallet.connected;
 
   const isFormFullField =
-    isValidCryptoAddress(addressInput) &&
+    isValidCryptoAddress(destinationAddress) &&
     amountToReceive > 0 &&
-    amountToPay > 0;
+    amountToSell > 0;
 
   const closeModalHandler = () => setOpenModal(false);
 
@@ -51,40 +58,49 @@ export const CreateModal = () => {
     main: (
       <div className={"w-full flex flex-col text-white"}>
         <div className={"flex flex-row justify-between items-center text-xs"}>
-          <div className={"flex flex-col justify-between items-start"}>
-            <span className={"text-gray-700"}>You Pay</span>
-            <span className={"mt-2"}>
-              SOL <span className={"text-gray-700"}>(SOL)</span>
-            </span>
+          <div className={"w-full flex flex-col justify-between items-start"}>
+            <span className={"text-gray-700"}>Token to Sell </span>
+            <SelectCoin
+              placeholder={"Token to Sell"}
+              className={"mt-2"}
+              value={tokenToSell}
+              setValue={setTokenToSell}
+            />
           </div>
-          <div className={"flex flex-col justify-between items-start"}>
-            <span className={"ml-2 text-gray-700"}>Amount</span>
+          <div
+            className={"w-full ml-2 flex flex-col justify-between items-start"}
+          >
+            <span className={"text-gray-700"}>Amount</span>
             <Input
               className={"mt-2 bg-black border rounded-lg border-gray-800"}
-              value={amountToPay}
+              value={amountToReceive}
               onChange={(e) =>
-                handleAmountInput(e.target.value, setAmountToPay)
+                handleAmountInput(e.target.value, setAmountToReceive)
               }
             />
           </div>
         </div>
         <div
-          className={"flex flex-row justify-between items-center mt-5 text-xs"}
+          className={"flex flex-row justify-between items-center text-xs mt-5"}
         >
-          <div className={"flex flex-col justify-between items-start"}>
-            <span className={"text-gray-700"}>Token to Recieve</span>
-            <span className={"mt-2"}>
-              ETH <span className={"text-gray-700"}>(BASE)</span>
-            </span>
+          <div className={"w-full flex flex-col justify-between items-start"}>
+            <span className={"text-gray-700"}>Token to Recieve </span>
+            <SelectCoin
+              placeholder={"Token to Recieve"}
+              className={"mt-2"}
+              value={tokenToReceive}
+              setValue={setTokenToReceive}
+            />
           </div>
-          <div className={"flex flex-col justify-between items-start"}>
-            <span className={"ml-2 text-gray-700"}>Amount</span>
+          <div
+            className={"ml-2 w-full flex flex-col justify-between items-start"}
+          >
+            <span className={" text-gray-700"}>Set Exchange Rate</span>
             <Input
               className={"mt-2 bg-black border rounded-lg border-gray-800"}
-              value={amountToReceive}
-              type={"number"}
+              value={amountToSell}
               onChange={(e) =>
-                handleAmountInput(e.target.value, setAmountToReceive)
+                handleAmountInput(e.target.value, setAmountToSell)
               }
             />
           </div>
@@ -95,28 +111,34 @@ export const CreateModal = () => {
           </span>
           <Input
             className={"mt-2 bg-black border rounded-lg border-gray-800"}
-            value={addressInput}
-            onChange={(e) => setAddressInput(e.target.value)}
+            value={destinationAddress}
+            onChange={(e) => setDestinationAddress(e.target.value)}
           />
         </div>
         <div className={"w-full flex flex-col text-xs mt-5"}>
           <div
             className={"w-full flex flex-row justify-between items-center my-2"}
           >
-            <span>Amount to pay</span>
+            <span>Locked Amount</span>
             <span>
-              214.5 SOL
-              <span className={"text-gray-700"}>(SOL)</span>
+              {amountToSell > 0 && tokenToSell.length > 1 ? (
+                <span>
+                  {amountToSell}{" "}
+                  <span className={"text-gray-700"}>{tokenToSell}</span>
+                </span>
+              ) : (
+                <span>N/A</span>
+              )}
             </span>
           </div>
           <div
             className={"w-full flex flex-row justify-between items-center my-2"}
           >
             <span>to Wallet</span>
-            {addressInput.length > 8 && (
+            {destinationAddress.length > 8 && (
               <div className={"flex flex-row  items-center text-gray-800"}>
-                {addressFormat(addressInput)}
-                <Copy textToCopy={addressInput} />
+                {addressFormat(destinationAddress)}
+                <Copy textToCopy={destinationAddress} />
               </div>
             )}
           </div>
@@ -124,18 +146,19 @@ export const CreateModal = () => {
             className={"w-full flex flex-row justify-between items-center my-2"}
           >
             <span>from Wallet</span>
-            {solanaWallet.publicKey?.toString() && (
+            {address ? (
               <div className={"flex flex-row  items-center text-gray-800"}>
-                {addressFormat(solanaWallet.publicKey!.toString())}
-
+                {addressFormat(address)}
                 <Copy textToCopy={solanaWallet.publicKey!.toString()} />
               </div>
+            ) : (
+              <span className={"text-gray-700"}>Connect Wallet</span>
             )}
           </div>
           <div
             className={"w-full flex flex-row justify-between items-center my-2"}
           >
-            <span>Amount to recieve</span>
+            <span>Exchange Rate</span>
             <span>
               10 ETH
               <span className={"text-gray-700"}>(BASE)</span>
@@ -145,10 +168,34 @@ export const CreateModal = () => {
             className={"w-full flex flex-row justify-between items-center my-2"}
           >
             <span>Exchange Rate</span>
-            <span>
-              22.154 <span className={"text-gray-700"}>SOL</span> = 1
-              <span className={"text-gray-700"}>(ETH)</span>
-            </span>
+            {amountToSell > 0 && tokenToSell.length > 0 ? (
+              <span>
+                {amountToSell}{" "}
+                <span className={"text-gray-700"}>{tokenToSell}</span> = 1
+                <span className={"text-gray-700"}>(ETH)</span>
+              </span>
+            ) : (
+              <span className={"text--gray-700"}>Set Exchange Rate</span>
+            )}
+          </div>
+          <div
+            className={"w-full flex flex-row justify-between items-center my-2"}
+          >
+            <span>Protocol Fee</span>
+            <span>1%</span>
+          </div>
+          <div
+            className={"w-full flex flex-row justify-between items-center my-2"}
+          >
+            <span>Total Receive amount</span>
+            {amountToReceive > 0 ? (
+              <span>
+                {amountToReceive * amountToSell}{" "}
+                <span className={"ml-2"}>{tokenToReceive}</span>
+              </span>
+            ) : (
+              <span className={"text-gray-700"}>Set Exchange Rate</span>
+            )}
           </div>
         </div>
         <Button
@@ -200,8 +247,8 @@ export const CreateModal = () => {
                   "flex flex-row items-center justify-center text-gray-800"
                 }
               >
-                {addressFormat(addressInput)}
-                <Copy textToCopy={addressInput} />
+                {addressFormat(destinationAddress)}
+                <Copy textToCopy={destinationAddress} />
                 <ArrowUpRight
                   className={
                     "w-5 h-5 ml-1 text-gray-700 cursor-pointer hover:text-white"
@@ -226,10 +273,10 @@ export const CreateModal = () => {
               }
             >
               <span>to Wallet</span>
-              {addressInput.length > 8 && (
+              {destinationAddress.length > 8 && (
                 <div className={"flex flex-row items-center text-gray-800"}>
-                  {addressFormat(addressInput)}
-                  <Copy textToCopy={addressInput} />
+                  {addressFormat(destinationAddress)}
+                  <Copy textToCopy={destinationAddress} />
                 </div>
               )}
             </div>
@@ -275,8 +322,8 @@ export const CreateModal = () => {
             /*onClick={closeModalHandler}*/
             variant={"secondary"}
           >
-            <Redo2 className={"w-5 h-5 mr-2"} /> Retry
-            {/*<Clock10 className={"w-5 h-5 mr-2"}/> Proccessing Transaction*/}
+            {/*<Redo2 className={"w-5 h-5 mr-2"} /> Retry*/}
+            <Clock10 className={"w-5 h-5 mr-2"} /> Proccessing Transaction
           </Button>
         </div>
       </>
@@ -290,7 +337,7 @@ export const CreateModal = () => {
   return (
     <Dialog open={openModal} onOpenChange={(_open) => setOpenModal(_open)}>
       <DialogTrigger asChild>
-        <Button className={"bg-white text-black "}>Accept</Button>
+        <Button className={"bg-white text-black "}>Create</Button>
       </DialogTrigger>
       <DialogContent className={"w-full max-w-[370px]"}>
         <VisuallyHidden>

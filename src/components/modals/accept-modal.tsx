@@ -275,8 +275,8 @@ export const AcceptModal = () => {
             /*onClick={closeModalHandler}*/
             variant={"secondary"}
           >
-            <Redo2 className={"w-5 h-5 mr-2"} /> Retry
-            {/*<Clock10 className={"w-5 h-5 mr-2"}/> Proccessing Transaction*/}
+            {/*<Redo2 className={"w-5 h-5 mr-2"} /> Retry*/}
+            <Clock10 className={"w-5 h-5 mr-2"} /> Proccessing Transaction
           </Button>
         </div>
       </>

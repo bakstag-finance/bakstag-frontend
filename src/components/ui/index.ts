@@ -61,5 +61,5 @@ export {
   TabsContent,
   VisuallyHidden,
   Copy,
-  SelectCoin
+  SelectCoin,
 };

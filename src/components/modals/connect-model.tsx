@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Button,
   Dialog,
@@ -7,7 +7,8 @@ import {
   DialogDescription,
   DialogTitle,
   DialogTrigger,
-  Select, SelectCoin,
+  Select,
+  SelectCoin,
   SelectContent,
   SelectItem,
   SelectTrigger,
@@ -45,11 +46,14 @@ export const ConnectModal = () => {
   const isWalletConnected = !!account.address;
   const isSolanaWalletConnected = !!solanaWallet.publicKey;
 
-  // useEffect(() => {
-  //   if(status === "success" && isWalletConnected || isSolanaWalletConnected) {
-  //     setStep("main");
-  //   }
-  // }, [isWalletConnected, status]);
+  useEffect(() => {
+    if (
+      status === "success" ||
+      (isWalletConnected && isSolanaWalletConnected)
+    ) {
+      setStep("main");
+    }
+  }, [isWalletConnected, status]);
 
   const metamaskWalletHandler = async () => {
     if (!account.address) {
@@ -187,7 +191,7 @@ export const ConnectModal = () => {
           <TabsContent value="ads" className="w-full">
             <div className="w-full flex flex-col">
               <div className="w-full flex flex-row justify-between mt-2">
-                <SelectCoin placeholder={"Token to buy"}/>
+                <SelectCoin placeholder={"Token to buy"} value={""} setValue={(s)=> {}}/>
                 <Select>
                   <SelectTrigger className="w-full ml-2" defaultValue={"most"}>
                     <SelectValue placeholder="Most Recent" />
@@ -242,10 +246,18 @@ export const ConnectModal = () => {
           className="w-full flex flex-col items-center text-white"
         >
           <TabsList className={"w-full"}>
-            <TabsTrigger value="ethereum" className={"w-full"} disabled={isWalletConnected}>
+            <TabsTrigger
+              value="ethereum"
+              className={"w-full"}
+              disabled={isWalletConnected}
+            >
               Ethereum
             </TabsTrigger>
-            <TabsTrigger value="solana" className={"w-full"} disabled={isSolanaWalletConnected}>
+            <TabsTrigger
+              value="solana"
+              className={"w-full"}
+              disabled={isSolanaWalletConnected}
+            >
               Solana
             </TabsTrigger>
             <TabsTrigger value="tron" className={"w-full"}>
