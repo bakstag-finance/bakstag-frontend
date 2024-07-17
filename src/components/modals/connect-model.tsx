@@ -368,13 +368,13 @@ export const ConnectModal = () => {
   };
 
   const onOpenChangeHandler = (_open: boolean) => {
-    if(!_open) {
+    if (!_open) {
       setMainTabsStep("main");
       setIsDeletingStep(false);
     }
-    
+
     setOpenModal(_open);
-  }
+  };
 
   return (
     <Dialog open={openModal} onOpenChange={onOpenChangeHandler}>
@@ -394,7 +394,7 @@ export const ConnectModal = () => {
         <div
           className={"w-full flex justify-center items-center flex-col pt-5"}
         >
-          {!isDeletingStep ? walletStepRender(): <DeletingStep />}
+          {!isDeletingStep ? walletStepRender() : <DeletingStep />}
 
           <Button
             className="w-full mt-5 bg-black text-gray-700 border border-white border-opacity-50 hover:bg-gray-800"

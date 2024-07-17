@@ -11,11 +11,11 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-  VisuallyHidden, 
+  VisuallyHidden,
 } from "@/components/ui";
 import { useConnect, useAccount, useDisconnect } from "wagmi";
 import { metaMask } from "wagmi/connectors";
-import {  LogOut, X } from "lucide-react";
+import { LogOut, X } from "lucide-react";
 import { addressFormat } from "@/lib/helpers";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { PhantomWalletName } from "@solana/wallet-adapter-wallets";
@@ -93,96 +93,92 @@ export const WalletConnect = () => {
   const steps = {
     main: (
       <>
-            <div className="w-full flex flex-col">
-              <div
-                className={`mt-2 border border-gray-800 rounded-xl  h-20  px-5 ${isWalletConnected ? "h-24" : "pt-5"}`}
+        <div className="w-full flex flex-col">
+          <div
+            className={`mt-2 border border-gray-800 rounded-xl  h-20  px-5 ${isWalletConnected ? "h-24" : "pt-5"}`}
+          >
+            <div className={"flex w-full justify-between items-center"}>
+              <div className="flex flex-col text-white text-sm">
+                <span>Ethereum</span>
+              </div>
+              <Button
+                onClick={() => {
+                  if (isWalletConnected) {
+                    void metamaskWalletHandler();
+                  } else {
+                    setWalletTabStep("ethereum");
+                    setStep("wallet-choose");
+                  }
+                }}
+                className={
+                  isWalletConnected
+                    ? "bg-transparent group  border border-gray-800 w-10 h-10 self-start mt-5 rounded-lg justify-center"
+                    : ""
+                }
               >
-                <div className={"flex w-full justify-between items-center"}>
-                  <div className="flex flex-col text-white text-sm">
-                    <span>Ethereum</span>
-                  </div>
-                  <Button
-                    onClick={() => {
-                      if (isWalletConnected) {
-                        void metamaskWalletHandler();
-                      } else {
-                        setWalletTabStep("ethereum");
-                        setStep("wallet-choose");
-                      }
-                    }}
-                    className={
-                      isWalletConnected
-                        ? "bg-transparent group  border border-gray-800 w-10 h-10 self-start mt-5 rounded-lg justify-center"
-                        : ""
-                    }
-                  >
-                    {isWalletConnected ? (
-                      <span>
-                        <X
-                          className={
-                            "text-muted-foreground group-hover:text-white"
-                          }
-                          size={20}
-                        />
-                      </span>
-                    ) : (
-                      <LogOut />
-                    )}
-                  </Button>
-                </div>
-                <span
-                  className={`text-muted-foreground mt-5 ${!isWalletConnected && "hidden"}`}
-                >
-                  {isWalletConnected && addressFormat(account.address!)}
-                </span>
-              </div>
-              <div
-                className={`mt-2 border border-gray-800 rounded-xl  h-20  px-5 ${isSolanaWalletConnected ? "h-24" : "pt-5"}`}
-              >
-                <div className={"flex w-full justify-between items-center"}>
-                  <div className="flex flex-col text-white text-sm">
-                    <span>Solana</span>
-                  </div>
-                  <Button
-                    onClick={() => {
-                      if (isSolanaWalletConnected) {
-                        void solanaWalletHandler();
-                      } else {
-                        setWalletTabStep("solana");
-                        setStep("wallet-choose");
-                      }
-                    }}
-                    className={
-                      isSolanaWalletConnected
-                        ? "bg-transparent group  border border-gray-800 w-10 h-10 self-start mt-5 rounded-lg justify-center"
-                        : ""
-                    }
-                  >
-                    {isSolanaWalletConnected ? (
-                      <span>
-                        <X
-                          className={
-                            "text-muted-foreground group-hover:text-white"
-                          }
-                          size={20}
-                        />
-                      </span>
-                    ) : (
-                      <LogOut />
-                    )}
-                  </Button>
-                </div>
-                <span
-                  className={`text-muted-foreground mt-5 ${!isSolanaWalletConnected && "hidden"}`}
-                >
-                  {isSolanaWalletConnected &&
-                    addressFormat(solanaWallet.publicKey!.toString())}
-                </span>
-              </div>
-              <div className="my-2 border border-gray-800 text-gray-800 rounded-xl flex w-full h-10 justify-between items-center px-5">
-                <span>Tron (in development )</span>
-              </div>
+                {isWalletConnected ? (
+                  <span>
+                    <X
+                      className={"text-muted-foreground group-hover:text-white"}
+                      size={20}
+                    />
+                  </span>
+                ) : (
+                  <LogOut />
+                )}
+              </Button>
             </div>
+            <span
+              className={`text-muted-foreground mt-5 ${!isWalletConnected && "hidden"}`}
+            >
+              {isWalletConnected && addressFormat(account.address!)}
+            </span>
+          </div>
+          <div
+            className={`mt-2 border border-gray-800 rounded-xl  h-20  px-5 ${isSolanaWalletConnected ? "h-24" : "pt-5"}`}
+          >
+            <div className={"flex w-full justify-between items-center"}>
+              <div className="flex flex-col text-white text-sm">
+                <span>Solana</span>
+              </div>
+              <Button
+                onClick={() => {
+                  if (isSolanaWalletConnected) {
+                    void solanaWalletHandler();
+                  } else {
+                    setWalletTabStep("solana");
+                    setStep("wallet-choose");
+                  }
+                }}
+                className={
+                  isSolanaWalletConnected
+                    ? "bg-transparent group  border border-gray-800 w-10 h-10 self-start mt-5 rounded-lg justify-center"
+                    : ""
+                }
+              >
+                {isSolanaWalletConnected ? (
+                  <span>
+                    <X
+                      className={"text-muted-foreground group-hover:text-white"}
+                      size={20}
+                    />
+                  </span>
+                ) : (
+                  <LogOut />
+                )}
+              </Button>
+            </div>
+            <span
+              className={`text-muted-foreground mt-5 ${!isSolanaWalletConnected && "hidden"}`}
+            >
+              {isSolanaWalletConnected &&
+                addressFormat(solanaWallet.publicKey!.toString())}
+            </span>
+          </div>
+          <div className="my-2 border border-gray-800 text-gray-800 rounded-xl flex w-full h-10 justify-between items-center px-5">
+            <span>Tron (in development )</span>
+          </div>
+        </div>
       </>
     ),
     "wallet-choose": (
@@ -268,12 +264,12 @@ export const WalletConnect = () => {
   };
 
   const onOpenChangeHandler = (_open: boolean) => {
-    if(!_open) {
+    if (!_open) {
       setIsDeletingStep(false);
     }
-    
+
     setOpenModal(_open);
-  }
+  };
 
   return (
     <Dialog open={openModal} onOpenChange={onOpenChangeHandler}>
@@ -293,7 +289,7 @@ export const WalletConnect = () => {
         <div
           className={"w-full flex justify-center items-center flex-col pt-5"}
         >
-          {!isDeletingStep ? walletStepRender(): <DeletingStep />}
+          {!isDeletingStep ? walletStepRender() : <DeletingStep />}
 
           <Button
             className="w-full mt-5 bg-black text-gray-700 border border-white border-opacity-50 hover:bg-gray-800"

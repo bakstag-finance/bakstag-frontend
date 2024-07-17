@@ -6,4 +6,10 @@ import {
 } from "./address-validation";
 import { isNumberOrCommaNumber } from "./input-validation";
 
-export { addressFormat, isEthAddress, isSolanaAddress, isValidCryptoAddress, isNumberOrCommaNumber };
+export {
+  addressFormat,
+  isEthAddress,
+  isSolanaAddress,
+  isValidCryptoAddress,
+  isNumberOrCommaNumber,
+};

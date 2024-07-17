@@ -12,7 +12,11 @@ import {
   VisuallyHidden,
   Copy,
 } from "@/components/ui";
-import { addressFormat, isNumberOrCommaNumber, isValidCryptoAddress } from "@/lib/helpers";
+import {
+  addressFormat,
+  isNumberOrCommaNumber,
+  isValidCryptoAddress,
+} from "@/lib/helpers";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { ArrowUpRight, Clock10, Clock11, Redo2 } from "lucide-react";
 import { WalletConnect } from "./wallet-connect";
@@ -27,6 +31,7 @@ export const AcceptModal = () => {
   const [amountToPay, setAmountToPay] = useState("0");
   const [amountToReceive, setAmountToReceive] = useState("0");
   const [addressInput, setAddressInput] = useState("");
+  const [hasInteracted, setHasInteracted] = useState(false);
 
   const solanaWallet = useWallet();
 
@@ -42,13 +47,20 @@ export const AcceptModal = () => {
     setStep("main");
   };
 
+  const handleAddressInputChange = (value: string) => {
+    setAddressInput(value);
+    if (!hasInteracted) {
+      setHasInteracted(true);
+    }
+  };
+
   const steps = {
     main: (
       <div className={"w-full flex flex-col text-white"}>
         <div className={"flex flex-row justify-between items-center text-xs"}>
-          <div className={"flex flex-col justify-between items-start"}>
-            <span className={"text-gray-700"}>You Pay</span>
-            <span className={"mt-2"}>
+          <div className={"flex flex-col justify-between items-start h-full"}>
+            <span className={"text-gray-700 h-full"}>You Pay</span>
+            <span className={"h-full"}>
               SOL <span className={"text-gray-700"}>(SOL)</span>
             </span>
           </div>
@@ -56,7 +68,7 @@ export const AcceptModal = () => {
             <span className={"ml-2 text-gray-700"}>Amount</span>
             <Input
               className={cn(
-                "mt-2 bg-black border rounded-lg ",
+                "mt-2 bg-black border rounded-lg",
                 isNumberOrCommaNumber(amountToPay)
                   ? "border-gray-800"
                   : "border-red-200  focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1",
@@ -70,17 +82,17 @@ export const AcceptModal = () => {
         <div
           className={"flex flex-row justify-between items-center mt-5 text-xs"}
         >
-          <div className={"flex flex-col justify-between items-start"}>
-            <span className={"text-gray-700"}>Token to Recieve</span>
-            <span className={"mt-2"}>
+          <div className={"flex flex-col justify-between items-start h-full"}>
+            <span className={"text-gray-700 h-full"}>Token to Recieve</span>
+            <span className={"h-full"}>
               ETH <span className={"text-gray-700"}>(BASE)</span>
             </span>
           </div>
-          <div className={"flex flex-col justify-between items-start"}>
+          <div className={"flex flex-col justify-between items-start h-full"}>
             <span className={"ml-2 text-gray-700"}>Amount</span>
             <Input
               className={cn(
-                "mt-2 bg-black border rounded-lg ",
+                "mt-3 bg-black border rounded-lg ",
                 isNumberOrCommaNumber(amountToReceive)
                   ? "border-gray-800"
                   : "border-red-200  focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1",
@@ -98,12 +110,13 @@ export const AcceptModal = () => {
           <Input
             className={cn(
               "mt-2 bg-black border rounded-lg ",
-              isValidCryptoAddress(addressInput)
-                ? "border-gray-800"
-                : "border-red-200  focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1",
-            )}
+              !hasInteracted || isValidCryptoAddress(addressInput)
+              ? "border-gray-800"
+              : "border-red-200 focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1",
+                      )}
+
             value={addressInput}
-            onChange={(e) => setAddressInput(e.target.value)}
+            onChange={(e) => handleAddressInputChange(e.target.value)}
             required
           />
         </div>

@@ -31,9 +31,9 @@ export default function Home() {
   });
 
   return (
-    <main className="flex h-screen flex-col items-center justify-start bg-black text-white py-10 lg:py-5 pb-10 px-5 lg:px-0">
-      <div className="w-full max-w-[748px] max-h-full">
-        <div className="flex w-full lg:h-20 justify-between items-center mb-5 lg:mb-0">
+    <main className="flex h-screen flex-col items-center justify-start bg-black text-white">
+      <div className="w-full max-w-[748px] h-full py-5 px-5 lg:px-0">
+        <div className="flex w-full lg:h-20 justify-between items-center lg:mb-0">
           <div className="flex flex-col-reverse lg:flex-row w-full justify-between">
             <div className="flex flex-col w-full mt-5 lg:mt-0">
               <label className="text-xs mb-2 ml-2 text-gray-700">
@@ -51,17 +51,16 @@ export default function Home() {
               <label className="text-xs mb-2 ml-2 text-gray-700">
                 Amount to Buy
               </label>
-              <Input 
-              className={cn(
-                "bg-black border rounded-lg ",
-                isNumberOrCommaNumber(amountToBuy)
-                ? "border-gray-800"
-                : "border-red-200  focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1",
-              )                
-              }
-              value={amountToBuy}
-              onChange={(e)=> setAmountToBuy(e.target.value)}
-              required
+              <Input
+                className={cn(
+                  "bg-black border rounded-lg ",
+                  isNumberOrCommaNumber(amountToBuy)
+                    ? "border-gray-800"
+                    : "border-red-200  focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1",
+                )}
+                value={amountToBuy}
+                onChange={(e) => setAmountToBuy(e.target.value)}
+                required
               />
             </div>
           </div>
@@ -85,8 +84,8 @@ export default function Home() {
         </div>
         <div
           className={cn(
-            "mt-2 w-full border overflow-y-auto scroll-smooth border-gray-800 rounded-xl flex flex-col justify-start items-center mb-32",
-            isLoading || isError ? "h-[425px]" : "table-content",
+            "mt-5 w-full border overflow-y-auto scroll-smooth border-gray-800 rounded-xl flex flex-col justify-start items-center",
+            isLoading || isError ? "h-[425px]" : "h-[80%] lg:h-[88%]",
           )}
         >
           <div className="hidden border-b border-gray-800 w-full lg:flex justify-center items-center text-sm">
