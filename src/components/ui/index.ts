@@ -30,6 +30,17 @@ import { VisuallyHidden } from "./visually-hidden";
 import { Copy } from "./copy";
 import { SelectCoin } from "./select-coin";
 
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableFooter,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableCaption,
+} from "./table";
+
 export {
   Button,
   buttonVariants,
@@ -62,4 +73,12 @@ export {
   VisuallyHidden,
   Copy,
   SelectCoin,
+  Table,
+  TableHeader,
+  TableBody,
+  TableFooter,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableCaption,
 };

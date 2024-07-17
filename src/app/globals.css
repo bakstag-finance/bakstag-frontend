@@ -74,3 +74,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+.table-content {
+  height: calc(100% - 90px);
+}

@@ -29,26 +29,26 @@ export const SelectCoin = ({
       <SelectTrigger className={cn("w-full", className)}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
-      <SelectContent className={"bg-black text-white p-2"}>
+      <SelectContent className={"bg-black text-white p-2 hover:border-gray-800 focus:border-gray-800"}>
         <SelectGroup>
-          <SelectLabel>Optimism Tokens</SelectLabel>
-          <SelectItem value="eth-opt">ETH (Optimism)</SelectItem>
-          <SelectItem value="op-opt">OP (Optimism)</SelectItem>
-          <SelectItem value="usdc-opt">USDC (Optimism)</SelectItem>
-          <SelectItem value="usdt-opt">USDC (Optimism)</SelectItem>
+          <SelectLabel className="text-gray-700">Optimism Tokens</SelectLabel>
+          <SelectItem value="eth-opt" >ETH <span className="text-gray-700">(Optimism)</span></SelectItem>
+          <SelectItem value="op-opt">OP <span className="text-gray-700">(Optimism)</span></SelectItem>
+          <SelectItem value="usdc-opt">USDC <span className="text-gray-700">(Optimism)</span></SelectItem>
+          <SelectItem value="usdt-opt">USDC <span className="text-gray-700">(Optimism)</span></SelectItem>
         </SelectGroup>
-        <SelectSeparator className={"bg-white"} />
+        <SelectSeparator className={"bg-gray-800"} />
         <SelectGroup>
           <SelectLabel className={"text-gray-700"}>Solana Tokens</SelectLabel>
-          <SelectItem value="sol-sol">SOL (Solana)</SelectItem>
-          <SelectItem value="usdc-sol">USDC (Solana)</SelectItem>
-          <SelectItem value="usdt-sol">USDT (Solana)</SelectItem>
+          <SelectItem value="sol-sol">SOL <span className="text-gray-700">(Solana)</span></SelectItem>
+          <SelectItem value="usdc-sol">USDC <span className="text-gray-700">(Solana)</span></SelectItem>
+          <SelectItem value="usdt-sol">USDT <span className="text-gray-700">(Solana)</span></SelectItem>
         </SelectGroup>
-        <SelectSeparator className={"bg-white"} />
+        <SelectSeparator className={"bg-gray-800"} />
         <SelectGroup>
           <SelectLabel>Base Tokens</SelectLabel>
-          <SelectItem value="eth-base">ETH (Base)</SelectItem>
-          <SelectItem value="usdc-base">USDC (Base)</SelectItem>
+          <SelectItem value="eth-base">ETH <span className="text-gray-700">(Base)</span></SelectItem>
+          <SelectItem value="usdc-base">USDC <span className="text-gray-700">(Base)</span></SelectItem>
         </SelectGroup>
       </SelectContent>
     </Select>

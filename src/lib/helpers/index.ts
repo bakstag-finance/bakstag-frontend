@@ -4,5 +4,6 @@ import {
   isSolanaAddress,
   isValidCryptoAddress,
 } from "./address-validation";
+import { isNumberOrCommaNumber } from "./input-validation";
 
-export { addressFormat, isEthAddress, isSolanaAddress, isValidCryptoAddress };
+export { addressFormat, isEthAddress, isSolanaAddress, isValidCryptoAddress, isNumberOrCommaNumber };

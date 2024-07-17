@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import {
   Button,
@@ -11,9 +12,11 @@ import {
   VisuallyHidden,
   Copy,
 } from "@/components/ui";
-import { addressFormat, isValidCryptoAddress } from "@/lib/helpers";
+import { addressFormat, isNumberOrCommaNumber, isValidCryptoAddress } from "@/lib/helpers";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { ArrowUpRight, Clock10, Clock11, Redo2 } from "lucide-react";
+import { WalletConnect } from "./wallet-connect";
+import { cn } from "@/lib/utils";
 
 type ConnectModalStep = "main" | "transaction";
 
@@ -21,8 +24,8 @@ export const AcceptModal = () => {
   const [openModal, setOpenModal] = useState(false);
   const [step, setStep] = useState<ConnectModalStep>("main");
 
-  const [amountToPay, setAmountToPay] = useState(0);
-  const [amountToReceive, setAmountToReceive] = useState(0);
+  const [amountToPay, setAmountToPay] = useState("0");
+  const [amountToReceive, setAmountToReceive] = useState("0");
   const [addressInput, setAddressInput] = useState("");
 
   const solanaWallet = useWallet();
@@ -31,20 +34,12 @@ export const AcceptModal = () => {
 
   const isFormFullField =
     isValidCryptoAddress(addressInput) &&
-    amountToReceive > 0 &&
-    amountToPay > 0;
+    +amountToReceive > 0 &&
+    +amountToPay > 0;
 
-  const closeModalHandler = () => setOpenModal(false);
-
-  function isNumberOrCommaNumber(input: string) {
-    const regex = /^-?\d+(,\d+)?$/;
-    return regex.test(input);
-  }
-
-  const handleAmountInput = (amount: string, handle: any) => {
-    if (isNumberOrCommaNumber(amount)) {
-      handle(amount);
-    }
+  const closeModalHandler = () => {
+    setOpenModal(false);
+    setStep("main");
   };
 
   const steps = {
@@ -60,11 +55,15 @@ export const AcceptModal = () => {
           <div className={"flex flex-col justify-between items-start"}>
             <span className={"ml-2 text-gray-700"}>Amount</span>
             <Input
-              className={"mt-2 bg-black border rounded-lg border-gray-800"}
+              className={cn(
+                "mt-2 bg-black border rounded-lg ",
+                isNumberOrCommaNumber(amountToPay)
+                  ? "border-gray-800"
+                  : "border-red-200  focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1",
+              )}
               value={amountToPay}
-              onChange={(e) =>
-                handleAmountInput(e.target.value, setAmountToPay)
-              }
+              onChange={(e) => setAmountToPay(e.target.value)}
+              required
             />
           </div>
         </div>
@@ -80,12 +79,15 @@ export const AcceptModal = () => {
           <div className={"flex flex-col justify-between items-start"}>
             <span className={"ml-2 text-gray-700"}>Amount</span>
             <Input
-              className={"mt-2 bg-black border rounded-lg border-gray-800"}
+              className={cn(
+                "mt-2 bg-black border rounded-lg ",
+                isNumberOrCommaNumber(amountToReceive)
+                  ? "border-gray-800"
+                  : "border-red-200  focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1",
+              )}
               value={amountToReceive}
-              type={"number"}
-              onChange={(e) =>
-                handleAmountInput(e.target.value, setAmountToReceive)
-              }
+              onChange={(e) => setAmountToReceive(e.target.value)}
+              required
             />
           </div>
         </div>
@@ -94,9 +96,15 @@ export const AcceptModal = () => {
             Destination Wallet Address | ETH (BASE)
           </span>
           <Input
-            className={"mt-2 bg-black border rounded-lg border-gray-800"}
+            className={cn(
+              "mt-2 bg-black border rounded-lg ",
+              isValidCryptoAddress(addressInput)
+                ? "border-gray-800"
+                : "border-red-200  focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1",
+            )}
             value={addressInput}
             onChange={(e) => setAddressInput(e.target.value)}
+            required
           />
         </div>
         <div className={"w-full flex flex-col text-xs mt-5"}>
@@ -151,19 +159,21 @@ export const AcceptModal = () => {
             </span>
           </div>
         </div>
-        <Button
-          className={"w-full mt-5"}
-          disabled={!isSolanaWalletConneceted || !isFormFullField}
-          onClick={() => {
-            setStep("transaction");
-          }}
-        >
-          {isSolanaWalletConneceted
-            ? isFormFullField
+        {isSolanaWalletConneceted ? (
+          <Button
+            className={"w-full mt-5"}
+            disabled={!isFormFullField}
+            onClick={() => {
+              setStep("transaction");
+            }}
+          >
+            {isFormFullField
               ? "Sign & Transaction"
-              : "Add Destination Wallet Address"
-            : "+ Connect SOL (SOL) Wallet"}
-        </Button>
+              : "Add Destination Wallet Address"}
+          </Button>
+        ) : (
+          <WalletConnect />
+        )}
         <Button
           className="w-full mt-5 bg-black text-gray-700 border border-white border-opacity-50 hover:bg-gray-800"
           onClick={closeModalHandler}
@@ -290,7 +300,7 @@ export const AcceptModal = () => {
   return (
     <Dialog open={openModal} onOpenChange={(_open) => setOpenModal(_open)}>
       <DialogTrigger asChild>
-        <Button className={"bg-white text-black "}>Accept</Button>
+        <Button className={"bg-white text-black rounded-xl"}>Accept</Button>
       </DialogTrigger>
       <DialogContent className={"w-full max-w-[370px]"}>
         <VisuallyHidden>
