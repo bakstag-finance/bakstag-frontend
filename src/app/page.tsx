@@ -85,7 +85,7 @@ export default function Home() {
         <div
           className={cn(
             "mt-5 w-full border overflow-y-auto scroll-smooth border-gray-800 rounded-xl flex flex-col justify-start items-center",
-            (isLoading || isError) ? "h-[425px]" : "flex-grow"
+            isLoading || isError ? "h-[425px]" : "flex-grow",
           )}
         >
           <div className="hidden border-b border-gray-800 w-full lg:flex justify-center items-center text-sm">
