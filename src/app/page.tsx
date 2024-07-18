@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button, Input, SelectCoin } from "@/components/ui";
-import { AcceptModal, ConnectModal, CreateModal } from "@/components/modals";
+import { AcceptModal, ConnectModal } from "@/components/modals";
 import { useQuery } from "@tanstack/react-query";
 import { Clock10 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -31,8 +31,8 @@ export default function Home() {
   });
 
   return (
-    <main className="flex h-screen flex-col items-center justify-start bg-black text-white">
-      <div className="w-full max-w-[748px] h-full py-5 px-5 lg:px-0">
+    <main className="flex h-screen flex-col items-center bg-black text-white">
+      <div className="w-full max-w-[748px] h-full py-5 px-5 lg:px-0 flex flex-col">
         <div className="flex w-full lg:h-20 justify-between items-center lg:mb-0">
           <div className="flex flex-col-reverse lg:flex-row w-full justify-between">
             <div className="flex flex-col w-full mt-5 lg:mt-0">
@@ -85,7 +85,7 @@ export default function Home() {
         <div
           className={cn(
             "mt-5 w-full border overflow-y-auto scroll-smooth border-gray-800 rounded-xl flex flex-col justify-start items-center",
-            isLoading || isError ? "h-[425px]" : "h-[80%] lg:h-[88%]",
+            (isLoading || isError) ? "h-[425px]" : "flex-grow"
           )}
         >
           <div className="hidden border-b border-gray-800 w-full lg:flex justify-center items-center text-sm">

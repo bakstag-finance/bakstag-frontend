@@ -111,10 +111,9 @@ export const AcceptModal = () => {
             className={cn(
               "mt-2 bg-black border rounded-lg ",
               !hasInteracted || isValidCryptoAddress(addressInput)
-              ? "border-gray-800"
-              : "border-red-200 focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1",
-                      )}
-
+                ? "border-gray-800"
+                : "border-red-200 focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1",
+            )}
             value={addressInput}
             onChange={(e) => handleAddressInputChange(e.target.value)}
             required
