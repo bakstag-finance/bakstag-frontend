@@ -14,7 +14,7 @@ import {
 } from "@/components/ui";
 import {
   addressFormat,
-  isNumberOrCommaNumber,
+  isNumericOrCommaSeparated,
   isValidCryptoAddress,
 } from "@/lib/helpers";
 import { useWallet } from "@solana/wallet-adapter-react";
@@ -69,7 +69,7 @@ export const AcceptModal = () => {
             <Input
               className={cn(
                 "mt-2 bg-black border rounded-lg",
-                isNumberOrCommaNumber(amountToPay)
+                isNumericOrCommaSeparated(amountToPay)
                   ? "border-gray-800"
                   : "border-red-200  focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1",
               )}
@@ -93,7 +93,7 @@ export const AcceptModal = () => {
             <Input
               className={cn(
                 "mt-3 bg-black border rounded-lg ",
-                isNumberOrCommaNumber(amountToReceive)
+                isNumericOrCommaSeparated(amountToReceive)
                   ? "border-gray-800"
                   : "border-red-200  focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1",
               )}

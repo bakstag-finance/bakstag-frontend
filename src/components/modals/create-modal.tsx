@@ -12,49 +12,77 @@ import {
   Copy,
   SelectCoin,
 } from "@/components/ui";
-import { addressFormat, isValidCryptoAddress } from "@/lib/helpers";
+import {
+  addressFormat,
+  isNumericOrCommaSeparated,
+  isValidCryptoAddress,
+} from "@/lib/helpers";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { ArrowUpRight, Clock10, Clock11, Redo2 } from "lucide-react";
-import { useAccount } from "wagmi";
+import {
+  useAccount,
+  usePublicClient,
+  useReadContract,
+  useWriteContract,
+} from "wagmi";
+import { tokensIdentity } from "@/lib/constants";
+import { otcMarketAbi } from "@/lib/wagmi/contracts/base-otc";
 
 type CreateModalStep = "main" | "transaction";
 
 export const CreateModal = () => {
   const [openModal, setOpenModal] = useState(false);
-  const [step, setStep] = useState<CreateModalStep>("main");
+  const [currentStep, setCurrentStep] = useState<CreateModalStep>("main");
 
-  const [tokenToSell, setTokenToSell] = useState("");
-  const [amountToSell, setAmountToSell] = useState(0);
+  const [selectedSellToken, setSelectedSellToken] = useState("");
+  const [sellAmount, setSellAmount] = useState(0);
 
-  const [tokenToReceive, setTokenToReceive] = useState("");
-  const [amountToReceive, setAmountToReceive] = useState(0);
-  const [destinationAddress, setDestinationAddress] = useState("");
+  const [selectedReceiveToken, setSelectedReceiveToken] = useState("");
+  const [receiveAmount, setReceiveAmount] = useState(0);
+  const [destinationWallet, setDestinationWallet] = useState("");
+
+  const { writeContractAsync } = useWriteContract();
+  const client = usePublicClient();
 
   const { address } = useAccount();
 
-  const solanaWallet = useWallet();
+  const solanaWalletConnector = useWallet();
 
-  const isSolanaWalletConneceted = solanaWallet.connected;
+  const isSolanaWalletConnected = solanaWalletConnector.connected;
 
-  const isFormFullField =
-    isValidCryptoAddress(destinationAddress) &&
-    amountToReceive > 0 &&
-    amountToSell > 0;
+  const isFormValid =
+    isValidCryptoAddress(destinationWallet) &&
+    receiveAmount > 0 &&
+    sellAmount > 0;
 
-  const closeModalHandler = () => setOpenModal(false);
+  const handleClose = () => setOpenModal(false);
 
-  function isNumberOrCommaNumber(input: string) {
-    const regex = /^-?\d+(,\d+)?$/;
-    return regex.test(input);
-  }
-
-  const handleAmountInput = (amount: string, handle: any) => {
-    if (isNumberOrCommaNumber(amount)) {
+  const handleAmountChange = (amount: string, handle: any) => {
+    if (isNumericOrCommaSeparated(amount)) {
       handle(amount);
     }
   };
 
-  const steps = {
+  const handleCreateSwap = async () => {
+    if (!client) {
+      return null;
+    }
+
+    // const getTX = writeContractAsync({
+    //   address: "0xYourContractAddress",
+    //   abi: otcMarketAbi,
+    //   functionName: "createOffer",
+    //   args: [destinationWallet, ]
+    // }).then((tx) => {
+    //   return client.waitForTransactionReceipt({
+    //     hash: tx,
+    //   });
+    // })
+    // 1. Write Conract
+    // 3. Start Next Step
+    setCurrentStep("transaction");
+  };
+  const stepsContent = {
     main: (
       <div className={"w-full flex flex-col text-white"}>
         <div className={"flex flex-row justify-between items-center text-xs"}>
@@ -63,8 +91,8 @@ export const CreateModal = () => {
             <SelectCoin
               placeholder={"Token to Sell"}
               className={"mt-2"}
-              value={tokenToSell}
-              setValue={setTokenToSell}
+              value={selectedSellToken}
+              setValue={setSelectedSellToken}
             />
           </div>
           <div
@@ -73,9 +101,9 @@ export const CreateModal = () => {
             <span className={"text-gray-700"}>Amount</span>
             <Input
               className={"mt-2 bg-black border rounded-lg border-gray-800"}
-              value={amountToReceive}
+              value={receiveAmount}
               onChange={(e) =>
-                handleAmountInput(e.target.value, setAmountToReceive)
+                handleAmountChange(e.target.value, setReceiveAmount)
               }
             />
           </div>
@@ -88,8 +116,8 @@ export const CreateModal = () => {
             <SelectCoin
               placeholder={"Token to Recieve"}
               className={"mt-2"}
-              value={tokenToReceive}
-              setValue={setTokenToReceive}
+              value={selectedReceiveToken}
+              setValue={setSelectedReceiveToken}
             />
           </div>
           <div
@@ -98,9 +126,9 @@ export const CreateModal = () => {
             <span className={" text-gray-700"}>Set Exchange Rate</span>
             <Input
               className={"mt-2 bg-black border rounded-lg border-gray-800"}
-              value={amountToSell}
+              value={sellAmount}
               onChange={(e) =>
-                handleAmountInput(e.target.value, setAmountToSell)
+                handleAmountChange(e.target.value, setSellAmount)
               }
             />
           </div>
@@ -111,8 +139,8 @@ export const CreateModal = () => {
           </span>
           <Input
             className={"mt-2 bg-black border rounded-lg border-gray-800"}
-            value={destinationAddress}
-            onChange={(e) => setDestinationAddress(e.target.value)}
+            value={destinationWallet}
+            onChange={(e) => setDestinationWallet(e.target.value)}
           />
         </div>
         <div className={"w-full flex flex-col text-xs mt-5"}>
@@ -121,10 +149,15 @@ export const CreateModal = () => {
           >
             <span>Locked Amount</span>
             <span>
-              {amountToSell > 0 && tokenToSell.length > 1 ? (
+              {sellAmount > 0 && selectedSellToken.length > 1 ? (
                 <span>
-                  {amountToSell}{" "}
-                  <span className={"text-gray-700"}>{tokenToSell}</span>
+                  {sellAmount}{" "}
+                  <span className={"text-gray-700"}>
+                    {tokensIdentity[selectedSellToken].token}{" "}
+                    <span className="text-gray-700">
+                      ({tokensIdentity[selectedSellToken].network})
+                    </span>
+                  </span>
                 </span>
               ) : (
                 <span>N/A</span>
@@ -135,10 +168,10 @@ export const CreateModal = () => {
             className={"w-full flex flex-row justify-between items-center my-2"}
           >
             <span>to Wallet</span>
-            {destinationAddress.length > 8 && (
+            {destinationWallet.length > 8 && (
               <div className={"flex flex-row  items-center text-gray-800"}>
-                {addressFormat(destinationAddress)}
-                <Copy textToCopy={destinationAddress} />
+                {addressFormat(destinationWallet)}
+                <Copy textToCopy={destinationWallet} />
               </div>
             )}
           </div>
@@ -149,7 +182,9 @@ export const CreateModal = () => {
             {address ? (
               <div className={"flex flex-row  items-center text-gray-800"}>
                 {addressFormat(address)}
-                <Copy textToCopy={solanaWallet.publicKey!.toString()} />
+                <Copy
+                  textToCopy={solanaWalletConnector.publicKey!.toString()}
+                />
               </div>
             ) : (
               <span className={"text-gray-700"}>Connect Wallet</span>
@@ -161,18 +196,23 @@ export const CreateModal = () => {
             <span>Exchange Rate</span>
             <span>
               10 ETH
-              <span className={"text-gray-700"}>(BASE)</span>
+              <span className={"text-gray-700"}> (BASE)</span>
             </span>
           </div>
           <div
             className={"w-full flex flex-row justify-between items-center my-2"}
           >
             <span>Exchange Rate</span>
-            {amountToSell > 0 && tokenToSell.length > 0 ? (
+            {sellAmount > 0 && selectedSellToken.length > 0 ? (
               <span>
-                {amountToSell}{" "}
-                <span className={"text-gray-700"}>{tokenToSell}</span> = 1
-                <span className={"text-gray-700"}>(ETH)</span>
+                {sellAmount}{" "}
+                <span className={"text-gray-700"}>
+                  {tokensIdentity[selectedSellToken].token}{" "}
+                  <span className="text-gray-700">
+                    ({tokensIdentity[selectedSellToken].network})
+                  </span>
+                </span>{" "}
+                = 1<span className={"text-gray-700"}> (ETH)</span>
               </span>
             ) : (
               <span className={"text--gray-700"}>Set Exchange Rate</span>
@@ -188,10 +228,15 @@ export const CreateModal = () => {
             className={"w-full flex flex-row justify-between items-center my-2"}
           >
             <span>Total Receive amount</span>
-            {amountToReceive > 0 ? (
+            {receiveAmount > 0 ? (
               <span>
-                {amountToReceive * amountToSell}{" "}
-                <span className={"ml-2"}>{tokenToReceive}</span>
+                {receiveAmount * sellAmount}{" "}
+                <span className={"ml-2"}>
+                  {tokensIdentity[selectedReceiveToken].token}{" "}
+                  <span className="text-gray-700">
+                    ({tokensIdentity[selectedReceiveToken].network})
+                  </span>
+                </span>
               </span>
             ) : (
               <span className={"text-gray-700"}>Set Exchange Rate</span>
@@ -200,20 +245,18 @@ export const CreateModal = () => {
         </div>
         <Button
           className={"w-full mt-5"}
-          disabled={!isSolanaWalletConneceted || !isFormFullField}
-          onClick={() => {
-            setStep("transaction");
-          }}
+          disabled={!isSolanaWalletConnected || !isFormValid}
+          onClick={handleCreateSwap}
         >
-          {isSolanaWalletConneceted
-            ? isFormFullField
+          {isSolanaWalletConnected
+            ? isFormValid
               ? "Sign & Transaction"
               : "Add Destination Wallet Address"
             : "+ Connect SOL (SOL) Wallet"}
         </Button>
         <Button
           className="w-full mt-5 bg-black text-gray-700 border border-white border-opacity-50 hover:bg-gray-800"
-          onClick={closeModalHandler}
+          onClick={handleClose}
         >
           Cancel
         </Button>
@@ -247,8 +290,8 @@ export const CreateModal = () => {
                   "flex flex-row items-center justify-center text-gray-800"
                 }
               >
-                {addressFormat(destinationAddress)}
-                <Copy textToCopy={destinationAddress} />
+                {addressFormat(destinationWallet)}
+                <Copy textToCopy={destinationWallet} />
                 <ArrowUpRight
                   className={
                     "w-5 h-5 ml-1 text-gray-700 cursor-pointer hover:text-white"
@@ -273,10 +316,10 @@ export const CreateModal = () => {
               }
             >
               <span>to Wallet</span>
-              {destinationAddress.length > 8 && (
+              {destinationWallet.length > 8 && (
                 <div className={"flex flex-row items-center text-gray-800"}>
-                  {addressFormat(destinationAddress)}
-                  <Copy textToCopy={destinationAddress} />
+                  {addressFormat(destinationWallet)}
+                  <Copy textToCopy={destinationWallet} />
                 </div>
               )}
             </div>
@@ -286,11 +329,13 @@ export const CreateModal = () => {
               }
             >
               <span>from Wallet</span>
-              {solanaWallet.publicKey?.toString() && (
+              {solanaWalletConnector.publicKey?.toString() && (
                 <div className={"flex flex-row text-gray-800"}>
-                  {addressFormat(solanaWallet.publicKey!.toString())}
+                  {addressFormat(solanaWalletConnector.publicKey!.toString())}
 
-                  <Copy textToCopy={solanaWallet.publicKey!.toString()} />
+                  <Copy
+                    textToCopy={solanaWalletConnector.publicKey!.toString()}
+                  />
                 </div>
               )}
             </div>
@@ -330,8 +375,8 @@ export const CreateModal = () => {
     ),
   };
 
-  const walletStepRender = () => {
-    return steps[step];
+  const renderStepContent = () => {
+    return stepsContent[currentStep];
   };
 
   return (
@@ -349,7 +394,7 @@ export const CreateModal = () => {
         <div
           className={"w-full flex justify-center items-center flex-col pt-5"}
         >
-          {walletStepRender()}
+          {renderStepContent()}
           <span className={"text-gray-700 text-xs mt-5 text-justify"}>
             Assets will be locked. After the transaction is successfully
             completed, the assets will be automatically sent to the destination

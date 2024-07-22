@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { Button, Input, SelectCoin } from "@/components/ui";
-import { AcceptModal, ConnectModal } from "@/components/modals";
+import { AcceptModal, ConnectModal, CreateModal } from "@/components/modals";
 import { useQuery } from "@tanstack/react-query";
 import { Clock10 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { isNumberOrCommaNumber } from "@/lib/helpers";
+import { isNumericOrCommaSeparated } from "@/lib/helpers";
 
 export default function Home() {
   const [tokenToBuy, setTokenToBuy] = useState("");
@@ -24,11 +24,15 @@ export default function Home() {
       return new Promise((resolve) => {
         setTimeout(() => {
           const result = Array.from(Array(20));
-          resolve(result);
+          resolve([]);
         }, 3000);
       });
     },
   });
+
+  const isEmptyAdsList = tableData && tableData.length === 0;
+  const heightOfTable =
+    isEmptyAdsList || isLoading || isError ? "h-[425px]" : "flex-grow";
 
   return (
     <main className="flex h-screen flex-col items-center bg-black text-white">
@@ -54,7 +58,7 @@ export default function Home() {
               <Input
                 className={cn(
                   "bg-black border rounded-lg ",
-                  isNumberOrCommaNumber(amountToBuy)
+                  isNumericOrCommaSeparated(amountToBuy)
                     ? "border-gray-800"
                     : "border-red-200  focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1",
                 )}
@@ -85,7 +89,7 @@ export default function Home() {
         <div
           className={cn(
             "mt-5 w-full border overflow-y-auto scroll-smooth border-gray-800 rounded-xl flex flex-col justify-start items-center",
-            isLoading || isError ? "h-[425px]" : "flex-grow",
+            heightOfTable,
           )}
         >
           <div className="hidden border-b border-gray-800 w-full lg:flex justify-center items-center text-sm">
@@ -97,21 +101,11 @@ export default function Home() {
             </div>
           </div>
 
-          {isLoading && (
-            <div className="flex justify-center items-center h-full my-full">
-              <Button variant="secondary">
-                <Clock10 className="w-5 h-5 mr-2" /> Fetching Ads
-              </Button>
-            </div>
-          )}
+          {isLoading && <LoadingComponent />}
 
-          {isError && (
-            <div className="flex justify-center items-center h-full my-full">
-              <Button variant="destructive" onClick={() => refetch()}>
-                Fetching Failed (Retry)
-              </Button>
-            </div>
-          )}
+          {isError && <ErrorComponent refetch={refetch} />}
+
+          {isEmptyAdsList && <EmptyComponent />}
 
           {tableData &&
             tableData.map((_: any, i: number) => (
@@ -168,3 +162,31 @@ export default function Home() {
     </main>
   );
 }
+
+const LoadingComponent = () => {
+  return (
+    <div className="flex justify-center items-center h-full my-full">
+      <Button variant="secondary">
+        <Clock10 className="w-5 h-5 mr-2" /> Fetching Ads
+      </Button>
+    </div>
+  );
+};
+
+const ErrorComponent = ({ refetch }: { refetch: () => void }) => {
+  return (
+    <div className="flex justify-center items-center h-full my-full">
+      <Button variant="destructive" onClick={() => refetch()}>
+        Fetching Failed (Retry)
+      </Button>
+    </div>
+  );
+};
+
+const EmptyComponent = () => {
+  return (
+    <div className="flex justify-center items-center h-full my-full">
+      <CreateModal />
+    </div>
+  );
+};

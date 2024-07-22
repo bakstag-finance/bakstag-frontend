@@ -20,9 +20,9 @@ import {
   VisuallyHidden,
   Copy,
 } from "@/components/ui";
-import { useConnect, useAccount, useDisconnect } from "wagmi";
+import { useConnect, useAccount, useDisconnect, useWriteContract } from "wagmi";
 import { metaMask } from "wagmi/connectors";
-import { ArrowUpRight, Ghost, LogOut, Trash, X } from "lucide-react";
+import { Ghost, LogOut, Trash, X } from "lucide-react";
 import { addressFormat } from "@/lib/helpers";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { PhantomWalletName } from "@solana/wallet-adapter-wallets";
@@ -50,6 +50,8 @@ export const ConnectModal = () => {
 
   const isWalletConnected = !!account.address;
   const isSolanaWalletConnected = !!solanaWallet.publicKey;
+
+  const { writeContract } = useWriteContract();
 
   const { data: tableData } = useQuery<any[]>({
     queryKey: ["ads"],

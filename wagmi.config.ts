@@ -6,11 +6,11 @@ export default defineConfig({
   contracts: [],
   plugins: [
     blockExplorer({
-      baseUrl: "https://sepolia.basescan.org/api",
+      baseUrl: "https://optimism-sepolia.blockscout.com/api",
       contracts: [
         {
           name: "OtcMarket",
-          address: "0xEA8cf4E72Daef673d38A5094BC06036204aab54c",
+          address: "0x59BCcF525121202FC7D60E0b7A0e88E32D041adB",
         },
       ],
       getAddress({ address }) {
