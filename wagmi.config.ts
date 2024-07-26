@@ -6,18 +6,18 @@ export default defineConfig({
   contracts: [],
   plugins: [
     blockExplorer({
-      baseUrl: "https://optimism-sepolia.blockscout.com/api",
+      baseUrl: "https://base-sepolia.blockscout.com/api",
       contracts: [
         {
           name: "OtcMarket",
-          address: "0x59BCcF525121202FC7D60E0b7A0e88E32D041adB",
+          address: "0x94c0D6607c8deB1d674F768C87b091452e73aB0f",
         },
       ],
       getAddress({ address }) {
         if (typeof address === "string") return address;
         return Object.values(address)[0];
       },
-      name: "Basescan",
+      name: "Sepolia",
     }),
   ],
 });

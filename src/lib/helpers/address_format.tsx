@@ -1,5 +1,5 @@
 export const addressFormat = (str: string): string => {
-  if (str.length <= 8) {
+  if (!str || str.length <= 8) {
     return str;
   }
 

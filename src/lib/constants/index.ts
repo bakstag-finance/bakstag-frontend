@@ -1,3 +1,3 @@
-import { tokensIdentity } from "./tokens";
+import { tokensData } from "./tokens";
 
-export { tokensIdentity };
+export { tokensData };
