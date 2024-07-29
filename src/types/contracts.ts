@@ -1,1 +1,1 @@
-export type ApprovingStatus =  "idle" | "pending" | "error" | "success";
+export type ApprovingStatus = "idle" | "pending" | "error" | "success";

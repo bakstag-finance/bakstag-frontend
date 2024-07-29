@@ -43,9 +43,8 @@ export const FormStep = ({
   handleCreateSwap,
   handleClose,
   approvingStatus,
-  approvingErrorMessage
+  approvingErrorMessage,
 }: FormStepProps) => {
-  
   const handleNumberChange = (
     e: ChangeEvent<HTMLInputElement>,
     setter: (value: number) => void,
@@ -178,13 +177,17 @@ export const FormStep = ({
           {exchangeRate > 0 && selectedSrcToken.length > 0 ? (
             <span>
               {exchangeRate}{" "}
-              <span >
+              <span>
                 {tokensData[selectedSrcToken]?.token}{" "}
                 <span className="text-gray-700">
                   ({tokensData[selectedSrcToken]?.network})
                 </span>
               </span>{" "}
-              = 1<span className={"text-gray-700"}> ({tokensData[selectedDstToken]?.network})</span>
+              = 1
+              <span className={"text-gray-700"}>
+                {" "}
+                ({tokensData[selectedDstToken]?.network})
+              </span>
             </span>
           ) : (
             <span className={"text--gray-700"}>Set Exchange Rate</span>
@@ -217,10 +220,14 @@ export const FormStep = ({
       </div>
       <Button
         className={"w-full mt-5"}
-        disabled={!isWalletConnected || !isFormValid || approvingStatus === "pending"}
+        disabled={
+          !isWalletConnected || !isFormValid || approvingStatus === "pending"
+        }
         onClick={handleCreateSwap}
         variant={
-          (approvingStatus === "pending" && "secondary") || (approvingStatus === "error" && "destructive") || "default"
+          (approvingStatus === "pending" && "secondary") ||
+          (approvingStatus === "error" && "destructive") ||
+          "default"
         }
       >
         {getButtonText()}

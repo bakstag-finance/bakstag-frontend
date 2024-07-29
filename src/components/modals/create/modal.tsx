@@ -74,7 +74,9 @@ export const CreateModal = () => {
   const [approvingErrorMessage, setApprovingErrorMessage] = useState("");
 
   // State of transaction proccess
-  const [ transactionStatus, setTransactionStatus] = useState<"idle"| "pending"| "success">("idle");
+  const [transactionStatus, setTransactionStatus] = useState<
+    "idle" | "pending" | "success"
+  >("idle");
 
   const isFormValid =
     isValidCryptoAddress(destinationWallet) &&
@@ -91,7 +93,7 @@ export const CreateModal = () => {
     setExchangeRate(0.000001);
     setSelectedDstToken("");
     setDestinationWallet("");
-  }
+  };
 
   const prepareDataForContracts = () => {
     const abiConfig = tokensData[selectedSrcToken].otcConfig;
@@ -140,7 +142,7 @@ export const CreateModal = () => {
     _srcAmountLD,
     _exchangeRateSD,
     _lzFee,
-    _value
+    _value,
   }: ContractProps) => {
     setApprovingStatus("pending");
     try {
@@ -193,7 +195,7 @@ export const CreateModal = () => {
       setApprovingErrorMessage("Something went wrong");
       setApprovingStatus("error");
     }
-  }
+  };
 
   const handleWriteContract = async ({
     abiConfig,
@@ -205,7 +207,7 @@ export const CreateModal = () => {
     _srcAmountLD,
     _exchangeRateSD,
     _lzFee,
-    _value
+    _value,
   }: ContractProps) => {
     try {
       const txHash = await writeContract(wagmiConfig, {
@@ -242,7 +244,7 @@ export const CreateModal = () => {
       setApprovingErrorMessage("Something went wrong");
       setApprovingStatus("error");
     }
-  }
+  };
 
   const handleCreateSwap = async () => {
     if (!isWalletConnected || !address || approvingStatus === "success") {
@@ -279,10 +281,10 @@ export const CreateModal = () => {
         _srcAmountLD,
         _exchangeRateSD,
         _lzFee,
-        _value
+        _value,
       };
-  
-    handleApprove(dataForContracts);
+
+      handleApprove(dataForContracts);
       handleWriteContract(dataForContracts);
     }
   };
@@ -330,7 +332,7 @@ export const CreateModal = () => {
   const renderStepContent = () => {
     return stepsContent[currentStep];
   };
-  
+
   const onOpenChangeHandler = (_open: boolean) => {
     if (!_open) {
       if (transactionStatus === "pending") {

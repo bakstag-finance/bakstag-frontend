@@ -30,7 +30,9 @@ interface Props {
   srcChainId: number;
   handleClose: () => void;
   handleRetry: () => void;
-  setTransactionStatus: Dispatch<SetStateAction<"idle" | "pending" | "success">>;
+  setTransactionStatus: Dispatch<
+    SetStateAction<"idle" | "pending" | "success">
+  >;
 }
 
 const LAYER_ZERO_SCAN = "https://testnet.layerzeroscan.com/tx/";
@@ -47,7 +49,7 @@ export const TransactionStep = ({
   selectedSrcToken,
   handleClose,
   handleRetry,
-  setTransactionStatus
+  setTransactionStatus,
 }: Props) => {
   const { isLoading, isError, isSuccess } = useQuery({
     queryKey: ["create-offer", txHash],
@@ -64,14 +66,14 @@ export const TransactionStep = ({
     },
   });
 
-  const buttonHandler = () => isError ? handleRetry() : handleClose();
+  const buttonHandler = () => (isError ? handleRetry() : handleClose());
   const renderStatusIcon = () => {
     if (isError) {
       return <FileWarning className="size-12" />;
     }
     if (isLoading) {
       return <Clock11 className="size-12 text-white" />;
-    } 
+    }
     if (isSuccess) {
       return <CircleCheck className="size-12" />;
     }
@@ -86,8 +88,8 @@ export const TransactionStep = ({
           <span className="text-gray-700">Please Retry</span>
         </>
       );
-    } 
-    
+    }
+
     if (isLoading) {
       return (
         <>
@@ -97,8 +99,8 @@ export const TransactionStep = ({
           </span>
         </>
       );
-    } 
-    
+    }
+
     if (isSuccess) {
       return <span className="mt-5">Success</span>;
     }
@@ -232,7 +234,7 @@ export const TransactionStep = ({
         }
         disabled={isLoading}
       >
-       {renderButtonContent()}
+        {renderButtonContent()}
       </Button>
     </div>
   );
