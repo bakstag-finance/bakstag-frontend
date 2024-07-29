@@ -308,9 +308,16 @@ export const AcceptModal = () => {
   const walletStepRender = () => {
     return steps[step];
   };
+  const onOpenChangeHandler = (_open: boolean) => {
+    if (!_open) {
+      setStep("main");
+    }
+
+    setOpenModal(_open);
+  };
 
   return (
-    <Dialog open={openModal} onOpenChange={(_open) => setOpenModal(_open)}>
+    <Dialog open={openModal} onOpenChange={onOpenChangeHandler}>
       <DialogTrigger asChild>
         <Button className={"bg-white text-black rounded-xl"}>Accept</Button>
       </DialogTrigger>

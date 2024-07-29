@@ -46,10 +46,10 @@ export const SelectCoin = ({
             USDC <span className="text-gray-700">(Optimism)</span>
           </SelectItem>
           <SelectItem value="usdt-opt">
-            USDC <span className="text-gray-700">(Optimism)</span>
+            USDT <span className="text-gray-700">(Optimism)</span>
           </SelectItem>
         </SelectGroup>
-        <SelectSeparator className={"bg-gray-800"} />
+        {/* <SelectSeparator className={"bg-gray-800"} />
         <SelectGroup>
           <SelectLabel className={"text-gray-700"}>Solana Tokens</SelectLabel>
           <SelectItem value="sol-sol">
@@ -61,7 +61,7 @@ export const SelectCoin = ({
           <SelectItem value="usdt-sol">
             USDT <span className="text-gray-700">(Solana)</span>
           </SelectItem>
-        </SelectGroup>
+        </SelectGroup> */}
         <SelectSeparator className={"bg-gray-800"} />
         <SelectGroup>
           <SelectLabel>Base Tokens</SelectLabel>

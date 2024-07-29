@@ -11,11 +11,11 @@ export type TokenData = {
 };
 
 /**
- * Optimism 
+ * Optimism
  * sepolia chain id - 11155420
  * main chain id - 10
- * 
- * Base 
+ *
+ * Base
  * sepolia chain id - 84532
  * main chain id -  8453
  */
@@ -27,7 +27,7 @@ export const tokensData: Record<string, TokenData> = {
     eid: "40232",
     tokenAddress: "0x0000000000000000000000000000000000000000",
     otcConfig: otcMarketConfig,
-    decimals: 18
+    decimals: 18,
   },
   "op-opt": {
     token: "OPT",
@@ -36,7 +36,7 @@ export const tokensData: Record<string, TokenData> = {
     eid: "40232",
     tokenAddress: "0x8B3bcfa4680e8a16215e587DfCcD1730A453CeaD",
     otcConfig: otcMarketConfig,
-    decimals: 18 // TODO: replace to 6
+    decimals: 18, // TODO: replace to 6
   },
   "usdc-opt": {
     token: "USDC",
@@ -45,7 +45,7 @@ export const tokensData: Record<string, TokenData> = {
     eid: "40232",
     tokenAddress: "0x8B3bcfa4680e8a16215e587DfCcD1730A453CeaD",
     otcConfig: otcMarketConfig,
-    decimals: 18 // TODO: replace to 6
+    decimals: 18, // TODO: replace to 6
   },
   "usdt-opt": {
     token: "USDT",
@@ -54,8 +54,8 @@ export const tokensData: Record<string, TokenData> = {
     eid: "40232",
     tokenAddress: "0x8B3bcfa4680e8a16215e587DfCcD1730A453CeaD",
     otcConfig: otcMarketConfig,
-    decimals: 18 // TODO: replace to 6 
-      },
+    decimals: 18, // TODO: replace to 6
+  },
   // "sol-sol": {
   //   token: "SOL",
   //   network: "SOL",
@@ -72,18 +72,18 @@ export const tokensData: Record<string, TokenData> = {
     token: "ETH",
     network: "BASE",
     tokenAddress: "0x0000000000000000000000000000000000000000",
-    eid: "40232",
+    eid: "40245",
     chainId: 84532,
     otcConfig: otcMarketConfig,
-    decimals: 18
+    decimals: 18,
   },
   "usdc-base": {
     token: "USDC",
     network: "BASE",
     tokenAddress: "0x21bFF5Cd1f61b59Cc2D908C050735b87cb780d2d",
-    eid: "40232",
+    eid: "40245",
     chainId: 84532,
     otcConfig: otcMarketConfig,
-    decimals: 18 // TODO: replace to 6
+    decimals: 18, // TODO: replace to 6
   },
-} as const
+} as const;
