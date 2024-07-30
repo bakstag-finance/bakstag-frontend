@@ -282,7 +282,7 @@ export const ConnectModal = () => {
               </div>
             </div>
             <div className="mt-5">
-            <CreateModal buttonText={"+ Create Add"} />
+              <CreateModal buttonText={"+ Create Add"} />
             </div>
           </TabsContent>
         </Tabs>

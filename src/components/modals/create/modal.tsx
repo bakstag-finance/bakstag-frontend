@@ -47,10 +47,10 @@ interface ContractProps {
 }
 
 interface Props {
-  buttonText: string
+  buttonText: string;
 }
 
-export const CreateModal = ({buttonText}: Props) => {
+export const CreateModal = ({ buttonText }: Props) => {
   const [openModal, setOpenModal] = useState(false);
   const [currentStep, setCurrentStep] = useState<CreateModalStep>("main");
 
