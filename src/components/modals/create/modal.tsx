@@ -70,8 +70,8 @@ export const CreateModal = () => {
     srcTokenAddress: "",
     dstTokenAddress: "",
     srcAmountLD: BigInt(0),
-    exchangeRateSD: BigInt(0)
-  })
+    exchangeRateSD: BigInt(0),
+  });
 
   // State of Wallet
   const { address } = useAccount();
@@ -144,7 +144,6 @@ export const CreateModal = () => {
     };
   };
 
-
   const handleCreateSwap = async () => {
     if (!isWalletConnected || !address || approvingStatus === "success") {
       return null;
@@ -184,13 +183,13 @@ export const CreateModal = () => {
           _value,
         };
 
-        console.log("DataForContracts", dataForContracts)
-  
+        console.log("DataForContracts", dataForContracts);
+
         setApprovingStatus("pending");
         await switchChainAsync({
           chainId: srcToken.chainId!,
         });
-  
+
         const [lzFee, { offerId, srcAmountLD }] = await readContract(
           wagmiConfig,
           {
@@ -214,13 +213,13 @@ export const CreateModal = () => {
             chainId: srcToken.chainId as any,
           },
         );
-  
+
         _lzFee = lzFee;
         _value =
           srcToken.tokenAddress == ethers.constants.AddressZero
             ? _lzFee.nativeFee + srcAmountLD
             : _lzFee.nativeFee;
-  
+
         if (srcToken.tokenAddress != ethers.constants.AddressZero) {
           await writeContract(wagmiConfig, {
             abi: erc20Abi,
@@ -230,13 +229,13 @@ export const CreateModal = () => {
             chainId: srcToken.chainId,
           });
         }
-  
-        setInfoForTransactionStep(prevState => {
+
+        setInfoForTransactionStep((prevState) => {
           return {
             ...prevState,
-            offerId: offerId
-          }
-        })
+            offerId: offerId,
+          };
+        });
         const txHash = await writeContract(wagmiConfig, {
           abi: abiConfig.abi,
           address: abiConfig.address,
@@ -257,30 +256,30 @@ export const CreateModal = () => {
           value: _value,
           chainId: srcToken.chainId,
         });
-  
+
         if (txHash) {
-          setInfoForTransactionStep(prevState => {
+          setInfoForTransactionStep((prevState) => {
             return {
-                ...prevState,
-                txHash,
-                srcEid:  Number(srcToken.eid),
-                srcChainId: Number(srcToken.chainId),
-                dstEid: _dstEid,
-                dstSellerAddress: _dstSellerAddress,
-                srcTokenAddress: _srcTokenAddress,
-                dstTokenAddress: _dstTokenAddress,
-                srcAmountLD: BigInt(_srcAmountLD),
-                exchangeRateSD: BigInt(_exchangeRateSD)
-              }
+              ...prevState,
+              txHash,
+              srcEid: Number(srcToken.eid),
+              srcChainId: Number(srcToken.chainId),
+              dstEid: _dstEid,
+              dstSellerAddress: _dstSellerAddress,
+              srcTokenAddress: _srcTokenAddress,
+              dstTokenAddress: _dstTokenAddress,
+              srcAmountLD: BigInt(_srcAmountLD),
+              exchangeRateSD: BigInt(_exchangeRateSD),
+            };
           });
-  
+
           setApprovingStatus("success");
           setTransactionStatus("pending");
           setCurrentStep("transaction");
         }
-      } catch(e: any) {
+      } catch (e: any) {
         const error = getContractErrorInfo(e);
-        console.log('Error', error);
+        console.log("Error", error);
         console.error(e.message);
         setApprovingErrorMessage(error.name);
         setApprovingStatus("error");

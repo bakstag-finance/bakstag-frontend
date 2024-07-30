@@ -24,7 +24,9 @@ export default function Home() {
   } = useQuery<Order[]>({
     queryKey: ["home-page-ads", tokenToBuy, tokenToSell, amountToBuy],
     queryFn: async () => {
-      const result =  await axios.get(`/api/orders/get_all?tokenToBuy=${tokenToBuy}&tokenToSell=${tokenToSell}&amountToBuy=${amountToBuy}`);
+      const result = await axios.get(
+        `/api/orders/get_all?tokenToBuy=${tokenToBuy}&tokenToSell=${tokenToSell}&amountToBuy=${amountToBuy}`,
+      );
       return result.data.orders;
     },
   });
@@ -109,15 +111,15 @@ export default function Home() {
           {tableData &&
             tableData?.map((item: any, i: number) => (
               <>
-                <TableItem 
+                <TableItem
                   srcAmountLD={item.srcAmountLD}
                   srcToken={{
                     ticker: item.srcTokenTicker,
-                    network: item.srcTokenNetwork
+                    network: item.srcTokenNetwork,
                   }}
                   dstToken={{
                     ticker: item.dstTokenTicker,
-                    network: item.dstTokenNetwork
+                    network: item.dstTokenNetwork,
                   }}
                   offerId={item.offerId}
                   srcTokenAddress={item.srcTokenAddress}

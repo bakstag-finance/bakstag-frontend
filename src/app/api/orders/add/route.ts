@@ -6,7 +6,19 @@ export const dynamic = "force-dynamic";
 export async function POST(req: Request) {
   try {
     const data = await req.json();
-    const { offerId, dstSellerAddress, dstEid, srcTokenAddress, srcTokenTicker, srcTokenNetwork, dstTokenAddress, dstTokenTicker, dstTokenNetwork, srcAmountLD, exchangeRateSD } = data;
+    const {
+      offerId,
+      dstSellerAddress,
+      dstEid,
+      srcTokenAddress,
+      srcTokenTicker,
+      srcTokenNetwork,
+      dstTokenAddress,
+      dstTokenTicker,
+      dstTokenNetwork,
+      srcAmountLD,
+      exchangeRateSD,
+    } = data;
 
     await prisma.order.create({
       data: {
@@ -16,10 +28,11 @@ export async function POST(req: Request) {
         srcTokenTicker,
         srcTokenNetwork,
         srcTokenAddress,
-        dstTokenTicker, dstTokenNetwork,
+        dstTokenTicker,
+        dstTokenNetwork,
         dstTokenAddress,
         srcAmountLD: BigInt(srcAmountLD),
-        exchangeRateSD: BigInt(exchangeRateSD)
+        exchangeRateSD: BigInt(exchangeRateSD),
       },
     });
 
@@ -34,4 +47,4 @@ export async function POST(req: Request) {
     });
   }
 }
-export async function GET() { }
+export async function GET() {}

@@ -323,7 +323,9 @@ export const AcceptModal = ({}: Props) => {
   return (
     <Dialog open={openModal} onOpenChange={onOpenChangeHandler}>
       <DialogTrigger asChild>
-        <Button className={"bg-white text-black rounded-xl font-extralight"}>Accept</Button>
+        <Button className={"bg-white text-black rounded-xl font-extralight"}>
+          Accept
+        </Button>
       </DialogTrigger>
       <DialogContent className={"w-full max-w-[370px]"}>
         <VisuallyHidden>

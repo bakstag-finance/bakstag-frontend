@@ -381,9 +381,13 @@ export const ConnectModal = () => {
   return (
     <Dialog open={openModal} onOpenChange={onOpenChangeHandler}>
       <DialogTrigger asChild>
-        <Button className={"bg-white text-black w-full rounded-xl font-extralight"}>
+        <Button
+          className={"bg-white text-black w-full rounded-xl font-extralight"}
+        >
           {" "}
-          {isWalletConnected || isSolanaWalletConnected  ? "Connected" : "+ Connect"}
+          {isWalletConnected || isSolanaWalletConnected
+            ? "Connected"
+            : "+ Connect"}
         </Button>
       </DialogTrigger>
       <DialogContent className={"w-full max-w-[370px]"}>

@@ -18,7 +18,9 @@ export async function GET(req: Request) {
     console.log("AMOUNTTOBUY", amountToBuy);
     console.log("TokenToSell", tokenToSell);
 
-    const amountToBuyInSmallestUnit = BigInt(Math.floor(parseFloat(amountToBuy) * 1e18)); 
+    const amountToBuyInSmallestUnit = BigInt(
+      Math.floor(parseFloat(amountToBuy) * 1e18),
+    );
 
     const whereCondition: any = {};
 
@@ -36,12 +38,11 @@ export async function GET(req: Request) {
       where: whereCondition,
     });
 
-    
-    const filteredOrders = result.filter(order => {
+    const filteredOrders = result.filter((order) => {
       return BigInt(order.exchangeRateSD) >= amountToBuyInSmallestUnit;
     });
 
-    const orders = filteredOrders.map(order => ({
+    const orders = filteredOrders.map((order) => ({
       ...order,
       srcAmountLD: order.srcAmountLD.toString(),
       exchangeRateSD: order.exchangeRateSD.toString(),

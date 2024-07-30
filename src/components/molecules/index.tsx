@@ -1,5 +1,3 @@
 import { TableItem } from "./table-item";
 
-export {
-    TableItem
-}
+export { TableItem };
