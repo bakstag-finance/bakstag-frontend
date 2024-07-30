@@ -10,7 +10,7 @@ import {
   DialogTrigger,
   VisuallyHidden,
 } from "@/components/ui";
-import { isValidCryptoAddress, hexZeroPadTo32 } from "@/lib/helpers";
+import { isValidCryptoAddress, hexZeroPadTo32, toSD } from "@/lib/helpers";
 import { useAccount, useSwitchChain } from "wagmi";
 import { tokensData } from "@/lib/constants";
 import { wagmiConfig } from "@/lib/wagmi/config";
@@ -152,6 +152,7 @@ export const CreateModal = () => {
     const {
       abiConfig,
       srcToken,
+      dstToken,
       _srcSellerAddress,
       _dstSellerAddress,
       _dstEid,
@@ -166,25 +167,14 @@ export const CreateModal = () => {
       lzTokenFee: BigInt(0),
     };
     let _value: bigint = BigInt(0);
+    const srcAmountSD = toSD(_srcAmountLD);
+    const dstDecimalConversionRate = BigInt(10 ** (dstToken.decimals - 6));
 
-    if (approvingStatus === "idle" || approvingStatus === "error") {
+  
+    const isOrderAcceptible = srcAmountSD * BigInt(_exchangeRateSD) * dstDecimalConversionRate >= 10 ** 8;
+
+    if (approvingStatus === "idle" || approvingStatus === "error" || isOrderAcceptible) {
       try {
-        const dataForContracts = {
-          abiConfig,
-          srcToken,
-          _srcSellerAddress,
-          _dstSellerAddress,
-          _dstEid,
-          _srcTokenAddress,
-          _dstTokenAddress,
-          _srcAmountLD,
-          _exchangeRateSD,
-          _lzFee,
-          _value,
-        };
-
-        console.log("DataForContracts", dataForContracts);
-
         setApprovingStatus("pending");
         await switchChainAsync({
           chainId: srcToken.chainId!,
@@ -277,7 +267,7 @@ export const CreateModal = () => {
           setTransactionStatus("pending");
           setCurrentStep("transaction");
         }
-      } catch (e: any) {
+      } catch (e: any) { 
         const error = getContractErrorInfo(e);
         console.log("Error", error);
         console.error(e.message);

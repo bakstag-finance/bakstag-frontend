@@ -85,6 +85,7 @@ export const FormStep = ({
             type="number"
             step="0.000001"
             min={0.000001}
+            max={2 ** 64 - 1}
             onChange={(e) => handleNumberChange(e, setSrcTokenAmount)}
           />
         </div>
@@ -111,6 +112,7 @@ export const FormStep = ({
             type="number"
             step="0.000001"
             min={0.000001}
+            max={2 ** 64 - 1}
             onChange={(e) => handleNumberChange(e, setExchangeRate)}
           />
         </div>

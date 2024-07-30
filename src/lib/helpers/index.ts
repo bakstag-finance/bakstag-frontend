@@ -9,9 +9,11 @@ import {
   addressToBytes32,
   hexZeroPadTo32,
   hexZeroPadTo20,
+  toSD,
 } from "./string-converter";
 
 export {
+  toSD,
   addressFormat,
   isEthAddress,
   isSolanaAddress,
