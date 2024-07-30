@@ -29,6 +29,6 @@ export function addressToBytes32(address: `0x${string}`): Uint8Array {
 
 const SHARED_SYSTEM_DECIMAL = 6;
 
-export function toSD (amount: string): bigint {
+export function toSD(amount: string): bigint {
   return parseUnits(amount.toString(), SHARED_SYSTEM_DECIMAL);
 }

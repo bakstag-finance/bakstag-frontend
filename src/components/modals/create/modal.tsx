@@ -170,10 +170,15 @@ export const CreateModal = () => {
     const srcAmountSD = toSD(_srcAmountLD);
     const dstDecimalConversionRate = BigInt(10 ** (dstToken.decimals - 6));
 
-  
-    const isOrderAcceptible = srcAmountSD * BigInt(_exchangeRateSD) * dstDecimalConversionRate >= 10 ** 8;
+    const isOrderAcceptible =
+      srcAmountSD * BigInt(_exchangeRateSD) * dstDecimalConversionRate >=
+      10 ** 8;
 
-    if (approvingStatus === "idle" || approvingStatus === "error" || isOrderAcceptible) {
+    if (
+      approvingStatus === "idle" ||
+      approvingStatus === "error" ||
+      isOrderAcceptible
+    ) {
       try {
         setApprovingStatus("pending");
         await switchChainAsync({
@@ -267,7 +272,7 @@ export const CreateModal = () => {
           setTransactionStatus("pending");
           setCurrentStep("transaction");
         }
-      } catch (e: any) { 
+      } catch (e: any) {
         const error = getContractErrorInfo(e);
         console.log("Error", error);
         console.error(e.message);
