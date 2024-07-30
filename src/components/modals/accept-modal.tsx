@@ -24,7 +24,11 @@ import { cn } from "@/lib/utils";
 
 type ConnectModalStep = "main" | "transaction";
 
-export const AcceptModal = () => {
+interface Props {
+  isMobileButton?: boolean;
+}
+
+export const AcceptModal = ({}: Props) => {
   const [openModal, setOpenModal] = useState(false);
   const [step, setStep] = useState<ConnectModalStep>("main");
 
@@ -319,7 +323,7 @@ export const AcceptModal = () => {
   return (
     <Dialog open={openModal} onOpenChange={onOpenChangeHandler}>
       <DialogTrigger asChild>
-        <Button className={"bg-white text-black rounded-xl"}>Accept</Button>
+        <Button className={"bg-white text-black rounded-xl font-extralight"}>Accept</Button>
       </DialogTrigger>
       <DialogContent className={"w-full max-w-[370px]"}>
         <VisuallyHidden>

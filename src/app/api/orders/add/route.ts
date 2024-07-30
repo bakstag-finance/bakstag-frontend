@@ -6,11 +6,22 @@ export const dynamic = "force-dynamic";
 export async function POST(req: Request) {
   try {
     const data = await req.json();
-    const { somedata } = data;
+    const { offerId, dstSellerAddress, dstEid, srcTokenAddress, srcTokenTicker, srcTokenNetwork, dstTokenAddress, dstTokenTicker, dstTokenNetwork, srcAmountLD, exchangeRateSD } = data;
 
-    // const result = await prisma.order.create({
-    //   data: {},
-    // });
+    await prisma.order.create({
+      data: {
+        offerId,
+        dstSellerAddress,
+        dstEid: parseInt(dstEid),
+        srcTokenTicker,
+        srcTokenNetwork,
+        srcTokenAddress,
+        dstTokenTicker, dstTokenNetwork,
+        dstTokenAddress,
+        srcAmountLD: BigInt(srcAmountLD),
+        exchangeRateSD: BigInt(exchangeRateSD)
+      },
+    });
 
     return NextResponse.json({
       status: 200,
@@ -23,4 +34,4 @@ export async function POST(req: Request) {
     });
   }
 }
-export async function GET() {}
+export async function GET() { }

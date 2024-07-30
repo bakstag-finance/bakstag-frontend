@@ -25,9 +25,18 @@ interface Props {
   srcTokenAmount: number;
   selectedSrcToken: string;
   selectedDstToken: string;
-  txHash: string;
-  srcEid: number;
-  srcChainId: number;
+  transactionData: {
+    txHash: string;
+    srcEid: number;
+    srcChainId: number;
+    offerId: string;
+    dstEid: number;
+    srcTokenAddress: string;
+    dstTokenAddress: string;
+    dstSellerAddress: string;
+    srcAmountLD: bigint;
+    exchangeRateSD: bigint;
+  };
   handleClose: () => void;
   handleRetry: () => void;
   setTransactionStatus: Dispatch<
@@ -40,26 +49,39 @@ const LAYER_ZERO_SCAN = "https://testnet.layerzeroscan.com/tx/";
 export const TransactionStep = ({
   destinationWallet,
   srcAddress,
-  txHash,
-  srcEid,
-  srcChainId,
   exchangeRate,
   srcTokenAmount,
   selectedDstToken,
   selectedSrcToken,
+  transactionData,
   handleClose,
   handleRetry,
   setTransactionStatus,
 }: Props) => {
   const { isLoading, isError, isSuccess } = useQuery({
-    queryKey: ["create-offer", txHash],
+    queryKey: ["create-offer", transactionData.txHash],
     queryFn: async () => {
-      const result = await axios.get(
-        `/api/offer_info?txHash=${txHash}&srcEid=${srcEid}`,
+      await axios.get(
+        `/api/offer_info?txHash=${transactionData.txHash}&srcEid=${transactionData.srcEid}`,
       );
+
       await waitForTransactionReceipt(wagmiConfig, {
-        chainId: srcChainId as any,
-        hash: txHash as any,
+        chainId: transactionData.srcChainId as any,
+        hash: transactionData.txHash as any,
+      });
+
+      await axios.post("/api/orders/add", {
+        offerId: transactionData.offerId,
+        dstSellerAddress: transactionData.dstSellerAddress,
+        dstEid: transactionData.dstEid,
+        srcTokenAddress: transactionData.srcTokenAddress,
+        srcTokenTicker: tokensData[selectedSrcToken].token,
+        srcTokenNetwork: tokensData[selectedSrcToken].network,
+        dstTokenAddress: transactionData.dstTokenAddress,
+        dstTokenTicker: tokensData[selectedDstToken].token,
+        dstTokenNetwork: tokensData[selectedDstToken].network,
+        srcAmountLD: transactionData.srcAmountLD.toString(),
+        exchangeRateSD: transactionData.exchangeRateSD.toString(),
       });
       setTransactionStatus("success");
       return null;
@@ -150,9 +172,12 @@ export const TransactionStep = ({
               "flex flex-row items-center justify-center text-gray-800"
             }
           >
-            {addressFormat(txHash)}
-            <Copy textToCopy={txHash} />
-            <Link href={LAYER_ZERO_SCAN + txHash} target="_blank">
+            {addressFormat(transactionData.txHash)}
+            <Copy textToCopy={transactionData.txHash} />
+            <Link
+              href={LAYER_ZERO_SCAN + transactionData.txHash}
+              target="_blank"
+            >
               <ArrowUpRight
                 className={
                   "w-5 h-5 ml-1 text-gray-700 cursor-pointer hover:text-white"

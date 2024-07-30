@@ -2,11 +2,14 @@
 
 import { useState } from "react";
 import { Button, Input, SelectCoin } from "@/components/ui";
-import { AcceptModal, ConnectModal, CreateModal } from "@/components/modals";
+import { ConnectModal, CreateModal } from "@/components/modals";
 import { useQuery } from "@tanstack/react-query";
 import { Clock10 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { isNumericOrCommaSeparated } from "@/lib/helpers";
+import axios from "axios";
+import { Order } from "@/types/order";
+import { TableItem } from "@/components/molecules";
 
 export default function Home() {
   const [tokenToBuy, setTokenToBuy] = useState("");
@@ -18,15 +21,11 @@ export default function Home() {
     isError,
     isLoading,
     refetch,
-  } = useQuery<any[]>({
-    queryKey: ["home-page-ads"],
-    queryFn: () => {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          const result = Array.from(Array(20));
-          resolve([]);
-        }, 3000);
-      });
+  } = useQuery<Order[]>({
+    queryKey: ["home-page-ads", tokenToBuy, tokenToSell, amountToBuy],
+    queryFn: async () => {
+      const result =  await axios.get(`/api/orders/get_all?tokenToBuy=${tokenToBuy}&tokenToSell=${tokenToSell}&amountToBuy=${amountToBuy}`);
+      return result.data.orders;
     },
   });
 
@@ -108,53 +107,25 @@ export default function Home() {
           {isEmptyAdsList && <EmptyComponent />}
 
           {tableData &&
-            tableData.map((_: any, i: number) => (
+            tableData?.map((item: any, i: number) => (
               <>
-                <div className="lg:hidden w-full" key={`offer-mb-${i}`}>
-                  <div
-                    className={cn(
-                      "flex flex-row items-end justify-center text-white h-32 border-gray-800 px-5 py-3 w-full",
-                      i !== tableData.length && "border-b",
-                    )}
-                  >
-                    <div className="flex w-full h-full flex-col justify-between">
-                      <span className="w-full">0x71...976f</span>
-                      <span className="font-semibold w-full">
-                        0.22 <span className="text-gray-700">SOL</span>
-                      </span>
-                      <div className="flex flex-col w-full">
-                        <span className="text-gray-700">Max Amount:</span>
-                        <span className="w-full">11.865 ETH (Base)</span>
-                      </div>
-                    </div>
-                    <AcceptModal />
-                  </div>
-                </div>
-
-                <div
-                  className="hidden lg:block text-sm w-full"
-                  key={`offer-${i}`}
-                >
-                  <div className="flex justify-around items-center h-20">
-                    <div
-                      className={cn(
-                        "p-5 w-[95%] flex justify-around items-center border-gray-800",
-                        i === tableData.length - 1 ? "" : "border-b",
-                      )}
-                    >
-                      <span className="w-full">0x71...976f</span>
-                      <span className="w-full text-center">
-                        0.22 <span className="text-gray-700">SOL</span>
-                      </span>
-                      <span className="w-full text-center">
-                        11.865 <span className="text-gray-700">ETH (Base)</span>
-                      </span>
-                      <div className="w-full flex justify-end">
-                        <AcceptModal />
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <TableItem 
+                  srcAmountLD={item.srcAmountLD}
+                  srcToken={{
+                    ticker: item.srcTokenTicker,
+                    network: item.srcTokenNetwork
+                  }}
+                  dstToken={{
+                    ticker: item.dstTokenTicker,
+                    network: item.dstTokenNetwork
+                  }}
+                  offerId={item.offerId}
+                  srcTokenAddress={item.srcTokenAddress}
+                  dstTokenAddress={item.dstTokenAddress}
+                  exchangeRateSD={item.exchangeRateSD}
+                  dstSellerAddress={item.dstSellerAddress}
+                  key={`order-id-${i}`}
+                />
               </>
             ))}
         </div>

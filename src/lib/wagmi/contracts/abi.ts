@@ -55,6 +55,11 @@ export const otcMarketAbi = [
     ],
     name: "InvalidPricing",
   },
+  {
+    type: "error",
+    inputs: [{ name: "receiver", internalType: "address", type: "address" }],
+    name: "InvalidReceiver",
+  },
   { type: "error", inputs: [], name: "LzTokenUnavailable" },
   {
     type: "error",
@@ -261,6 +266,19 @@ export const otcMarketAbi = [
     name: "PeerSet",
   },
   {
+    type: "event",
+    anonymous: false,
+    inputs: [
+      {
+        name: "treasury",
+        internalType: "address",
+        type: "address",
+        indexed: false,
+      },
+    ],
+    name: "TreasurySet",
+  },
+  {
     type: "function",
     inputs: [],
     name: "FEE",
@@ -362,7 +380,7 @@ export const otcMarketAbi = [
       },
       { name: "_extraSendOptions", internalType: "bytes", type: "bytes" },
     ],
-    name: "cancelOfferOrder",
+    name: "cancelOffer",
     outputs: [
       {
         name: "msgReceipt",
@@ -791,7 +809,7 @@ export const otcMarketAbi = [
 ] as const;
 
 export const otcMarketAddress =
-  "0x94c0D6607c8deB1d674F768C87b091452e73aB0f" as const;
+  "0x829430b3f5f668BaD750594F18F879687c94c24c" as const;
 
 export const otcMarketConfig = {
   address: otcMarketAddress,
