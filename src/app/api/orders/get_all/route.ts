@@ -14,10 +14,6 @@ export async function GET(req: Request) {
     const amountToBuy = searchParams.get("amountToBuy") || "";
     const tokenToSell = searchParams.get("tokenToSell") || "";
 
-    console.log("TOKENToBUY", tokenToBuy);
-    console.log("AMOUNTTOBUY", amountToBuy);
-    console.log("TokenToSell", tokenToSell);
-
     const amountToBuyInSmallestUnit = BigInt(
       Math.floor(parseFloat(amountToBuy) * 1e18),
     );

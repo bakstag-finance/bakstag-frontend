@@ -29,6 +29,7 @@ import { PhantomWalletName } from "@solana/wallet-adapter-wallets";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { DeletingStep } from "./components/deleting";
+import { CreateModal } from "./create";
 
 type ConnectModalStep = "main" | "wallet-choose";
 
@@ -280,9 +281,9 @@ export const ConnectModal = () => {
                 )}
               </div>
             </div>
-            <Button className="w-full mt-5 hover:text-black">
-              + Create Add
-            </Button>
+            <div className="mt-5">
+            <CreateModal buttonText={"+ Create Add"} />
+            </div>
           </TabsContent>
         </Tabs>
       </>

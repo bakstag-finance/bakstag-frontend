@@ -159,7 +159,7 @@ const ErrorComponent = ({ refetch }: { refetch: () => void }) => {
 const EmptyComponent = () => {
   return (
     <div className="flex justify-center items-center h-full my-full">
-      <CreateModal />
+      <CreateModal buttonText={"Create & Publish Ad"} />
     </div>
   );
 };

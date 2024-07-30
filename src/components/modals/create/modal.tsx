@@ -46,7 +46,11 @@ interface ContractProps {
   _value: bigint;
 }
 
-export const CreateModal = () => {
+interface Props {
+  buttonText: string
+}
+
+export const CreateModal = ({buttonText}: Props) => {
   const [openModal, setOpenModal] = useState(false);
   const [currentStep, setCurrentStep] = useState<CreateModalStep>("main");
 
@@ -338,7 +342,7 @@ export const CreateModal = () => {
   return (
     <Dialog open={openModal} onOpenChange={onOpenChangeHandler}>
       <DialogTrigger asChild>
-        <Button className={"bg-white text-black "}>Create & Publish Ad</Button>
+        <Button className={"bg-white text-black w-full"}>{buttonText}</Button>
       </DialogTrigger>
       <DialogContent className={"w-full max-w-[370px]"}>
         <VisuallyHidden>
