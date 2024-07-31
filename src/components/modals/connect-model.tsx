@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
   Button,
   Dialog,
@@ -30,6 +30,8 @@ import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { DeletingStep } from "./components/deleting";
 import { CreateModal } from "./create";
+import axios from "axios";
+import { TableComponent } from "../connect/table-ads";
 
 type ConnectModalStep = "main" | "wallet-choose";
 
@@ -51,21 +53,6 @@ export const ConnectModal = () => {
 
   const isWalletConnected = !!account.address;
   const isSolanaWalletConnected = !!solanaWallet.publicKey;
-
-  const { writeContract } = useWriteContract();
-
-  const { data: tableData } = useQuery<any[]>({
-    queryKey: ["ads"],
-    queryFn: () => {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          const result = Array.from(Array(20));
-          resolve(result);
-        }, 3000);
-      });
-    },
-  });
-
   useEffect(() => {
     if (
       status === "success" ||
@@ -213,77 +200,7 @@ export const ConnectModal = () => {
             </div>
           </TabsContent>
           <TabsContent value="ads" className="w-full">
-            <div className="w-full flex flex-col">
-              {tableData && tableData.length > 0 && (
-                <div className="w-full flex flex-row justify-between mt-2">
-                  <SelectCoin
-                    placeholder={"Token to buy"}
-                    value={""}
-                    setValue={(s) => {}}
-                  />
-                  <Select>
-                    <SelectTrigger
-                      className="w-full ml-2"
-                      defaultValue={"most"}
-                    >
-                      <SelectValue placeholder="Most Recent" />
-                    </SelectTrigger>
-                    <SelectContent className={"bg-black text-white p-2"}>
-                      <SelectItem value="most">Most Recent</SelectItem>
-                      <SelectItem value="new">Newest</SelectItem>
-                      <SelectItem value="old">Oldest</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-              <div className="mt-5 w-full flex flex-col h-64 overflow-scroll rounded-xl border border-gray-800 p-2">
-                {tableData && tableData.length > 0 ? (
-                  tableData.map((_: any, i: number) => (
-                    <div
-                      className={cn(
-                        "w-full flex flex-row  h-28 px-2 pb-5 pt-2 ",
-                        i !== tableData.length - 1
-                          ? "border-b border-gray-800"
-                          : "",
-                      )}
-                      key={`modal-order-${i}`}
-                    >
-                      <div className="flex flex-col w-full justify-between">
-                        <div className="flex flex-col">
-                          <span className="text-xs text-gray-700">
-                            Exchange Range
-                          </span>
-                          <span>22.154 SOL (SOL) </span>
-                        </div>
-                        <div className="flex flex-col mt-5">
-                          <span className="text-xs text-gray-700">
-                            Avaliable Amount
-                          </span>
-                          <span>200 ETH (BASE) </span>
-                        </div>
-                      </div>
-                      <div className="flex justify-center items-end w-10">
-                        <Trash
-                          className="cursor-pointer"
-                          onClick={() => setIsDeletingStep(true)}
-                        />
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="w-full h-full flex flex-col justify-center items-center text-sm">
-                    <Ghost className="w-20 h-28 stroke-[0.25]" />
-                    <span>No Ads Yet</span>
-                    <span className="text-gray-700 text-xs">
-                      create & start advertising
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-            <div className="mt-5">
-              <CreateModal buttonText={"+ Create Add"} />
-            </div>
+            <TableComponent setIsDeletingStep={setIsDeletingStep} />
           </TabsContent>
         </Tabs>
       </>

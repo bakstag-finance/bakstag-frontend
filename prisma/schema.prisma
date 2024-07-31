@@ -8,9 +8,10 @@ datasource db {
 }
 
 model Order {
-   id               Int      @id @default(autoincrement())
+  id               Int      @id @default(autoincrement())
   offerId String  
-   dstSellerAddress String   
+  srcSellerAddress String?
+  dstSellerAddress String   
   dstEid           Int      
   srcTokenAddress  String   
   srcTokenTicker   String

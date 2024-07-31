@@ -1,4 +1,5 @@
 import { tokensData } from "@/lib/constants";
+import { hexZeroPadTo32 } from "@/lib/helpers";
 import { prisma } from "@/lib/prisma/prisma";
 import { NextResponse } from "next/server";
 
@@ -13,12 +14,16 @@ export async function GET(req: Request) {
     const tokenToBuy = searchParams.get("tokenToBuy") || "";
     const amountToBuy = searchParams.get("amountToBuy") || "";
     const tokenToSell = searchParams.get("tokenToSell") || "";
+    const srcAddress = searchParams.get("address") || "";
 
     const amountToBuyInSmallestUnit = BigInt(
       Math.floor(parseFloat(amountToBuy) * 1e18),
     );
-
     const whereCondition: any = {};
+
+    if (srcAddress && srcAddress.length > 0) {
+      whereCondition.srcSellerAddress = hexZeroPadTo32(srcAddress as any);
+    }
 
     if (tokenToBuy && tokensData[tokenToBuy]) {
       whereCondition.dstTokenTicker = tokensData[tokenToBuy].token;
