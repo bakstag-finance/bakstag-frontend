@@ -36,7 +36,7 @@ export default function Home() {
     isEmptyAdsList || isLoading || isError ? "h-[425px]" : "flex-grow";
 
   return (
-    <main className="flex h-screen flex-col items-center bg-black text-white">
+    <main className="flex h-dvh flex-col items-center bg-black text-white">
       <div className="w-full max-w-[748px] h-full py-5 px-5 lg:px-0 flex flex-col">
         <div className="flex w-full lg:h-20 justify-between items-center lg:mb-0">
           <div className="flex flex-col-reverse lg:flex-row w-full justify-between">

@@ -6,6 +6,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogOverlay,
   DialogTitle,
   DialogTrigger,
   VisuallyHidden,
@@ -344,24 +345,27 @@ export const CreateModal = ({ buttonText }: Props) => {
       <DialogTrigger asChild>
         <Button className={"bg-white text-black w-full"}>{buttonText}</Button>
       </DialogTrigger>
-      <DialogContent className={"w-full max-w-[370px]"}>
-        <VisuallyHidden>
-          <DialogTitle></DialogTitle>
-        </VisuallyHidden>
-        <VisuallyHidden>
-          <DialogDescription></DialogDescription>
-        </VisuallyHidden>
-        <div
-          className={"w-full flex justify-center items-center flex-col pt-5"}
-        >
-          {renderStepContent()}
-          <span className={"text-gray-700 text-xs mt-5 text-justify"}>
-            Assets will be locked. After the transaction is successfully
-            completed, the assets will be automatically sent to the destination
-            wallet address you provided. Verify all details before confirming.
-          </span>
-        </div>
-      </DialogContent>
+      <DialogOverlay>
+        <DialogContent className={"w-full max-w-[370px]"}>
+          <VisuallyHidden>
+            <DialogTitle></DialogTitle>
+          </VisuallyHidden>
+          <VisuallyHidden>
+            <DialogDescription></DialogDescription>
+          </VisuallyHidden>
+          <div
+            className={"w-full flex justify-center items-center flex-col pt-5"}
+          >
+            {renderStepContent()}
+            <span className={"text-gray-700 text-xs mt-3 text-justify"}>
+              Assets will be locked. After the transaction is successfully
+              completed, the assets will be automatically sent to the
+              destination wallet address you provided. Verify all details before
+              confirming.
+            </span>
+          </div>
+        </DialogContent>
+      </DialogOverlay>
     </Dialog>
   );
 };

@@ -63,6 +63,8 @@ export const FormStep = ({
     return "Sign & Transact";
   };
 
+  const totalReceiveAmount = +srcTokenAmount * +exchangeRate * 0.99;
+
   return (
     <div className={"max-w-[320px] w-full flex flex-col text-white"}>
       <div className={"flex flex-row justify-between items-center text-xs"}>
@@ -119,7 +121,7 @@ export const FormStep = ({
       </div>
       <div className={"w-full flex flex-col mt-5"}>
         <span className={"text-xs text-gray-700"}>
-          Destination Wallet Address | ETH (BASE)
+          Destination Wallet Address
         </span>
         <Input
           className={"mt-2 bg-black border rounded-lg border-gray-800"}
@@ -207,7 +209,7 @@ export const FormStep = ({
           <span>Total Receive amount</span>
           {srcTokenAmount > 0 ? (
             <span>
-              {+srcTokenAmount * +exchangeRate}{" "}
+              {totalReceiveAmount.toFixed(4)}{" "}
               <span className={"ml-2"}>
                 {tokensData[selectedDstToken]?.token}{" "}
                 <span className="text-gray-700">

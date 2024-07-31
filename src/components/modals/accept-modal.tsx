@@ -84,7 +84,7 @@ export const AcceptModal = ({}: Props) => {
           </div>
         </div>
         <div
-          className={"flex flex-row justify-between items-center mt-5 text-xs"}
+          className={"flex flex-row justify-between items-center mt-3 text-xs"}
         >
           <div className={"flex flex-col justify-between items-start h-full"}>
             <span className={"text-gray-700 h-full"}>Token to Recieve</span>
@@ -107,7 +107,7 @@ export const AcceptModal = ({}: Props) => {
             />
           </div>
         </div>
-        <div className={"w-full flex flex-col mt-5"}>
+        <div className={"w-full flex flex-col mt-3"}>
           <span className={"text-xs text-gray-700"}>
             Destination Wallet Address | ETH (BASE)
           </span>
@@ -123,7 +123,7 @@ export const AcceptModal = ({}: Props) => {
             required
           />
         </div>
-        <div className={"w-full flex flex-col text-xs mt-5"}>
+        <div className={"w-full flex flex-col text-xs mt-3"}>
           <div
             className={"w-full flex flex-row justify-between items-center my-2"}
           >
@@ -312,6 +312,7 @@ export const AcceptModal = ({}: Props) => {
   const walletStepRender = () => {
     return steps[step];
   };
+
   const onOpenChangeHandler = (_open: boolean) => {
     if (!_open) {
       setStep("main");
@@ -338,7 +339,7 @@ export const AcceptModal = ({}: Props) => {
           className={"w-full flex justify-center items-center flex-col pt-5"}
         >
           {walletStepRender()}
-          <span className={"text-gray-700 text-xs mt-5 text-justify"}>
+          <span className={"text-gray-700 text-xs mt-3 text-justify"}>
             The advertiser&apos;s assets are locked. After the transaction is
             successfully completed, the assets will be automatically sent to the
             destination wallet address you provided. Verify all details before
