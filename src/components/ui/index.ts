@@ -29,6 +29,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "./tabs";
 import { VisuallyHidden } from "./visually-hidden";
 import { Copy } from "./copy";
 import { SelectCoin } from "./select-coin";
+import { Skeleton } from "./skeleton";
 
 import {
   Table,
@@ -81,4 +82,5 @@ export {
   TableRow,
   TableCell,
   TableCaption,
+  Skeleton,
 };

@@ -1,4 +1,4 @@
-import { Button, Copy, Input, SelectCoin } from "@/components/ui";
+import { Button, Copy, Input, SelectCoin, Skeleton } from "@/components/ui";
 import { tokensData } from "@/lib/constants";
 import {
   addressFormat,
@@ -58,8 +58,13 @@ export const FormStep = ({
     setter(value);
   };
 
-  const totalReceiveAmount =
+  const _totalReceiveAmount =
     Number(srcTokenAmount) * Number(exchangeRate) * 0.99;
+  const totalReceiveAmount = new Intl.NumberFormat("ru-RU", {
+    style: "decimal",
+    minimumFractionDigits: 14,
+    maximumFractionDigits: 14,
+  }).format(_totalReceiveAmount);
 
   const isCorrectSrcTokenAmount =
     isValidTokenAmount(srcTokenAmount) && !isValueOutOfBounds(srcTokenAmount);
@@ -146,7 +151,12 @@ export const FormStep = ({
           Destination Wallet Address
         </span>
         <Input
-          className={"mt-2 bg-black border rounded-lg border-gray-800"}
+          className={cn(
+            "mt-2 bg-black border rounded-lg border-gray-800",
+            isValidDestinationWallet
+              ? "border-gray-800"
+              : "border-red-700  focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1",
+          )}
           value={destinationWallet}
           onChange={(e) => setDestinationWallet(e.target.value)}
         />
@@ -176,11 +186,13 @@ export const FormStep = ({
           className={"w-full flex flex-row justify-between items-center my-2"}
         >
           <span>to Wallet</span>
-          {destinationWallet.length > 8 && (
+          {destinationWallet.length > 8 ? (
             <div className={"flex flex-row  items-center text-gray-800"}>
               {addressFormat(destinationWallet)}
               <Copy textToCopy={destinationWallet} />
             </div>
+          ) : (
+            <Skeleton className="w-16 h-4" />
           )}
         </div>
         <div
@@ -216,7 +228,7 @@ export const FormStep = ({
               </span>
             </span>
           ) : (
-            <span className={"text--gray-700"}>Set Exchange Rate</span>
+            <span className={"text-gray-700"}>Set Exchange Rate</span>
           )}
         </div>
         <div
@@ -229,18 +241,22 @@ export const FormStep = ({
           className={"w-full flex flex-row justify-between items-center my-2"}
         >
           <span>Total Receive amount</span>
-          {Number(srcTokenAmount) > 0 ? (
-            <span>
-              {totalReceiveAmount.toFixed(4)}{" "}
-              <span className={"ml-2"}>
-                {tokensData[selectedDstToken]?.token}{" "}
-                <span className="text-gray-700">
-                  ({tokensData[selectedDstToken]?.network})
+          {selectedDstToken !== "" ? (
+            Number(srcTokenAmount) > 0 ? (
+              <span>
+                {totalReceiveAmount}{" "}
+                <span className={"ml-2"}>
+                  {tokensData[selectedDstToken]?.token}{" "}
+                  <span className="text-gray-700">
+                    ({tokensData[selectedDstToken]?.network})
+                  </span>
                 </span>
               </span>
-            </span>
+            ) : (
+              <span className={"text-gray-700"}>Set Exchange Rate</span>
+            )
           ) : (
-            <span className={"text-gray-700"}>Set Exchange Rate</span>
+            <Skeleton className="w-16 h-4" />
           )}
         </div>
       </div>
