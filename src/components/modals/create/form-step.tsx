@@ -1,6 +1,11 @@
 import { Button, Copy, Input, SelectCoin } from "@/components/ui";
 import { tokensData } from "@/lib/constants";
-import { addressFormat } from "@/lib/helpers";
+import {
+  addressFormat,
+  isValidTokenAmount,
+  isValueOutOfBounds,
+} from "@/lib/helpers";
+import { cn } from "@/lib/utils";
 import { ApprovingStatus } from "@/types/contracts";
 import { ChangeEvent, Dispatch, SetStateAction } from "react";
 
@@ -9,22 +14,22 @@ interface FormStepProps {
   setSelectedSrcToken: Dispatch<SetStateAction<string>>;
   selectedDstToken: string;
   setSelectedDstToken: Dispatch<SetStateAction<string>>;
-  srcTokenAmount: number;
-  setSrcTokenAmount: Dispatch<SetStateAction<number>>;
-  exchangeRate: number;
-  setExchangeRate: Dispatch<SetStateAction<number>>;
+  srcTokenAmount: string;
+  setSrcTokenAmount: Dispatch<SetStateAction<string>>;
+  exchangeRate: string;
+  setExchangeRate: Dispatch<SetStateAction<string>>;
   destinationWallet: string;
   setDestinationWallet: Dispatch<SetStateAction<string>>;
   srcAddress: `0x${string}` | undefined;
   isWalletConnected: boolean;
-  isFormValid: boolean;
   approvingStatus: ApprovingStatus;
   approvingErrorMessage: string;
+  isValidDestinationWallet: boolean;
+  isValidTokenAmount: boolean;
+  isValidExchangeRate: boolean;
   handleCreateSwap: () => void;
   handleClose: () => void;
 }
-
-const inputNumberRegex = /^\d+(\.\d{0,6})?$/;
 
 export const FormStep = ({
   selectedSrcToken,
@@ -39,31 +44,44 @@ export const FormStep = ({
   setDestinationWallet,
   srcAddress,
   isWalletConnected,
-  isFormValid,
+  isValidDestinationWallet,
   handleCreateSwap,
   handleClose,
   approvingStatus,
   approvingErrorMessage,
 }: FormStepProps) => {
-  const handleNumberChange = (
+  const handleInputChange = (
     e: ChangeEvent<HTMLInputElement>,
-    setter: (value: number) => void,
+    setter: (value: string) => void,
   ) => {
     const value = e.target.value;
-    if (value === "" || inputNumberRegex.test(value)) {
-      setter(Number(value));
-    }
+    setter(value);
   };
+
+  const totalReceiveAmount =
+    Number(srcTokenAmount) * Number(exchangeRate) * 0.99;
+
+  const isCorrectSrcTokenAmount =
+    isValidTokenAmount(srcTokenAmount) && !isValueOutOfBounds(srcTokenAmount);
+  const isCorrectExchangeRate =
+    isValidTokenAmount(exchangeRate) && !isValueOutOfBounds(exchangeRate);
 
   const getButtonText = () => {
     if (!isWalletConnected) return "+ Connect Wallet";
-    if (!isFormValid) return "Add Destination Wallet Address";
+    if (!isValidDestinationWallet) return "Add Destination Wallet Address";
+    if (!isCorrectSrcTokenAmount) return "Incorrect token amount";
+    if (!isCorrectExchangeRate) return "Incorrect exchange amount";
     if (approvingStatus === "pending") return "Pending Approval";
     if (approvingStatus === "error") return approvingErrorMessage;
     return "Sign & Transact";
   };
 
-  const totalReceiveAmount = +srcTokenAmount * +exchangeRate * 0.99;
+  const buttonDisabled =
+    !isWalletConnected ||
+    !isValidDestinationWallet ||
+    !isCorrectExchangeRate ||
+    !isCorrectSrcTokenAmount ||
+    approvingStatus === "pending";
 
   return (
     <div className={"max-w-[320px] w-full flex flex-col text-white"}>
@@ -82,13 +100,15 @@ export const FormStep = ({
         >
           <span className={"text-gray-700"}>Amount</span>
           <Input
-            className={"mt-2 bg-black border rounded-lg border-gray-800"}
+            className={cn(
+              "mt-2 bg-black border rounded-lg border-gray-800",
+              !isCorrectSrcTokenAmount &&
+                "border-red-700  focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1",
+            )}
             value={srcTokenAmount}
-            type="number"
-            step="0.000001"
-            min={0.000001}
-            max={2 ** 64 - 1}
-            onChange={(e) => handleNumberChange(e, setSrcTokenAmount)}
+            type="text"
+            placeholder="0.0"
+            onChange={(e) => handleInputChange(e, setSrcTokenAmount)}
           />
         </div>
       </div>
@@ -109,13 +129,15 @@ export const FormStep = ({
         >
           <span className={" text-gray-700"}>Set Exchange Rate</span>
           <Input
-            className={"mt-2 bg-black border rounded-lg border-gray-800"}
+            className={cn(
+              "mt-2 bg-black border rounded-lg border-gray-800",
+              !isCorrectExchangeRate &&
+                "border-red-700  focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1",
+            )}
             value={exchangeRate}
-            type="number"
-            step="0.000001"
-            min={0.000001}
-            max={2 ** 64 - 1}
-            onChange={(e) => handleNumberChange(e, setExchangeRate)}
+            type="text"
+            placeholder="0.0"
+            onChange={(e) => handleInputChange(e, setExchangeRate)}
           />
         </div>
       </div>
@@ -135,7 +157,7 @@ export const FormStep = ({
         >
           <span>Locked Amount</span>
           <span>
-            {exchangeRate > 0 && selectedSrcToken.length > 1 ? (
+            {Number(exchangeRate) > 0 && selectedSrcToken.length > 1 ? (
               <span>
                 {exchangeRate}{" "}
                 <span>
@@ -178,7 +200,7 @@ export const FormStep = ({
           className={"w-full flex flex-row justify-between items-center my-2"}
         >
           <span>Exchange Rate</span>
-          {exchangeRate > 0 && selectedSrcToken.length > 0 ? (
+          {Number(exchangeRate) > 0 && selectedSrcToken.length > 0 ? (
             <span>
               {exchangeRate}{" "}
               <span>
@@ -207,7 +229,7 @@ export const FormStep = ({
           className={"w-full flex flex-row justify-between items-center my-2"}
         >
           <span>Total Receive amount</span>
-          {srcTokenAmount > 0 ? (
+          {Number(srcTokenAmount) > 0 ? (
             <span>
               {totalReceiveAmount.toFixed(4)}{" "}
               <span className={"ml-2"}>
@@ -224,9 +246,7 @@ export const FormStep = ({
       </div>
       <Button
         className={"w-full mt-5"}
-        disabled={
-          !isWalletConnected || !isFormValid || approvingStatus === "pending"
-        }
+        disabled={buttonDisabled}
         onClick={handleCreateSwap}
         variant={
           (approvingStatus === "pending" && "secondary") ||

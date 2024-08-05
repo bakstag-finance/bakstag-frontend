@@ -11,7 +11,12 @@ import {
   DialogTrigger,
   VisuallyHidden,
 } from "@/components/ui";
-import { isValidCryptoAddress, hexZeroPadTo32, toSD } from "@/lib/helpers";
+import {
+  isValidCryptoAddress,
+  hexZeroPadTo32,
+  toSD,
+  isValueOutOfBounds,
+} from "@/lib/helpers";
 import { useAccount, useSwitchChain } from "wagmi";
 import { tokensData } from "@/lib/constants";
 import { wagmiConfig } from "@/lib/wagmi/config";
@@ -57,10 +62,10 @@ export const CreateModal = ({ buttonText }: Props) => {
 
   // State of form
   const [selectedDstToken, setSelectedDstToken] = useState("");
-  const [exchangeRate, setExchangeRate] = useState(0.000001);
+  const [exchangeRate, setExchangeRate] = useState("0.000001");
 
   const [selectedSrcToken, setSelectedSrcToken] = useState("");
-  const [srcTokenAmount, setSrcTokenAmount] = useState(0.000001);
+  const [srcTokenAmount, setSrcTokenAmount] = useState("0.000001");
 
   const [destinationWallet, setDestinationWallet] = useState("");
 
@@ -93,10 +98,10 @@ export const CreateModal = ({ buttonText }: Props) => {
     "idle" | "pending" | "success"
   >("idle");
 
-  const isFormValid =
-    isValidCryptoAddress(destinationWallet) &&
-    srcTokenAmount > 0 &&
-    exchangeRate > 0;
+  const isValidDestinationWallet = isValidCryptoAddress(destinationWallet);
+
+  const isValidTokenAmount = !isValueOutOfBounds(srcTokenAmount);
+  const isValidExchangeRate = !isValueOutOfBounds(exchangeRate);
 
   const handleClose = () => {
     setOpenModal(false);
@@ -107,8 +112,8 @@ export const CreateModal = ({ buttonText }: Props) => {
   const handleResetState = () => {
     handleRetry();
     setSelectedSrcToken("");
-    setSrcTokenAmount(0.000001);
-    setExchangeRate(0.000001);
+    setSrcTokenAmount("0.000001");
+    setExchangeRate("0.000001");
     setSelectedDstToken("");
     setDestinationWallet("");
   };
@@ -304,7 +309,9 @@ export const CreateModal = ({ buttonText }: Props) => {
         setSelectedSrcToken={setSelectedSrcToken}
         setSelectedDstToken={setSelectedDstToken}
         isWalletConnected={isWalletConnected}
-        isFormValid={isFormValid}
+        isValidDestinationWallet={isValidDestinationWallet}
+        isValidTokenAmount={isValidTokenAmount}
+        isValidExchangeRate={isValidExchangeRate}
         approvingStatus={approvingStatus}
         approvingErrorMessage={approvingErrorMessage}
       />

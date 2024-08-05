@@ -1,8 +1,5 @@
 import { NextResponse } from "next/server";
-import {
-  createClient,
-  waitForMessageReceived,
-} from "@layerzerolabs/scan-client";
+import { waitForMessageReceived } from "@layerzerolabs/scan-client";
 
 const MessageStatus = {
   INFLIGHT: "INFLIGHT",

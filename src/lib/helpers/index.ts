@@ -4,7 +4,11 @@ import {
   isSolanaAddress,
   isValidCryptoAddress,
 } from "./address-validation";
-import { isNumericOrCommaSeparated } from "./input-validation";
+import {
+  isNumericOrCommaSeparated,
+  isValidTokenAmount,
+  isValueOutOfBounds,
+} from "./input-validation";
 import {
   addressToBytes32,
   hexZeroPadTo32,
@@ -21,5 +25,7 @@ export {
   hexZeroPadTo32,
   hexZeroPadTo20,
   isValidCryptoAddress,
+  isValidTokenAmount,
+  isValueOutOfBounds,
   isNumericOrCommaSeparated,
 };

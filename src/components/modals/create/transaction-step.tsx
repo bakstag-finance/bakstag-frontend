@@ -21,8 +21,8 @@ import { Dispatch, SetStateAction } from "react";
 interface Props {
   destinationWallet: string;
   srcAddress: `0x${string}` | undefined;
-  exchangeRate: number;
-  srcTokenAmount: number;
+  exchangeRate: string;
+  srcTokenAmount: string;
   selectedSrcToken: string;
   selectedDstToken: string;
   transactionData: {

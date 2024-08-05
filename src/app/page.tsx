@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { Button, Input, SelectCoin } from "@/components/ui";
 import { ConnectModal, CreateModal } from "@/components/modals";
 import { useQuery } from "@tanstack/react-query";
 import { Clock10 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { isNumericOrCommaSeparated } from "@/lib/helpers";
+import { isValidTokenAmount } from "@/lib/helpers";
 import axios from "axios";
 import { Order } from "@/types/order";
 import { TableItem } from "@/components/molecules";
@@ -14,7 +14,7 @@ import { TableItem } from "@/components/molecules";
 export default function Home() {
   const [tokenToBuy, setTokenToBuy] = useState("");
   const [tokenToSell, setTokenToSell] = useState("");
-  const [amountToBuy, setAmountToBuy] = useState("0");
+  const [amountToBuy, setAmountToBuy] = useState("0.0");
 
   const {
     data: tableData,
@@ -34,6 +34,12 @@ export default function Home() {
   const isEmptyAdsList = tableData && tableData.length === 0;
   const heightOfTable =
     isEmptyAdsList || isLoading || isError ? "h-[425px]" : "flex-grow";
+
+  const inputChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    setAmountToBuy(value);
+  };
 
   return (
     <main className="flex h-dvh flex-col items-center bg-black text-white">
@@ -59,12 +65,13 @@ export default function Home() {
               <Input
                 className={cn(
                   "bg-black border rounded-lg ",
-                  isNumericOrCommaSeparated(amountToBuy)
+                  isValidTokenAmount(amountToBuy)
                     ? "border-gray-800"
                     : "border-red-200  focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1",
                 )}
                 value={amountToBuy}
-                onChange={(e) => setAmountToBuy(e.target.value)}
+                onChange={inputChangeHandler}
+                placeholder="0.0"
                 required
               />
             </div>

@@ -1,14 +1,15 @@
-import { Ghost, Trash } from "lucide-react";
+import { Clock10, Ghost, Trash } from "lucide-react";
 import { CreateModal } from "../modals";
-import { cn } from "@/lib/utils";
 import {
+  Button,
+  SelectCoin,
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@radix-ui/react-select";
-import { SelectCoin } from "../ui";
+} from "../ui";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Dispatch, SetStateAction, useState } from "react";
@@ -23,7 +24,12 @@ export const TableComponent = ({ setIsDeletingStep }: Props) => {
   const { address } = useAccount();
   const [tokenToBuy, setTokenToBuy] = useState("");
 
-  const { data: tableData } = useQuery<any[]>({
+  const {
+    data: tableData,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery<any[]>({
     queryKey: ["table-ads", tokenToBuy, address],
     queryFn: async () => {
       const result = await axios.get(
@@ -44,19 +50,27 @@ export const TableComponent = ({ setIsDeletingStep }: Props) => {
               setValue={(value) => setTokenToBuy(value)}
             />
             <Select>
-              <SelectTrigger className="w-full ml-2" defaultValue={"most"}>
-                <SelectValue placeholder="Most Recent" />
+              <SelectTrigger className="w-full ml-2 border rounded-md">
+                <SelectValue placeholder={"Most Recent"} />
               </SelectTrigger>
-              <SelectContent className={"bg-black text-white p-2"}>
-                <SelectItem value="most">Most Recent</SelectItem>
-                <SelectItem value="new">Newest</SelectItem>
-                <SelectItem value="old">Oldest</SelectItem>
+              <SelectContent
+                className={
+                  "bg-black text-white p-2 hover:border-gray-800 focus:border-gray-800"
+                }
+                defaultValue={"most"}
+              >
+                <SelectGroup>
+                  <SelectItem value="most">Most Recent</SelectItem>
+                  <SelectItem value="new">Newest</SelectItem>
+                  <SelectItem value="old">Oldest</SelectItem>
+                </SelectGroup>
               </SelectContent>
             </Select>
           </div>
         )}
         <div className="mt-5 w-full flex flex-col h-64 overflow-scroll rounded-xl border border-gray-800 p-2">
-          {tableData && tableData.length > 0 ? (
+          {tableData &&
+            tableData.length > 0 &&
             tableData.map((item: any, i: number) => {
               const formatedSrcAmount = formatUnits(
                 BigInt(item.srcAmountLD),
@@ -108,14 +122,30 @@ export const TableComponent = ({ setIsDeletingStep }: Props) => {
                   </div>
                 </div>
               );
-            })
-          ) : (
+            })}
+          {tableData && tableData.length === 0 && (
+            <div className="w-full h-full flex flex-col justify-center items-center text-sm">
+              <Button variant="secondary">
+                <Clock10 className="w-5 h-5 mr-2" /> Fetching Ads
+              </Button>
+            </div>
+          )}
+
+          {isLoading && (
             <div className="w-full h-full flex flex-col justify-center items-center text-sm">
               <Ghost className="w-20 h-28 stroke-[0.25]" />
               <span>No Ads Yet</span>
               <span className="text-gray-700 text-xs">
                 create & start advertising
               </span>
+            </div>
+          )}
+
+          {isError && (
+            <div className="w-full h-full flex flex-col justify-center items-center text-sm">
+              <Button variant="destructive" onClick={() => refetch()}>
+                Fetching Failed (Retry)
+              </Button>
             </div>
           )}
         </div>
