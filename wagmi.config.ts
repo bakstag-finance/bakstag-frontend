@@ -2,7 +2,7 @@ import { defineConfig } from "@wagmi/cli";
 import { blockExplorer, react } from "@wagmi/cli/plugins";
 
 export default defineConfig({
-  out: "src/generated.ts",
+  out: "src/lib/wagmi/contracts/abi.ts",
   contracts: [],
   plugins: [
     blockExplorer({
@@ -10,7 +10,7 @@ export default defineConfig({
       contracts: [
         {
           name: "OtcMarket",
-          address: "0x829430b3f5f668BaD750594F18F879687c94c24c",
+          address: "0x25BC5fb512Fd3BDbd53420D258AA6f84DA723700",
         },
       ],
       getAddress({ address }) {

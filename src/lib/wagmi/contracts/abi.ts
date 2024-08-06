@@ -516,7 +516,7 @@ export const otcMarketAbi = [
   {
     type: "function",
     inputs: [
-      { name: "_advertiser", internalType: "bytes32", type: "bytes32" },
+      { name: "_srcSellerAddress", internalType: "bytes32", type: "bytes32" },
       { name: "_srcEid", internalType: "uint32", type: "uint32" },
       { name: "_dstEid", internalType: "uint32", type: "uint32" },
       { name: "_srcTokenAddress", internalType: "bytes32", type: "bytes32" },
@@ -809,7 +809,7 @@ export const otcMarketAbi = [
 ] as const;
 
 export const otcMarketAddress =
-  "0x829430b3f5f668BaD750594F18F879687c94c24c" as const;
+  "0x25BC5fb512Fd3BDbd53420D258AA6f84DA723700" as const;
 
 export const otcMarketConfig = {
   address: otcMarketAddress,
