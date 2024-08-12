@@ -9,7 +9,7 @@ datasource db {
 
 model Order {
   id               Int      @id @default(autoincrement())
-  offerId String  
+  offerId String  @unique
   srcSellerAddress String?
   dstSellerAddress String   
   dstEid           Int      

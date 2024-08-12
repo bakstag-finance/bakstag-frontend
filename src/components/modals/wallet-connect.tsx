@@ -276,7 +276,7 @@ export const WalletConnect = () => {
       <DialogTrigger asChild>
         <Button className={"bg-white text-black w-full rounded-xl"}>
           {" "}
-          + Connect Sol(Sol) Wallet
+          + Connect Wallet
         </Button>
       </DialogTrigger>
       <DialogContent className={"w-full max-w-[370px]"}>

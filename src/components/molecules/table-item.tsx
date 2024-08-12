@@ -1,35 +1,20 @@
 import { cn } from "@/lib/utils";
 import { AcceptModal } from "../modals";
-import { addressFormat } from "@/lib/helpers";
+import { addressFormat, getTokenField } from "@/lib/helpers";
 import { formatUnits } from "viem";
+import { OrderProps } from "@/types/order";
 
-interface Props {
-  srcToken: {
-    ticker: string;
-    network: string;
-  };
-  dstToken: {
-    ticker: string;
-    network: string;
-  };
-  dstSellerAddress: string;
-  offerId: string;
-  srcTokenAddress: string;
-  dstTokenAddress: string;
-  srcAmountLD: string;
-  exchangeRateSD: string;
-}
-
-export const TableItem = ({
-  srcToken,
-  dstToken,
-  dstSellerAddress,
-  srcAmountLD,
-  exchangeRateSD,
-}: Props) => {
+export const TableItem = (order: OrderProps) => {
+  const { dstSellerAddress, srcAmountLD, exchangeRateSD, srcToken, dstToken} = order
   const formatedAddress = addressFormat(dstSellerAddress);
-  const formatedSrcAmount = formatUnits(BigInt(srcAmountLD), 18);
-  const formatedDstAmount = formatUnits(BigInt(exchangeRateSD), 18);
+
+  const srcTokenDecimals = getTokenField(srcToken.ticker, srcToken.network, "decimals");
+  const dstTokenDecimals = getTokenField(dstToken.ticker, dstToken.network, "decimals");
+
+  const formatedSrcAmount = formatUnits(BigInt(srcAmountLD), srcTokenDecimals);
+  const formatedDstAmount = formatUnits(BigInt(exchangeRateSD), dstTokenDecimals);
+
+ 
   return (
     <>
       <div className="lg:hidden w-full">
@@ -56,7 +41,7 @@ export const TableItem = ({
               </span>
             </div>
           </div>
-          <AcceptModal />
+          <AcceptModal  order={order}/>
         </div>
       </div>
 
@@ -79,7 +64,7 @@ export const TableItem = ({
               </span>
             </span>
             <div className="w-full flex justify-end">
-              <AcceptModal />
+              <AcceptModal order={order}/>
             </div>
           </div>
         </div>

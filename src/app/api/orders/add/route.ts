@@ -20,6 +20,19 @@ export async function POST(req: Request) {
       exchangeRateSD,
     } = data;
 
+    const _prev = await prisma.order.findFirst({
+      where: {
+        offerId: offerId
+      }
+    });
+
+    if(_prev) {
+      return NextResponse.json({
+        status: 200,
+        objects: [],
+      })
+    }
+
     await prisma.order.create({
       data: {
         offerId,

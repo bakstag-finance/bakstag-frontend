@@ -10,6 +10,10 @@ export function hexZeroPadTo20(addr: `0x${string}`): `0x${string}` {
   return ethers.utils.hexZeroPad(addr, 40) as `0x${string}`;
 }
 
+export function hexStripsAddr(addr: `0x${string}`): `0x${string}` {
+  return ethers.utils.hexStripZeros(addr) as `0x${string}`;
+}
+
 export function trim0x(str: string): string {
   return str.replace(/^0x/, "");
 }

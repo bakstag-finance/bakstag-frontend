@@ -6,8 +6,9 @@ import {
   isValueOutOfBounds,
 } from "@/lib/helpers";
 import { cn } from "@/lib/utils";
-import { Dispatch, SetStateAction } from "react";
+import { ChangeEvent, Dispatch, SetStateAction } from "react";
 import { WalletConnect } from "../wallet-connect";
+import { OrderProps } from "@/types/order";
 
 interface Props {
   approvingStatus: string;
@@ -15,14 +16,16 @@ interface Props {
   isWalletConnected: boolean;
   srcTokenAmount: string;
   setSrcTokenAmount: Dispatch<SetStateAction<string>>;
-  exchangeRate: string;
-  setExchangeRate: Dispatch<SetStateAction<string>>;
+  dstTokenAmount: string;
+  setDstTokenAmount: Dispatch<SetStateAction<string>>;
   destinationWallet: string;
   setDestinationWallet: Dispatch<SetStateAction<string>>;
   srcWalletAddress: string;
   isValidDestinationWallet: boolean;
   closeModalHandler: () => void;
   submitHandler: () => void;
+  order: OrderProps;
+  handleInputChange: (e: ChangeEvent<HTMLInputElement>, inputValue: "src" | "dst") => void;
 }
 
 export const FormStep = ({
@@ -30,20 +33,23 @@ export const FormStep = ({
   isWalletConnected,
   approvingErrorMessage,
   srcTokenAmount,
-  setSrcTokenAmount,
-  exchangeRate,
-  setExchangeRate,
+  dstTokenAmount,
+  setDstTokenAmount,
   srcWalletAddress,
   destinationWallet,
   setDestinationWallet,
   isValidDestinationWallet,
   closeModalHandler,
   submitHandler,
+  order,
+  handleInputChange
 }: Props) => {
+
+  const {srcToken, dstToken} = order;
   const isCorrectSrcTokenAmount =
     isValidTokenAmount(srcTokenAmount) && !isValueOutOfBounds(srcTokenAmount);
   const isCorrectExchangeRate =
-    isValidTokenAmount(exchangeRate) && !isValueOutOfBounds(exchangeRate);
+    isValidTokenAmount(dstTokenAmount) && !isValueOutOfBounds(dstTokenAmount);
 
   const getButtonText = () => {
     if (!isWalletConnected) return "+ Connect Wallet";
@@ -61,7 +67,7 @@ export const FormStep = ({
         <div className={"flex flex-col justify-between items-start h-full"}>
           <span className={"text-gray-700 h-full"}>You Pay</span>
           <span className={"h-full"}>
-            SOL <span className={"text-gray-700"}>(SOL)</span>
+            {srcToken.ticker} <span className={"text-gray-700"}> ({srcToken.network})</span>
           </span>
         </div>
         <div className={"flex flex-col justify-between items-start"}>
@@ -75,7 +81,7 @@ export const FormStep = ({
             value={srcTokenAmount}
             type="text"
             placeholder="0.0"
-            onChange={(e) => setSrcTokenAmount(e.target.value)}
+            onChange={(e) => handleInputChange(e, "src")}
           />
         </div>
       </div>
@@ -85,7 +91,7 @@ export const FormStep = ({
         <div className={"flex flex-col justify-between items-start h-full"}>
           <span className={"text-gray-700 h-full"}>Token to Recieve</span>
           <span className={"h-full"}>
-            ETH <span className={"text-gray-700"}>(BASE)</span>
+            {dstToken.ticker} <span className={"text-gray-700"}> ({dstToken.network})</span>
           </span>
         </div>
         <div className={"flex flex-col justify-between items-start h-full"}>
@@ -96,16 +102,16 @@ export const FormStep = ({
               !isCorrectExchangeRate &&
                 "border-red-700  focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1",
             )}
-            value={exchangeRate}
+            value={dstTokenAmount}
             type="text"
             placeholder="0.0"
-            onChange={(e) => setExchangeRate(e.target.value)}
+            onChange={(e) => handleInputChange(e, "dst")}
           />
         </div>
       </div>
       <div className={"w-full flex flex-col mt-3"}>
         <span className={"text-xs text-gray-700"}>
-          Destination Wallet Address | ETH (BASE)
+          Destination Wallet Address
         </span>
         <Input
           className={cn(
@@ -125,8 +131,8 @@ export const FormStep = ({
         >
           <span>Amount to pay</span>
           <span>
-            214.5 SOL
-            <span className={"text-gray-700"}>(SOL)</span>
+            {srcTokenAmount} {srcToken.ticker}
+            <span className={"text-gray-700"}> ({srcToken.network})</span>
           </span>
         </div>
         <div
@@ -160,8 +166,8 @@ export const FormStep = ({
         >
           <span>Amount to recieve</span>
           <span>
-            10 ETH
-            <span className={"text-gray-700"}>(BASE)</span>
+            {dstTokenAmount} {dstToken.ticker}
+            <span className={"text-gray-700"}> ({dstToken.network})</span>
           </span>
         </div>
         <div
@@ -169,8 +175,8 @@ export const FormStep = ({
         >
           <span>Exchange Rate</span>
           <span>
-            22.154 <span className={"text-gray-700"}>SOL</span> = 1
-            <span className={"text-gray-700"}>(ETH)</span>
+            {dstTokenAmount} <span className={"text-gray-700"}>{dstToken.ticker}</span> = {srcTokenAmount}
+            <span className={"text-gray-700"}> ({srcToken.ticker})</span>
           </span>
         </div>
       </div>
@@ -178,6 +184,11 @@ export const FormStep = ({
         <Button
           className={"w-full mt-5"}
           disabled={!isValidDestinationWallet}
+          variant={
+            (approvingStatus === "pending" && "secondary") ||
+            (approvingStatus === "error" && "destructive") ||
+            "default"
+          }
           onClick={submitHandler}
         >
           {getButtonText()}

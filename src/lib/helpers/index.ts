@@ -14,7 +14,9 @@ import {
   hexZeroPadTo32,
   hexZeroPadTo20,
   toSD,
+  hexStripsAddr
 } from "./string-converter";
+import { getTokenField } from "./token-info";
 
 export {
   toSD,
@@ -28,4 +30,6 @@ export {
   isValidTokenAmount,
   isValueOutOfBounds,
   isNumericOrCommaSeparated,
+  getTokenField,
+  hexStripsAddr
 };

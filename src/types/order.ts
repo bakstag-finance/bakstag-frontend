@@ -12,6 +12,23 @@ export interface Order {
   exchangeRateSD: bigint;
 }
 
+export interface OrderProps {
+  srcToken: {
+    ticker: string;
+    network: string;
+  };
+  dstToken: {
+    ticker: string;
+    network: string;
+  };
+  dstSellerAddress: string;
+  offerId: string;
+  srcTokenAddress: string;
+  dstTokenAddress: string;
+  srcAmountLD: string;
+  exchangeRateSD: string;
+}
+
 export interface APIOrder {
   status: 200;
   objects: Order[];
