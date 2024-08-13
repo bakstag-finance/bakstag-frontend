@@ -21,7 +21,12 @@ import { useAccount, useSwitchChain } from "wagmi";
 import { tokensData } from "@/lib/constants";
 import { wagmiConfig } from "@/lib/wagmi/config";
 import { parseUnits } from "viem";
-import { readContract, ReadContractErrorType, writeContract, WriteContractErrorType } from "@wagmi/core";
+import {
+  readContract,
+  ReadContractErrorType,
+  writeContract,
+  WriteContractErrorType,
+} from "@wagmi/core";
 import { ethers } from "ethers";
 import { erc20Abi } from "viem";
 import { TransactionStep } from "./transaction-step";
@@ -31,7 +36,6 @@ import { otcMarketConfig } from "@/lib/wagmi/contracts/abi";
 import { TokenData } from "@/lib/constants/tokens";
 
 type CreateModalStep = "main" | "transaction";
-
 
 interface ContractProps {
   abiConfig: typeof otcMarketConfig;
@@ -71,6 +75,7 @@ export const CreateModal = ({ buttonText }: Props) => {
     srcChainId: 0,
     offerId: "",
     dstEid: 0,
+    srcSellerAddress: "",
     dstSellerAddress: "",
     srcTokenAddress: "",
     dstTokenAddress: "",
@@ -130,10 +135,7 @@ export const CreateModal = ({ buttonText }: Props) => {
       srcTokenAmount.toString(),
       srcToken.decimals,
     ).toString();
-    const _exchangeRateSD = parseUnits(
-      exchangeRate.toString(),
-      6,
-    ).toString();
+    const _exchangeRateSD = parseUnits(exchangeRate.toString(), 6).toString();
 
     return {
       srcToken,
@@ -154,7 +156,6 @@ export const CreateModal = ({ buttonText }: Props) => {
       return null;
     }
     try {
-
       const {
         abiConfig,
         srcToken,
@@ -167,89 +168,38 @@ export const CreateModal = ({ buttonText }: Props) => {
         _srcAmountLD,
         _exchangeRateSD,
       } = prepareDataForContracts();
-  
+
       let _lzFee: LzFee = {
         nativeFee: BigInt(0),
         lzTokenFee: BigInt(0),
       };
-  
+
       let _value: bigint = BigInt(0);
       const srcAmountSD = toSD(_srcAmountLD);
       const dstDecimalConversionRate = BigInt(10 ** (dstToken.decimals - 6));
-  
+
       const isOrderAcceptible =
         srcAmountSD * BigInt(_exchangeRateSD) * dstDecimalConversionRate >=
         10 ** 8;
-  
+
       if (
         approvingStatus === "idle" ||
         approvingStatus === "error" ||
         isOrderAcceptible
       ) {
-          setApprovingStatus("pending");
-          await switchChainAsync({
-            chainId: srcToken.chainId!,
-          });
-  
-          const [lzFee, { offerId, srcAmountLD }] = await readContract(
-            wagmiConfig,
-            {
-              abi: abiConfig.abi,
-              address: abiConfig.address,
-              functionName: "quoteCreateOffer",
-              args: [
-                _srcSellerAddress,
-                JSON.parse(
-                  JSON.stringify({
-                    dstSellerAddress: _dstSellerAddress,
-                    dstEid: _dstEid,
-                    srcTokenAddress: _srcTokenAddress,
-                    dstTokenAddress: _dstTokenAddress,
-                    srcAmountLD: _srcAmountLD,
-                    exchangeRateSD: _exchangeRateSD,
-                  }),
-                ),
-                false,
-              ],
-              chainId: srcToken.chainId as any,
-            },
-          ).catch(e => {
-            const error = e as ReadContractErrorType;
-            console.log(error);
-            throw new Error(error.name);
-          });
-  
-          _lzFee = lzFee;
-          _value =
-            srcToken.tokenAddress == ethers.constants.AddressZero
-              ? _lzFee.nativeFee + srcAmountLD
-              : _lzFee.nativeFee;
-  
-          if (srcToken.tokenAddress != ethers.constants.AddressZero) {
-            await writeContract(wagmiConfig, {
-              abi: erc20Abi,
-              address: srcToken.tokenAddress,
-              functionName: "approve",
-              args: [abiConfig.address, srcAmountLD],
-              chainId: srcToken.chainId,
-            }).catch(e => {
-              const error = e as WriteContractErrorType;
-              console.log(error);
-              throw new Error(error.name);
-            });
-          }
-  
-          setInfoForTransactionStep((prevState) => {
-            return {
-              ...prevState,
-              offerId: offerId,
-            };
-          });
-          const txHash = await writeContract(wagmiConfig, {
+        setApprovingStatus("pending");
+        await switchChainAsync({
+          chainId: srcToken.chainId!,
+        });
+
+        const [lzFee, { offerId, srcAmountLD }] = await readContract(
+          wagmiConfig,
+          {
             abi: abiConfig.abi,
             address: abiConfig.address,
-            functionName: "createOffer",
+            functionName: "quoteCreateOffer",
             args: [
+              _srcSellerAddress,
               JSON.parse(
                 JSON.stringify({
                   dstSellerAddress: _dstSellerAddress,
@@ -260,36 +210,90 @@ export const CreateModal = ({ buttonText }: Props) => {
                   exchangeRateSD: _exchangeRateSD,
                 }),
               ),
-              _lzFee as any,
+              false,
             ],
-            value: _value,
+            chainId: srcToken.chainId as any,
+          },
+        ).catch((e) => {
+          const error = e as ReadContractErrorType;
+          console.log(error);
+          throw new Error(error.name);
+        });
+
+        _lzFee = lzFee;
+        _value =
+          srcToken.tokenAddress == ethers.constants.AddressZero
+            ? _lzFee.nativeFee + srcAmountLD
+            : _lzFee.nativeFee;
+
+        if (srcToken.tokenAddress != ethers.constants.AddressZero) {
+          await writeContract(wagmiConfig, {
+            abi: erc20Abi,
+            address: srcToken.tokenAddress,
+            functionName: "approve",
+            args: [abiConfig.address, srcAmountLD],
             chainId: srcToken.chainId,
-          }).catch(e => {
+          }).catch((e) => {
             const error = e as WriteContractErrorType;
             console.log(error);
             throw new Error(error.name);
           });
-  
-          if (txHash) {
-            setInfoForTransactionStep((prevState) => {
-              return {
-                ...prevState,
-                txHash,
-                srcEid: Number(srcToken.eid),
-                srcChainId: Number(srcToken.chainId),
-                dstEid: _dstEid,
+        }
+
+        setInfoForTransactionStep((prevState) => {
+          return {
+            ...prevState,
+            offerId: offerId,
+          };
+        });
+
+        console.log("OfferId", offerId);
+        const txHash = await writeContract(wagmiConfig, {
+          abi: abiConfig.abi,
+          address: abiConfig.address,
+          functionName: "createOffer",
+          args: [
+            JSON.parse(
+              JSON.stringify({
                 dstSellerAddress: _dstSellerAddress,
+                dstEid: _dstEid,
                 srcTokenAddress: _srcTokenAddress,
                 dstTokenAddress: _dstTokenAddress,
-                srcAmountLD: BigInt(_srcAmountLD),
-                exchangeRateSD: BigInt(_exchangeRateSD),
-              };
-            });
-  
-            setApprovingStatus("success");
-            setTransactionStatus("pending");
-            setCurrentStep("transaction");
-          }
+                srcAmountLD: _srcAmountLD,
+                exchangeRateSD: _exchangeRateSD,
+              }),
+            ),
+            _lzFee as any,
+          ],
+          value: _value,
+          chainId: srcToken.chainId,
+        }).catch((e) => {
+          const error = e as WriteContractErrorType;
+          console.log(error);
+          throw new Error(error.name);
+        });
+
+        if (txHash) {
+          setInfoForTransactionStep((prevState) => {
+            return {
+              ...prevState,
+              txHash,
+              srcEid: Number(srcToken.eid),
+              srcChainId: Number(srcToken.chainId),
+              dstEid: _dstEid,
+              srcSellerAddress: _srcSellerAddress,
+              dstSellerAddress: _dstSellerAddress,
+              srcTokenAddress: _srcTokenAddress,
+              dstTokenAddress: _dstTokenAddress,
+              srcAmountLD: BigInt(_srcAmountLD),
+              exchangeRateSD: BigInt(_exchangeRateSD),
+            };
+          });
+
+          setApprovingStatus("success");
+          setTransactionStatus("pending");
+          setCurrentStep("transaction");
+        }
       }
     } catch (e: any) {
       setApprovingErrorMessage(e.message);

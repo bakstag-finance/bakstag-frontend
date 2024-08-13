@@ -31,6 +31,7 @@ interface Props {
     srcChainId: number;
     offerId: string;
     dstEid: number;
+    srcSellerAddress: string;
     srcTokenAddress: string;
     dstTokenAddress: string;
     dstSellerAddress: string;
@@ -72,6 +73,7 @@ export const TransactionStep = ({
 
       await axios.post("/api/orders/add", {
         offerId: transactionData.offerId,
+        srcSellerAddress: transactionData.srcSellerAddress,
         dstSellerAddress: transactionData.dstSellerAddress,
         dstEid: transactionData.dstEid,
         srcTokenAddress: transactionData.srcTokenAddress,
