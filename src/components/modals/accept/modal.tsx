@@ -36,9 +36,10 @@ type ConnectModalStep = "main" | "transaction";
 
 interface Props {
   order: OrderProps;
+  refetch: () => void;
 }
 
-export const AcceptModal = ({ order }: Props) => {
+export const AcceptModal = ({ order, refetch }: Props) => {
   const [openModal, setOpenModal] = useState(false);
   const [step, setStep] = useState<ConnectModalStep>("main");
 
@@ -244,7 +245,8 @@ export const AcceptModal = ({ order }: Props) => {
           ],
           value: _value,
           chainId: _dstTokenChainId,
-        }).catch((e) => {
+        })
+        .catch((e) => {
           const error = e as WriteContractErrorType;
           console.log("Error", e);
           throw new Error(error.name);
@@ -390,6 +392,7 @@ export const AcceptModal = ({ order }: Props) => {
           handleClose={handleClose}
           setTransactionStatus={setTransactionStatus}
           transactionData={infoForTransactionStep}
+          refetch={refetch}
         />
       ),
     };

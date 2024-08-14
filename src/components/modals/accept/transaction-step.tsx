@@ -44,6 +44,7 @@ interface Props {
   setTransactionStatus: Dispatch<
     SetStateAction<"idle" | "pending" | "success">
   >;
+  refetch: () => void;
 }
 
 export const TransactionStep = ({
@@ -53,6 +54,7 @@ export const TransactionStep = ({
   handleRetry,
   handleClose,
   setTransactionStatus,
+  refetch
 }: Props) => {
   const { srcToken, srcTokenAmount } = transactionData;
 
@@ -74,6 +76,7 @@ export const TransactionStep = ({
       });
 
       setTransactionStatus("success");
+      await refetch();
       return null;
     },
   });

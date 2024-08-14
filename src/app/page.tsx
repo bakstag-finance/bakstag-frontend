@@ -113,26 +113,29 @@ export default function Home() {
 
           {isError && <ErrorComponent refetch={refetch} />}
 
-          {isEmptyAdsList && <EmptyComponent />}
+          {isEmptyAdsList && <EmptyComponent refetch={refetch} />}
 
           {tableData &&
             tableData?.map((item: any, i: number) => (
               <>
                 <TableItem
-                  srcAmountLD={item.srcAmountLD}
-                  srcToken={{
-                    ticker: item.srcTokenTicker,
-                    network: item.srcTokenNetwork,
+                  refetch={refetch}
+                  order={{
+                    srcAmountLD: item.srcAmountLD,
+                    srcToken: {
+                      ticker: item.srcTokenTicker,
+                      network: item.srcTokenNetwork,
+                    },
+                    dstToken: {
+                      ticker: item.dstTokenTicker,
+                      network: item.dstTokenNetwork,
+                    },
+                    offerId: item.offerId,
+                    srcTokenAddress: item.srcTokenAddress,
+                    dstTokenAddress: item.dstTokenAddress,
+                    exchangeRateSD: item.exchangeRateSD,
+                    dstSellerAddress: item.dstSellerAddress,
                   }}
-                  dstToken={{
-                    ticker: item.dstTokenTicker,
-                    network: item.dstTokenNetwork,
-                  }}
-                  offerId={item.offerId}
-                  srcTokenAddress={item.srcTokenAddress}
-                  dstTokenAddress={item.dstTokenAddress}
-                  exchangeRateSD={item.exchangeRateSD}
-                  dstSellerAddress={item.dstSellerAddress}
                   key={`order-id-${i}`}
                 />
               </>
@@ -163,10 +166,10 @@ const ErrorComponent = ({ refetch }: { refetch: () => void }) => {
   );
 };
 
-const EmptyComponent = () => {
+const EmptyComponent = ({ refetch }: { refetch: () => void }) => {
   return (
     <div className="flex justify-center items-center h-full my-full">
-      <CreateModal buttonText={"Create & Publish Ad"} />
+      <CreateModal buttonText={"Create & Publish Ad"} refetch={refetch} />
     </div>
   );
 };

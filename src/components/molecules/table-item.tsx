@@ -4,7 +4,11 @@ import { addressFormat, getTokenField } from "@/lib/helpers";
 import { formatUnits } from "viem";
 import { OrderProps } from "@/types/order";
 
-export const TableItem = (order: OrderProps) => {
+interface Props {
+  order: OrderProps;
+  refetch: () => void;
+}
+export const TableItem = ({order, refetch}: Props) => {
   const { dstSellerAddress, srcAmountLD, exchangeRateSD, srcToken, dstToken } =
     order;
   const formatedAddress = addressFormat(dstSellerAddress);
@@ -52,7 +56,7 @@ export const TableItem = (order: OrderProps) => {
               </span>
             </div>
           </div>
-          <AcceptModal order={order} />
+          <AcceptModal order={order} refetch={refetch}/>
         </div>
       </div>
 
@@ -75,7 +79,7 @@ export const TableItem = (order: OrderProps) => {
               </span>
             </span>
             <div className="w-full flex justify-end">
-              <AcceptModal order={order} />
+              <AcceptModal order={order}  refetch={refetch}/>
             </div>
           </div>
         </div>

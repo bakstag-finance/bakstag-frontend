@@ -43,6 +43,7 @@ interface Props {
   setTransactionStatus: Dispatch<
     SetStateAction<"idle" | "pending" | "success">
   >;
+  refetch: () => void;
 }
 
 const LAYER_ZERO_SCAN = "https://testnet.layerzeroscan.com/tx/";
@@ -58,6 +59,7 @@ export const TransactionStep = ({
   handleClose,
   handleRetry,
   setTransactionStatus,
+  refetch
 }: Props) => {
   const { isLoading, isError, isSuccess } = useQuery({
     queryKey: ["create-offer", transactionData.txHash],
@@ -86,6 +88,9 @@ export const TransactionStep = ({
         exchangeRateSD: transactionData.exchangeRateSD.toString(),
       });
       setTransactionStatus("success");
+
+      await refetch();
+      
       return null;
     },
   });

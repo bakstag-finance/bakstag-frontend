@@ -151,7 +151,7 @@ export const TableComponent = ({ setIsDeletingStep }: Props) => {
         </div>
       </div>
       <div className="mt-5">
-        <CreateModal buttonText={"+ Create Add"} />
+        <CreateModal buttonText={"+ Create Add"} refetch={refetch} />
       </div>
     </>
   );

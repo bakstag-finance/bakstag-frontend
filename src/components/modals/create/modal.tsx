@@ -53,9 +53,10 @@ interface ContractProps {
 
 interface Props {
   buttonText: string;
+  refetch: () => void;
 }
 
-export const CreateModal = ({ buttonText }: Props) => {
+export const CreateModal = ({ buttonText, refetch }: Props) => {
   const [openModal, setOpenModal] = useState(false);
   const [currentStep, setCurrentStep] = useState<CreateModalStep>("main");
 
@@ -337,6 +338,7 @@ export const CreateModal = ({ buttonText }: Props) => {
         selectedDstToken={selectedDstToken}
         handleClose={handleClose}
         setTransactionStatus={setTransactionStatus}
+        refetch={refetch}
       />
     ),
   };
