@@ -14,7 +14,7 @@ import {
   hexZeroPadTo32,
   hexZeroPadTo20,
   toSD,
-  hexStripsAddr
+  hexStripsAddr,
 } from "./string-converter";
 import { getTokenField } from "./token-info";
 
@@ -31,5 +31,5 @@ export {
   isValueOutOfBounds,
   isNumericOrCommaSeparated,
   getTokenField,
-  hexStripsAddr
+  hexStripsAddr,
 };

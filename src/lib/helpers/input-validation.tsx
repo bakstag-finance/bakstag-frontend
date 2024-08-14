@@ -4,8 +4,17 @@ export const isNumericOrCommaSeparated = (input: string): boolean => {
 };
 
 export const isValidTokenAmount = (input: string): boolean => {
-  const floatRegex = /^-?\d*(\.\d+)?$/;
-  return floatRegex.test(input);
+  const floatRegex = /^(0|[1-9]\d*)?(\.\d*)?$/;
+  if (!floatRegex.test(input)) {
+    return false;
+  }
+
+  const decimalPart = input.split(".")[1];
+  if (decimalPart && decimalPart.length > 6) {
+    return false;
+  }
+
+  return true;
 };
 
 export const isValueOutOfBounds = (
