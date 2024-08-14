@@ -22,20 +22,21 @@ export async function POST(req: Request) {
 
     const _prev = await prisma.order.findFirst({
       where: {
-        offerId: offerId
-      }
+        offerId: offerId,
+      },
     });
 
-    if(_prev) {
+    if (_prev) {
       return NextResponse.json({
         status: 200,
         objects: [],
-      })
+      });
     }
 
     await prisma.order.create({
       data: {
         offerId,
+        srcSellerAddress: "",
         dstSellerAddress,
         dstEid: parseInt(dstEid),
         srcTokenTicker,

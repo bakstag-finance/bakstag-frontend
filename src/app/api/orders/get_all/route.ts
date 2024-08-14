@@ -39,9 +39,6 @@ export async function GET(req: Request) {
       where: whereCondition,
     });
 
-    console.log("whereCondition", whereCondition)
-    console.log("result", result);
-    
     const filteredOrders = result.filter((order) => {
       return BigInt(order.exchangeRateSD) >= amountToBuyInSmallestUnit;
     });
@@ -52,7 +49,6 @@ export async function GET(req: Request) {
       exchangeRateSD: order.exchangeRateSD.toString(),
     }));
 
-    console.log("Orders", orders)
     return NextResponse.json({
       status: 200,
       orders,
