@@ -123,7 +123,7 @@ export const TableComponent = ({ setIsDeletingStep }: Props) => {
                 </div>
               );
             })}
-          {tableData && tableData.length === 0 && (
+          {isLoading && (
             <div className="w-full h-full flex flex-col justify-center items-center text-sm">
               <Button variant="secondary">
                 <Clock10 className="w-5 h-5 mr-2" /> Fetching Ads
@@ -131,7 +131,7 @@ export const TableComponent = ({ setIsDeletingStep }: Props) => {
             </div>
           )}
 
-          {isLoading && (
+          {tableData && tableData.length === 0 && (
             <div className="w-full h-full flex flex-col justify-center items-center text-sm">
               <Ghost className="w-20 h-28 stroke-[0.25]" />
               <span>No Ads Yet</span>

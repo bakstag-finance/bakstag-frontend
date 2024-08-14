@@ -5,16 +5,27 @@ import { formatUnits } from "viem";
 import { OrderProps } from "@/types/order";
 
 export const TableItem = (order: OrderProps) => {
-  const { dstSellerAddress, srcAmountLD, exchangeRateSD, srcToken, dstToken} = order
+  const { dstSellerAddress, srcAmountLD, exchangeRateSD, srcToken, dstToken } =
+    order;
   const formatedAddress = addressFormat(dstSellerAddress);
 
-  const srcTokenDecimals = getTokenField(srcToken.ticker, srcToken.network, "decimals");
-  const dstTokenDecimals = getTokenField(dstToken.ticker, dstToken.network, "decimals");
+  const srcTokenDecimals = getTokenField(
+    srcToken.ticker,
+    srcToken.network,
+    "decimals",
+  );
+  const dstTokenDecimals = getTokenField(
+    dstToken.ticker,
+    dstToken.network,
+    "decimals",
+  );
 
   const formatedSrcAmount = formatUnits(BigInt(srcAmountLD), srcTokenDecimals);
-  const formatedDstAmount = formatUnits(BigInt(exchangeRateSD), dstTokenDecimals);
+  const formatedDstAmount = formatUnits(
+    BigInt(exchangeRateSD),
+    dstTokenDecimals,
+  );
 
- 
   return (
     <>
       <div className="lg:hidden w-full">
@@ -41,7 +52,7 @@ export const TableItem = (order: OrderProps) => {
               </span>
             </div>
           </div>
-          <AcceptModal  order={order}/>
+          <AcceptModal order={order} />
         </div>
       </div>
 
@@ -64,7 +75,7 @@ export const TableItem = (order: OrderProps) => {
               </span>
             </span>
             <div className="w-full flex justify-end">
-              <AcceptModal order={order}/>
+              <AcceptModal order={order} />
             </div>
           </div>
         </div>

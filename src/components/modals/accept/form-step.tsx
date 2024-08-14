@@ -3,7 +3,6 @@ import {
   addressFormat,
   isValidCryptoAddress,
   isValidTokenAmount,
-  isValueOutOfBounds,
 } from "@/lib/helpers";
 import { cn } from "@/lib/utils";
 import { ChangeEvent, Dispatch, SetStateAction } from "react";
@@ -25,7 +24,7 @@ interface Props {
   closeModalHandler: () => void;
   submitHandler: () => void;
   order: OrderProps;
-  handleInputChange: (e: ChangeEvent<HTMLInputElement>, inputValue: "src" | "dst") => void;
+  handleInputChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const FormStep = ({
@@ -34,7 +33,6 @@ export const FormStep = ({
   approvingErrorMessage,
   srcTokenAmount,
   dstTokenAmount,
-  setDstTokenAmount,
   srcWalletAddress,
   destinationWallet,
   setDestinationWallet,
@@ -42,20 +40,15 @@ export const FormStep = ({
   closeModalHandler,
   submitHandler,
   order,
-  handleInputChange
+  handleInputChange,
 }: Props) => {
-
-  const {srcToken, dstToken} = order;
-  const isCorrectSrcTokenAmount =
-    isValidTokenAmount(srcTokenAmount) && !isValueOutOfBounds(srcTokenAmount);
-  const isCorrectExchangeRate =
-    isValidTokenAmount(dstTokenAmount) && !isValueOutOfBounds(dstTokenAmount);
+  const { srcToken, dstToken } = order;
+  const isCorrectSrcTokenAmount = isValidTokenAmount(srcTokenAmount);
+  const isCorrectExchangeRate = isValidTokenAmount(dstTokenAmount);
 
   const getButtonText = () => {
     if (!isWalletConnected) return "+ Connect Wallet";
     if (!isValidDestinationWallet) return "Add Destination Wallet Address";
-    if (!isCorrectSrcTokenAmount) return "Incorrect token amount";
-    if (!isCorrectExchangeRate) return "Incorrect exchange amount";
     if (approvingStatus === "pending") return "Pending Approval";
     if (approvingStatus === "error") return approvingErrorMessage;
     return "Sign & Transact";
@@ -67,7 +60,8 @@ export const FormStep = ({
         <div className={"flex flex-col justify-between items-start h-full"}>
           <span className={"text-gray-700 h-full"}>You Pay</span>
           <span className={"h-full"}>
-            {srcToken.ticker} <span className={"text-gray-700"}> ({srcToken.network})</span>
+            {srcToken.ticker}{" "}
+            <span className={"text-gray-700"}> ({srcToken.network})</span>
           </span>
         </div>
         <div className={"flex flex-col justify-between items-start"}>
@@ -81,7 +75,7 @@ export const FormStep = ({
             value={srcTokenAmount}
             type="text"
             placeholder="0.0"
-            onChange={(e) => handleInputChange(e, "src")}
+            disabled
           />
         </div>
       </div>
@@ -91,7 +85,8 @@ export const FormStep = ({
         <div className={"flex flex-col justify-between items-start h-full"}>
           <span className={"text-gray-700 h-full"}>Token to Recieve</span>
           <span className={"h-full"}>
-            {dstToken.ticker} <span className={"text-gray-700"}> ({dstToken.network})</span>
+            {dstToken.ticker}{" "}
+            <span className={"text-gray-700"}> ({dstToken.network})</span>
           </span>
         </div>
         <div className={"flex flex-col justify-between items-start h-full"}>
@@ -105,7 +100,7 @@ export const FormStep = ({
             value={dstTokenAmount}
             type="text"
             placeholder="0.0"
-            onChange={(e) => handleInputChange(e, "dst")}
+            onChange={(e) => handleInputChange(e)}
           />
         </div>
       </div>
@@ -175,7 +170,9 @@ export const FormStep = ({
         >
           <span>Exchange Rate</span>
           <span>
-            {dstTokenAmount} <span className={"text-gray-700"}>{dstToken.ticker}</span> = {srcTokenAmount}
+            {dstTokenAmount}{" "}
+            <span className={"text-gray-700"}>{dstToken.ticker}</span> ={" "}
+            {srcTokenAmount}
             <span className={"text-gray-700"}> ({srcToken.ticker})</span>
           </span>
         </div>

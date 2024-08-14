@@ -9,7 +9,6 @@ import {
   DialogTitle,
   DialogTrigger,
   VisuallyHidden,
-  Copy,
 } from "@/components/ui";
 import {
   getTokenField,
@@ -23,9 +22,10 @@ import { FormStep } from "./form-step";
 import { TransactionStep } from "./transaction-step";
 import { ApprovingStatus, LzFee } from "@/types/contracts";
 import { OrderProps } from "@/types/order";
-import { erc20Abi, parseUnits, formatUnits } from "viem";
+import { erc20Abi, formatUnits, parseUnits } from "viem";
 import {
   readContract,
+  ReadContractErrorType,
   writeContract,
   type WriteContractErrorType,
 } from "@wagmi/core";
@@ -44,6 +44,7 @@ export const AcceptModal = ({ order }: Props) => {
 
   const [srcTokenAmount, setSrcTokenAmount] = useState("0.000001");
   const [dstTokenAmount, setDstTokenAmount] = useState("0.000001");
+
   const [destinationWallet, setDestinationWallet] = useState(
     "0xe3458913A876f6599d44F7830Ae7347537Ac407a",
   );
@@ -58,6 +59,32 @@ export const AcceptModal = ({ order }: Props) => {
   const [approvingStatus, setApprovingStatus] =
     useState<ApprovingStatus>("idle");
   const [approvingErrorMessage, setApprovingErrorMessage] = useState("");
+
+  // State of transaction proccess
+  const [transactionStatus, setTransactionStatus] = useState<
+    "idle" | "pending" | "success"
+  >("idle");
+
+  // State for transaction step
+  const [infoForTransactionStep, setInfoForTransactionStep] = useState({
+    txHash: "",
+    offerId: "",
+    srcChainId: undefined,
+    srcEid: "",
+    srcTokenAddress: "",
+    dstTokenAddress: "",
+    srcTokenAmount: "",
+    exchangeRate: "",
+    srcAmountLD: "",
+    srcToken: {
+      ticker: "",
+      network: "",
+    },
+    dstToken: {
+      ticker: "",
+      network: "",
+    },
+  });
 
   const closeModalHandler = () => {
     setOpenModal(false);
@@ -77,7 +104,7 @@ export const AcceptModal = ({ order }: Props) => {
       srcAmountLD,
     } = order;
 
-    const abiConfig = getTokenField(
+    const _abiConfig = getTokenField(
       srcToken.ticker,
       srcToken.network,
       "otcConfig",
@@ -88,296 +115,294 @@ export const AcceptModal = ({ order }: Props) => {
       dstToken.network,
       "chainId",
     );
+
     const _srcTokenChainId = getTokenField(
       srcToken.ticker,
       srcToken.network,
       "chainId",
     );
 
+    const _dstEid = getTokenField(dstToken.ticker, dstToken.network, "eid");
+
     const _srcTokenAddress = hexZeroPadTo32(srcTokenAddress as any);
     const _dstTokenAddress = hexZeroPadTo32(dstTokenAddress as any);
 
-    const srcTokenDecimals = getTokenField(
+    const _srcTokenDecimals = getTokenField(
       srcToken.ticker,
       srcToken.network,
       "decimals",
     );
-    const dstTokenDecimals = getTokenField(
+    const _dstTokenDecimals = getTokenField(
       dstToken.ticker,
       dstToken.network,
       "decimals",
     );
 
-    const _srcAmountSD = parseUnits(
-      formatUnits(BigInt(srcAmountLD), srcTokenDecimals),
+    const _srcAmountSD = parseUnits(dstTokenAmount, 6).toString();
+    const _srcAmountLD = parseUnits(
+      formatUnits(BigInt(srcAmountLD), _srcTokenDecimals),
       6,
     ).toString();
 
     const _offerId = offerId;
     return {
-      abiConfig,
+      _abiConfig,
       _srcTokenAddress,
       _dstTokenAddress,
       _srcAmountSD,
       _dstTokenChainId,
-      _srcTokenChainId,
-      dstTokenDecimals,
-      srcTokenDecimals,
+      _dstTokenDecimals,
+      _srcTokenDecimals,
       _offerId,
+      _dstEid,
+      _srcTokenChainId,
+      _srcAmountLD,
     };
   };
 
   const submitHandler = async () => {
-    // try {
-    if (!isWalletConnected || approvingStatus === "success") {
-      return null;
-    }
+    try {
+      if (!isWalletConnected || approvingStatus === "success") {
+        return null;
+      }
 
-    const {
-      abiConfig,
-      _offerId,
-      _srcTokenAddress,
-      _dstTokenAddress,
-      _srcAmountSD,
-      _srcTokenChainId,
-      _dstTokenChainId,
-    } = prepareDataForContracts();
+      const {
+        _abiConfig,
+        _offerId,
+        _srcTokenAddress,
+        _dstTokenAddress,
+        _srcAmountSD,
+        _dstTokenChainId,
+        _dstEid,
+        _srcTokenDecimals,
+        _dstTokenDecimals,
+      } = prepareDataForContracts();
 
-    if (approvingStatus === "idle" || approvingStatus === "error") {
-      setApprovingStatus("pending");
-      await switchChainAsync({
-        chainId: _srcTokenChainId!,
-      });
-
-      const [lzFee, { dstAmountLD, feeLD }] = (await readContract(wagmiConfig, {
-        abi: abiConfig.abi,
-        address: abiConfig.address,
-        functionName: "quoteAcceptOffer",
-        args: [
-          _dstTokenAddress,
-          JSON.parse(
-            JSON.stringify({
-              offerId: _offerId,
-              srcAmountSD: _srcAmountSD,
-              srcBuyerAddress: hexZeroPadTo32(address),
-            }),
-          ),
-          false,
-        ],
-        chainId: _dstTokenChainId,
-      })) as any;
-
-      const hexAddressZero = hexZeroPadTo32(ethers.constants.AddressZero);
-
-      // const dstTokenAddress =
-
-      let _value =
-        _dstTokenAddress == hexAddressZero
-          ? lzFee.nativeFee + dstAmountLD
-          : lzFee.nativeFee;
-
-      if (_srcTokenAddress != hexAddressZero) {
-        await writeContract(wagmiConfig, {
-          abi: erc20Abi,
-          address: hexStripsAddr(_dstTokenAddress),
-          functionName: "approve",
-          args: [abiConfig!.address, dstAmountLD],
-          chainId: _dstTokenChainId,
+      if (approvingStatus === "idle" || approvingStatus === "error") {
+        setApprovingStatus("pending");
+        await switchChainAsync({
+          chainId: _dstTokenChainId!,
         });
-      }
 
-      const txHash = await writeContract(wagmiConfig, {
-        abi: abiConfig.abi,
-        address: abiConfig.address,
-        functionName: "acceptOffer",
-        args: [
+        const [lzFee, { dstAmountLD, feeLD }] = await readContract(
+          wagmiConfig,
           {
-            offerId: _offerId as any,
-            srcAmountSD: _srcAmountSD as any,
-            srcBuyerAddress: hexZeroPadTo32(address),
+            abi: _abiConfig.abi,
+            address: _abiConfig.address,
+            functionName: "quoteAcceptOffer",
+            args: [
+              _dstTokenAddress,
+              JSON.parse(
+                JSON.stringify({
+                  offerId: _offerId,
+                  srcAmountSD: _srcAmountSD,
+                  srcBuyerAddress: hexZeroPadTo32(address),
+                }),
+              ),
+              false,
+            ],
+            chainId: _dstTokenChainId,
           },
-          lzFee,
-        ],
-        value: _value,
-        chainId: _dstTokenChainId,
-      });
+        ).catch((e) => {
+          const error = e as ReadContractErrorType;
+          console.log("Error", e);
+          throw new Error(error.name);
+        });
 
-      if (txHash) {
-        console.log(txHash);
+        const hexAddressZero = hexZeroPadTo32(ethers.constants.AddressZero);
+
+        let _value =
+          _dstTokenAddress == hexAddressZero
+            ? lzFee.nativeFee + dstAmountLD
+            : lzFee.nativeFee;
+
+        if (_srcTokenAddress != hexAddressZero) {
+          await writeContract(wagmiConfig, {
+            abi: erc20Abi,
+            address: hexStripsAddr(_dstTokenAddress),
+            functionName: "approve",
+            args: [_abiConfig!.address, dstAmountLD],
+            chainId: _dstTokenChainId,
+          }).catch((e) => {
+            const error = e as WriteContractErrorType;
+            console.log("Errpr", e);
+            throw new Error(error.name);
+          });
+        }
+
+        const txHash = await writeContract(wagmiConfig, {
+          abi: _abiConfig.abi,
+          address: _abiConfig.address,
+          functionName: "acceptOffer",
+          args: [
+            {
+              offerId: _offerId as any,
+              srcAmountSD: _srcAmountSD as any,
+              srcBuyerAddress: hexZeroPadTo32(address),
+            },
+            lzFee,
+          ],
+          value: _value,
+          chainId: _dstTokenChainId,
+        }).catch((e) => {
+          const error = e as WriteContractErrorType;
+          console.log("Error", e);
+          throw new Error(error.name);
+        });
+
+        if (txHash) {
+          const srcAmountLD = (
+            BigInt(order.srcAmountLD) -
+            parseUnits(dstTokenAmount, _dstTokenDecimals)
+          ).toString();
+          setInfoForTransactionStep({
+            txHash,
+            offerId: _offerId,
+            srcChainId: _dstTokenChainId! as any,
+            srcEid: _dstEid,
+            srcTokenAddress: _srcTokenAddress,
+            dstTokenAddress: _dstTokenAddress,
+            srcTokenAmount: srcTokenAmount,
+            exchangeRate: dstTokenAmount,
+            srcAmountLD: srcAmountLD,
+            srcToken: order.srcToken,
+            dstToken: order.dstToken,
+          });
+          setTransactionStatus("pending");
+          setApprovingStatus("success");
+          setStep("transaction");
+        }
       }
+    } catch (e: any) {
+      setApprovingStatus("error");
+      setApprovingErrorMessage(e.message);
     }
-    // } catch (e) {
-    //   const error = e as WriteContractErrorType
-    //   console.log(error);
-    //   setApprovingStatus("error");
-    //   setApprovingErrorMessage(error.name);
-    // }
   };
 
-  const handleInputChange = async (
-    e: ChangeEvent<HTMLInputElement>,
-    inputField: "src" | "dst",
-  ) => {
+  const handleResetState = () => {};
+  const handleClose = () => {
+    setOpenModal(false);
+    handleResetState();
+  };
+
+  const handleInputChange = async (e: ChangeEvent<HTMLInputElement>) => {
     try {
       const inputValue = e.target.value;
 
-      if (inputValue.length <= 0 || inputValue.endsWith(".") || !isValidTokenAmount(inputValue)) {
-        if (inputField === "src") 
-          setSrcTokenAmount(inputValue);
-        else 
-          setDstTokenAmount(inputValue);
+      if (!isValidTokenAmount(inputValue)) {
+        return;
+      }
+      setApprovingStatus("idle");
+
+      if (
+        inputValue.length === 0 ||
+        inputValue.endsWith(".") ||
+        inputValue === "0" ||
+        inputValue === "0." ||
+        /^0\.0*$/.test(inputValue) ||
+        parseFloat(inputValue) < 0.000009
+      ) {
+        setDstTokenAmount(inputValue);
         return;
       }
 
       const {
-        abiConfig,
+        _abiConfig,
         _offerId,
         _dstTokenAddress,
-        _srcAmountSD,
         _dstTokenChainId,
-        dstTokenDecimals,
-        srcTokenDecimals,
+        _dstTokenDecimals,
+        _srcAmountLD,
       } = prepareDataForContracts();
 
-      if (inputField === "src") 
-        await handleSrcInputChange(
-          inputValue,
-          abiConfig,
-          _offerId,
-          _dstTokenAddress,
-          _srcAmountSD,
-          _dstTokenChainId!,
-          dstTokenDecimals,
-          srcTokenDecimals,
-        );
-      else 
-        await handleDstInputChange(
-          inputValue,
-          abiConfig,
-          _offerId,
-          _dstTokenAddress,
-          _srcAmountSD,
-          _dstTokenChainId!,
-          dstTokenDecimals,
-        );
+      const MAX_VALUE = BigInt(_srcAmountLD);
+      const parsedValue = parseUnits(inputValue, 6);
+
+      const _srcAmountSD = parseUnits(inputValue, 6);
+      setDstTokenAmount(inputValue);
+      if (MAX_VALUE < parsedValue) {
+        setApprovingStatus("error");
+        setApprovingErrorMessage("Value exceeds maximum allowed amount");
+        return;
+      }
+
+      const [_, { dstAmountLD: exchangeRate }] = (await readContract(
+        wagmiConfig,
+        {
+          abi: _abiConfig.abi,
+          address: _abiConfig.address,
+          functionName: "quoteAcceptOffer",
+          args: [
+            _dstTokenAddress,
+            {
+              offerId: _offerId as `0x${string}`,
+              srcAmountSD: BigInt(_srcAmountSD),
+              srcBuyerAddress: hexZeroPadTo32(address!),
+            },
+            false,
+          ],
+          chainId: _dstTokenChainId as any,
+        },
+      ).catch((e) => {
+        const error = e as ReadContractErrorType;
+        console.log("Error read", error);
+        setApprovingStatus("error");
+        setApprovingErrorMessage(e.name);
+      })) as any;
+
+      const newExchangeRate = formatUnits(exchangeRate, _dstTokenDecimals);
+
+      setSrcTokenAmount(newExchangeRate);
     } catch (e) {
       const error = e as WriteContractErrorType;
       console.log(error);
     }
   };
 
-  const handleSrcInputChange = async (
-    inputValue: string,
-    abiConfig: any,
-    _offerId: string,
-    _dstTokenAddress: string,
-    _srcAmountSD: string,
-    _dstTokenChainId: number,
-    dstTokenDecimals: number,
-    srcTokenDecimals: number,
-  ) => {
-    const MAX_VALUE = BigInt(_srcAmountSD);
-    const parsedValue = parseUnits(inputValue, 6);
-
-    if (MAX_VALUE < parsedValue) {
-      throw new Error("Value exceeds maximum allowed amount");
-    }
-
-    setSrcTokenAmount(inputValue);
-
-    const [_, { dstAmountLD }] = (await readContract(wagmiConfig, {
-      abi: abiConfig.abi,
-      address: abiConfig.address,
-      functionName: "quoteAcceptOffer",
-      args: [
-        _dstTokenAddress,
-        JSON.parse(
-          JSON.stringify({
-            offerId: _offerId,
-            srcAmountSD: _srcAmountSD,
-            srcBuyerAddress: hexZeroPadTo32(address!),
-          }),
-        ),
-        false,
-      ],
-      chainId: _dstTokenChainId as any,
-    })) as any;
-
-    const newExchangeRate = formatUnits(dstAmountLD, dstTokenDecimals);
-    
-    setDstTokenAmount(newExchangeRate);
-  };
- 
-  const handleDstInputChange = async (
-    inputValue: string,
-    abiConfig: any,
-    _offerId: string,
-    _dstTokenAddress: string,
-    _srcAmountSD: string,
-    _dstTokenChainId: number,
-    dstTokenDecimals: number,
-  ) => {
-    const parsedValue = parseUnits(inputValue, dstTokenDecimals);
-    setDstTokenAmount(inputValue);
-
-    const [_, { dstAmountLD }] = (await readContract(wagmiConfig, {
-      abi: abiConfig.abi,
-      address: abiConfig.address,
-      functionName: "quoteAcceptOffer",
-      args: [
-        _dstTokenAddress,
-        JSON.parse(
-          JSON.stringify({
-            offerId: _offerId,
-            srcAmountSD: _srcAmountSD,
-            srcBuyerAddress: hexZeroPadTo32(address!),
-          }),
-        ),
-        false,
-      ],
-      chainId: _dstTokenChainId as any,
-    })) as any;
-
-    const srcAmountSD = dstAmountLD + parsedValue;
-    const formattedValue = formatUnits(srcAmountSD, 6);
-    setSrcTokenAmount(formattedValue);
-  };
-
-  const steps = {
-    main: (
-      <FormStep
-        isWalletConnected={isWalletConnected}
-        srcTokenAmount={srcTokenAmount}
-        setSrcTokenAmount={setSrcTokenAmount}
-        dstTokenAmount={dstTokenAmount}
-        setDstTokenAmount={setDstTokenAmount}
-        closeModalHandler={closeModalHandler}
-        srcWalletAddress={address as any}
-        isValidDestinationWallet={isValidDestinationWallet}
-        submitHandler={submitHandler}
-        destinationWallet={destinationWallet}
-        setDestinationWallet={setDestinationWallet}
-        approvingStatus={approvingStatus}
-        approvingErrorMessage={approvingErrorMessage}
-        order={order}
-        handleInputChange={handleInputChange}
-      />
-    ),
-    transaction: (
-      <TransactionStep
-        srcWalletAddress={address as any}
-        destinationWallet={destinationWallet}
-      />
-    ),
-  };
+  const handleRetry = () => setStep("main");
 
   const walletStepRender = () => {
+    const steps = {
+      main: (
+        <FormStep
+          isWalletConnected={isWalletConnected}
+          srcTokenAmount={srcTokenAmount}
+          setSrcTokenAmount={setSrcTokenAmount}
+          dstTokenAmount={dstTokenAmount}
+          setDstTokenAmount={setDstTokenAmount}
+          closeModalHandler={closeModalHandler}
+          srcWalletAddress={address as any}
+          isValidDestinationWallet={isValidDestinationWallet}
+          submitHandler={submitHandler}
+          destinationWallet={destinationWallet}
+          setDestinationWallet={setDestinationWallet}
+          approvingStatus={approvingStatus}
+          approvingErrorMessage={approvingErrorMessage}
+          order={order}
+          handleInputChange={handleInputChange}
+        />
+      ),
+      transaction: (
+        <TransactionStep
+          srcWalletAddress={address as any}
+          destinationWallet={destinationWallet}
+          handleRetry={handleRetry}
+          handleClose={handleClose}
+          setTransactionStatus={setTransactionStatus}
+          transactionData={infoForTransactionStep}
+        />
+      ),
+    };
+
     return steps[step];
   };
 
   const onOpenChangeHandler = (_open: boolean) => {
     if (!_open) {
-      closeModalHandler();
+      if (transactionStatus === "pending") {
+        return;
+      }
+      handleResetState();
     }
 
     setOpenModal(_open);
