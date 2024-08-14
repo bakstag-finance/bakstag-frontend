@@ -5,8 +5,11 @@ import {
   sepolia,
   fantomTestnet,
   baseSepolia,
+  base,
   optimismSepolia,
+  optimism,
   arbitrumSepolia,
+  arbitrum,
 } from "@wagmi/core/chains";
 
 export const wagmiConfig = createConfig({
@@ -22,6 +25,9 @@ export const wagmiConfig = createConfig({
   transports: {
     [mainnet.id]: http(),
     [sepolia.id]: http(),
+    [base.id]: http(),
+    [optimism.id]: http(),
+    [arbitrum.id]: http(),
     [baseSepolia.id]: http(),
     [fantomTestnet.id]: http(),
     [optimismSepolia.id]: http(),
