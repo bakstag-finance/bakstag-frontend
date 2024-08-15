@@ -59,7 +59,7 @@ export const TransactionStep = ({
   handleClose,
   handleRetry,
   setTransactionStatus,
-  refetch
+  refetch,
 }: Props) => {
   const { isLoading, isError, isSuccess } = useQuery({
     queryKey: ["create-offer", transactionData.txHash],
@@ -90,7 +90,7 @@ export const TransactionStep = ({
       setTransactionStatus("success");
 
       await refetch();
-      
+
       return null;
     },
   });

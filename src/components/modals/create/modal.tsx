@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { ChangeEvent, EventHandler, useState } from "react";
 import {
   Button,
   Dialog,
@@ -68,6 +68,7 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
   const [srcTokenAmount, setSrcTokenAmount] = useState("0.000001");
 
   const [destinationWallet, setDestinationWallet] = useState("");
+  const [isDstWalletChange, setIsDstWalletChange] = useState(false);
 
   // State for transaction step
   const [infoForTransactionStep, setInfoForTransactionStep] = useState({
@@ -151,6 +152,10 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
       _exchangeRateSD,
     };
   };
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setIsDstWalletChange(true);
+    setDestinationWallet(e.target.value);
+  }
 
   const handleCreateSwap = async () => {
     if (!isWalletConnected || approvingStatus === "success") {
@@ -305,9 +310,10 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
   const stepsContent = {
     main: (
       <FormStep
+      isDstWalletChange={isDstWalletChange}
         srcAddress={address}
         destinationWallet={destinationWallet}
-        setDestinationWallet={setDestinationWallet}
+        handleInputChange={handleInputChange}
         srcTokenAmount={srcTokenAmount}
         setSrcTokenAmount={setSrcTokenAmount}
         exchangeRate={exchangeRate}
@@ -357,6 +363,7 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
 
     setOpenModal(_open);
   };
+
 
   return (
     <Dialog open={openModal} onOpenChange={onOpenChangeHandler}>

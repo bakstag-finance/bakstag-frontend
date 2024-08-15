@@ -18,13 +18,14 @@ interface Props {
   dstTokenAmount: string;
   setDstTokenAmount: Dispatch<SetStateAction<string>>;
   destinationWallet: string;
+  isDstWalletChange: boolean;
   setDestinationWallet: Dispatch<SetStateAction<string>>;
   srcWalletAddress: string;
   isValidDestinationWallet: boolean;
   closeModalHandler: () => void;
   submitHandler: () => void;
   order: OrderProps;
-  handleInputChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  handleInputChange: (e: ChangeEvent<HTMLInputElement>, inputField: "src" | "dst") => void;
 }
 
 export const FormStep = ({
@@ -40,6 +41,7 @@ export const FormStep = ({
   closeModalHandler,
   submitHandler,
   order,
+  isDstWalletChange,
   handleInputChange,
 }: Props) => {
   const { srcToken, dstToken } = order;
@@ -75,7 +77,7 @@ export const FormStep = ({
             value={srcTokenAmount}
             type="text"
             placeholder="0.0"
-            disabled
+            onChange={(e) => handleInputChange(e, "src")}
           />
         </div>
       </div>
@@ -100,7 +102,7 @@ export const FormStep = ({
             value={dstTokenAmount}
             type="text"
             placeholder="0.0"
-            onChange={(e) => handleInputChange(e)}
+            onChange={(e) => handleInputChange(e, "dst")}
           />
         </div>
       </div>
@@ -111,9 +113,11 @@ export const FormStep = ({
         <Input
           className={cn(
             "mt-2 bg-black border rounded-lg ",
-            isValidCryptoAddress(destinationWallet)
+            !isDstWalletChange
+            ? isValidCryptoAddress(destinationWallet)
               ? "border-gray-800"
-              : "border-red-200 focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1",
+              : "border-red-200 focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1"
+            : "border-gray-800"
           )}
           value={destinationWallet}
           onChange={(e) => setDestinationWallet(e.target.value)}

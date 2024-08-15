@@ -46,9 +46,8 @@ export const AcceptModal = ({ order, refetch }: Props) => {
   const [srcTokenAmount, setSrcTokenAmount] = useState("0.000001");
   const [dstTokenAmount, setDstTokenAmount] = useState("0.000001");
 
-  const [destinationWallet, setDestinationWallet] = useState(
-    "0xe3458913A876f6599d44F7830Ae7347537Ac407a",
-  );
+  const [destinationWallet, setDestinationWallet] = useState("");
+  const [isDstWalletChange, setIsDstWalletChange] = useState(false);
 
   const isValidDestinationWallet = isValidCryptoAddress(destinationWallet);
 
@@ -245,8 +244,7 @@ export const AcceptModal = ({ order, refetch }: Props) => {
           ],
           value: _value,
           chainId: _dstTokenChainId,
-        })
-        .catch((e) => {
+        }).catch((e) => {
           const error = e as WriteContractErrorType;
           console.log("Error", e);
           throw new Error(error.name);
@@ -287,79 +285,115 @@ export const AcceptModal = ({ order, refetch }: Props) => {
     handleResetState();
   };
 
-  const handleInputChange = async (e: ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = async (
+    e: ChangeEvent<HTMLInputElement>,
+    inputField: "src" | "dst",
+  ) => {
     try {
-      const inputValue = e.target.value;
+      setIsDstWalletChange(true);
 
+      const inputValue = e.target.value;
+  
       if (!isValidTokenAmount(inputValue)) {
         return;
       }
       setApprovingStatus("idle");
-
+  
       if (
         inputValue.length === 0 ||
         inputValue.endsWith(".") ||
         inputValue === "0" ||
         inputValue === "0." ||
         /^0\.0*$/.test(inputValue) ||
-        parseFloat(inputValue) < 0.000009
+        parseFloat(inputValue) < 0.000001
       ) {
-        setDstTokenAmount(inputValue);
+        inputField === "src"
+          ? setSrcTokenAmount(inputValue)
+          : setDstTokenAmount(inputValue);
         return;
       }
-
+  
       const {
         _abiConfig,
         _offerId,
         _dstTokenAddress,
         _dstTokenChainId,
         _dstTokenDecimals,
+        _srcTokenDecimals,
         _srcAmountLD,
       } = prepareDataForContracts();
 
+      inputField === "src"
+      ? setSrcTokenAmount(inputValue)
+      : setDstTokenAmount(inputValue);
+  
       const MAX_VALUE = BigInt(_srcAmountLD);
       const parsedValue = parseUnits(inputValue, 6);
-
-      const _srcAmountSD = parseUnits(inputValue, 6);
-      setDstTokenAmount(inputValue);
+  
       if (MAX_VALUE < parsedValue) {
         setApprovingStatus("error");
         setApprovingErrorMessage("Value exceeds maximum allowed amount");
         return;
       }
-
-      const [_, { dstAmountLD: exchangeRate }] = (await readContract(
-        wagmiConfig,
+  
+      const contractArgs = [
+        _dstTokenAddress as `0x${string}`,
         {
-          abi: _abiConfig.abi,
-          address: _abiConfig.address,
-          functionName: "quoteAcceptOffer",
-          args: [
-            _dstTokenAddress,
-            {
-              offerId: _offerId as `0x${string}`,
-              srcAmountSD: BigInt(_srcAmountSD),
-              srcBuyerAddress: hexZeroPadTo32(address!),
-            },
-            false,
-          ],
-          chainId: _dstTokenChainId as any,
+          offerId: _offerId as `0x${string}`,
+          srcAmountSD: BigInt(parsedValue),
+          srcBuyerAddress: hexZeroPadTo32(address!),
         },
-      ).catch((e) => {
-        const error = e as ReadContractErrorType;
-        console.log("Error read", error);
-        setApprovingStatus("error");
-        setApprovingErrorMessage(e.name);
-      })) as any;
-
-      const newExchangeRate = formatUnits(exchangeRate, _dstTokenDecimals);
-
-      setSrcTokenAmount(newExchangeRate);
+        false,
+      ];
+  
+      if (inputField === "src") {
+        const [_, { dstAmountLD: exchangeRate }] = (await readContract(
+          wagmiConfig,
+          {
+            abi: _abiConfig.abi,
+            address: _abiConfig.address,
+            functionName: "quoteAcceptOffer",
+            args: contractArgs as any,
+            chainId: _dstTokenChainId as any,
+          },
+        )
+        .catch((e) => {
+          const error = e as ReadContractErrorType;
+          console.log("Error read", error);
+          setApprovingStatus("error");
+          setApprovingErrorMessage(e.name);
+        })) as any;
+  
+        const newExchangeRate = formatUnits(exchangeRate, _dstTokenDecimals);
+        setDstTokenAmount(newExchangeRate);
+      } else {
+        
+        const [_, { dstAmountLD: exchangeRate }] = (await readContract(
+          wagmiConfig,
+          {
+            abi: _abiConfig.abi,
+            address: _abiConfig.address,
+            functionName: "quoteAcceptOffer",
+            args: contractArgs as any,
+            chainId: _dstTokenChainId as any,
+          },
+        )
+        .catch((e) => {
+          const error = e as ReadContractErrorType;
+          console.log("Error read", error);
+          setApprovingStatus("error");
+          setApprovingErrorMessage(e.name);
+        })) as any;
+  
+        const newExchangeRate = formatUnits(exchangeRate, _srcTokenDecimals);
+        setSrcTokenAmount(newExchangeRate);
+      }
     } catch (e) {
-      const error = e as WriteContractErrorType;
+      const error = e as ReadContractErrorType;
       console.log(error);
     }
   };
+
 
   const handleRetry = () => setStep("main");
 
@@ -381,6 +415,7 @@ export const AcceptModal = ({ order, refetch }: Props) => {
           approvingStatus={approvingStatus}
           approvingErrorMessage={approvingErrorMessage}
           order={order}
+          isDstWalletChange={isDstWalletChange}
           handleInputChange={handleInputChange}
         />
       ),

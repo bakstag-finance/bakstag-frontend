@@ -54,7 +54,7 @@ export const TransactionStep = ({
   handleRetry,
   handleClose,
   setTransactionStatus,
-  refetch
+  refetch,
 }: Props) => {
   const { srcToken, srcTokenAmount } = transactionData;
 

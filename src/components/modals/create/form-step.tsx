@@ -19,7 +19,7 @@ interface FormStepProps {
   exchangeRate: string;
   setExchangeRate: Dispatch<SetStateAction<string>>;
   destinationWallet: string;
-  setDestinationWallet: Dispatch<SetStateAction<string>>;
+  handleInputChange: (e: ChangeEvent<HTMLInputElement>)=> void;
   srcAddress: `0x${string}` | undefined;
   isWalletConnected: boolean;
   approvingStatus: ApprovingStatus;
@@ -27,6 +27,7 @@ interface FormStepProps {
   isValidDestinationWallet: boolean;
   isValidTokenAmount: boolean;
   isValidExchangeRate: boolean;
+  isDstWalletChange: boolean;
   handleCreateSwap: () => void;
   handleClose: () => void;
 }
@@ -41,13 +42,14 @@ export const FormStep = ({
   exchangeRate,
   setExchangeRate,
   destinationWallet,
-  setDestinationWallet,
+  handleInputChange: handleDestinationAddress,
   srcAddress,
   isWalletConnected,
   isValidDestinationWallet,
   handleCreateSwap,
   handleClose,
   approvingStatus,
+  isDstWalletChange,
   approvingErrorMessage,
 }: FormStepProps) => {
   const handleInputChange = (
@@ -153,12 +155,14 @@ export const FormStep = ({
         <Input
           className={cn(
             "mt-2 bg-black border rounded-lg border-gray-800",
-            isValidDestinationWallet
+            !isDstWalletChange
+            ? isValidDestinationWallet
               ? "border-gray-800"
-              : "border-red-700  focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1",
+              : "border-red-200 focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1"
+            : "border-gray-800"
           )}
           value={destinationWallet}
-          onChange={(e) => setDestinationWallet(e.target.value)}
+          onChange={(e) => handleDestinationAddress(e)}
         />
       </div>
       <div className={"w-full flex flex-col text-xs mt-5"}>

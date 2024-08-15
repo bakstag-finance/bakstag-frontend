@@ -8,7 +8,7 @@ interface Props {
   order: OrderProps;
   refetch: () => void;
 }
-export const TableItem = ({order, refetch}: Props) => {
+export const TableItem = ({ order, refetch }: Props) => {
   const { dstSellerAddress, srcAmountLD, exchangeRateSD, srcToken, dstToken } =
     order;
   const formatedAddress = addressFormat(dstSellerAddress);
@@ -56,7 +56,7 @@ export const TableItem = ({order, refetch}: Props) => {
               </span>
             </div>
           </div>
-          <AcceptModal order={order} refetch={refetch}/>
+          <AcceptModal order={order} refetch={refetch} />
         </div>
       </div>
 
@@ -79,7 +79,7 @@ export const TableItem = ({order, refetch}: Props) => {
               </span>
             </span>
             <div className="w-full flex justify-end">
-              <AcceptModal order={order}  refetch={refetch}/>
+              <AcceptModal order={order} refetch={refetch} />
             </div>
           </div>
         </div>
