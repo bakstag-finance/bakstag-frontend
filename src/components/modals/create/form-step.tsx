@@ -19,7 +19,7 @@ interface FormStepProps {
   exchangeRate: string;
   setExchangeRate: Dispatch<SetStateAction<string>>;
   destinationWallet: string;
-  handleInputChange: (e: ChangeEvent<HTMLInputElement>)=> void;
+  handleInputChange: (e: ChangeEvent<HTMLInputElement>) => void;
   srcAddress: `0x${string}` | undefined;
   isWalletConnected: boolean;
   approvingStatus: ApprovingStatus;
@@ -156,10 +156,10 @@ export const FormStep = ({
           className={cn(
             "mt-2 bg-black border rounded-lg border-gray-800",
             !isDstWalletChange
-            ? isValidDestinationWallet
-              ? "border-gray-800"
-              : "border-red-200 focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1"
-            : "border-gray-800"
+              ? isValidDestinationWallet
+                ? "border-gray-800"
+                : "border-red-200 focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1"
+              : "border-gray-800",
           )}
           value={destinationWallet}
           onChange={(e) => handleDestinationAddress(e)}

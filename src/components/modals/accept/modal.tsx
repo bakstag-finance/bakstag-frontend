@@ -293,12 +293,12 @@ export const AcceptModal = ({ order, refetch }: Props) => {
       setIsDstWalletChange(true);
 
       const inputValue = e.target.value;
-  
+
       if (!isValidTokenAmount(inputValue)) {
         return;
       }
       setApprovingStatus("idle");
-  
+
       if (
         inputValue.length === 0 ||
         inputValue.endsWith(".") ||
@@ -312,7 +312,7 @@ export const AcceptModal = ({ order, refetch }: Props) => {
           : setDstTokenAmount(inputValue);
         return;
       }
-  
+
       const {
         _abiConfig,
         _offerId,
@@ -324,18 +324,18 @@ export const AcceptModal = ({ order, refetch }: Props) => {
       } = prepareDataForContracts();
 
       inputField === "src"
-      ? setSrcTokenAmount(inputValue)
-      : setDstTokenAmount(inputValue);
-  
+        ? setSrcTokenAmount(inputValue)
+        : setDstTokenAmount(inputValue);
+
       const MAX_VALUE = BigInt(_srcAmountLD);
       const parsedValue = parseUnits(inputValue, 6);
-  
+
       if (MAX_VALUE < parsedValue) {
         setApprovingStatus("error");
         setApprovingErrorMessage("Value exceeds maximum allowed amount");
         return;
       }
-  
+
       const contractArgs = [
         _dstTokenAddress as `0x${string}`,
         {
@@ -345,7 +345,7 @@ export const AcceptModal = ({ order, refetch }: Props) => {
         },
         false,
       ];
-  
+
       if (inputField === "src") {
         const [_, { dstAmountLD: exchangeRate }] = (await readContract(
           wagmiConfig,
@@ -356,18 +356,16 @@ export const AcceptModal = ({ order, refetch }: Props) => {
             args: contractArgs as any,
             chainId: _dstTokenChainId as any,
           },
-        )
-        .catch((e) => {
+        ).catch((e) => {
           const error = e as ReadContractErrorType;
           console.log("Error read", error);
           setApprovingStatus("error");
           setApprovingErrorMessage(e.name);
         })) as any;
-  
+
         const newExchangeRate = formatUnits(exchangeRate, _dstTokenDecimals);
         setDstTokenAmount(newExchangeRate);
       } else {
-        
         const [_, { dstAmountLD: exchangeRate }] = (await readContract(
           wagmiConfig,
           {
@@ -377,14 +375,13 @@ export const AcceptModal = ({ order, refetch }: Props) => {
             args: contractArgs as any,
             chainId: _dstTokenChainId as any,
           },
-        )
-        .catch((e) => {
+        ).catch((e) => {
           const error = e as ReadContractErrorType;
           console.log("Error read", error);
           setApprovingStatus("error");
           setApprovingErrorMessage(e.name);
         })) as any;
-  
+
         const newExchangeRate = formatUnits(exchangeRate, _srcTokenDecimals);
         setSrcTokenAmount(newExchangeRate);
       }
@@ -393,7 +390,6 @@ export const AcceptModal = ({ order, refetch }: Props) => {
       console.log(error);
     }
   };
-
 
   const handleRetry = () => setStep("main");
 

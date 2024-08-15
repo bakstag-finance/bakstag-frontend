@@ -25,7 +25,10 @@ interface Props {
   closeModalHandler: () => void;
   submitHandler: () => void;
   order: OrderProps;
-  handleInputChange: (e: ChangeEvent<HTMLInputElement>, inputField: "src" | "dst") => void;
+  handleInputChange: (
+    e: ChangeEvent<HTMLInputElement>,
+    inputField: "src" | "dst",
+  ) => void;
 }
 
 export const FormStep = ({
@@ -114,10 +117,10 @@ export const FormStep = ({
           className={cn(
             "mt-2 bg-black border rounded-lg ",
             !isDstWalletChange
-            ? isValidCryptoAddress(destinationWallet)
-              ? "border-gray-800"
-              : "border-red-200 focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1"
-            : "border-gray-800"
+              ? isValidCryptoAddress(destinationWallet)
+                ? "border-gray-800"
+                : "border-red-200 focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1"
+              : "border-gray-800",
           )}
           value={destinationWallet}
           onChange={(e) => setDestinationWallet(e.target.value)}

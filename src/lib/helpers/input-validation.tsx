@@ -5,9 +5,8 @@ export const isNumericOrCommaSeparated = (input: string): boolean => {
 
 export const isValidTokenAmount = (input: string): boolean => {
   const floatRegex = /^(0|[1-9]\d*)?(\.\d*)?$/;
-  return floatRegex.test(input)
+  return floatRegex.test(input);
 };
-
 
 export const isValueOutOfBounds = (
   value: string,

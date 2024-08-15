@@ -155,7 +155,7 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setIsDstWalletChange(true);
     setDestinationWallet(e.target.value);
-  }
+  };
 
   const handleCreateSwap = async () => {
     if (!isWalletConnected || approvingStatus === "success") {
@@ -310,7 +310,7 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
   const stepsContent = {
     main: (
       <FormStep
-      isDstWalletChange={isDstWalletChange}
+        isDstWalletChange={isDstWalletChange}
         srcAddress={address}
         destinationWallet={destinationWallet}
         handleInputChange={handleInputChange}
@@ -363,7 +363,6 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
 
     setOpenModal(_open);
   };
-
 
   return (
     <Dialog open={openModal} onOpenChange={onOpenChangeHandler}>
