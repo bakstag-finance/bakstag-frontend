@@ -17,6 +17,7 @@ import { waitForTransactionReceipt } from "@wagmi/core";
 import { wagmiConfig } from "@/lib/wagmi/config";
 import Link from "next/link";
 import { Dispatch, SetStateAction } from "react";
+import { ChainIds, Status } from "@/types/contracts";
 
 interface Props {
   destinationWallet: string;
@@ -28,7 +29,7 @@ interface Props {
   transactionData: {
     txHash: string;
     srcEid: number;
-    srcChainId: number;
+    srcChainId: ChainIds;
     offerId: string;
     dstEid: number;
     srcSellerAddress: string;
@@ -40,9 +41,7 @@ interface Props {
   };
   handleClose: () => void;
   handleRetry: () => void;
-  setTransactionStatus: Dispatch<
-    SetStateAction<"idle" | "pending" | "success">
-  >;
+  setTransactionStatus: Dispatch<SetStateAction<Status>>;
   refetch: () => void;
 }
 

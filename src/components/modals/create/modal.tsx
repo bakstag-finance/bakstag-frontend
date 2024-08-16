@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, EventHandler, useState } from "react";
+import { useState } from "react";
 import {
   Button,
   Dialog,
@@ -31,7 +31,7 @@ import { ethers } from "ethers";
 import { erc20Abi } from "viem";
 import { TransactionStep } from "./transaction-step";
 import { FormStep } from "./form-step";
-import { ApprovingStatus, LzFee } from "@/types/contracts";
+import { Status, LzFee, ChainIds } from "@/types/contracts";
 import { otcMarketConfig } from "@/lib/wagmi/contracts/abi";
 import { TokenData } from "@/lib/constants/tokens";
 
@@ -68,13 +68,12 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
   const [srcTokenAmount, setSrcTokenAmount] = useState("0.000001");
 
   const [destinationWallet, setDestinationWallet] = useState("");
-  const [isDstWalletChange, setIsDstWalletChange] = useState(false);
 
   // State for transaction step
   const [infoForTransactionStep, setInfoForTransactionStep] = useState({
     txHash: "",
     srcEid: 0,
-    srcChainId: 0,
+    srcChainId: undefined as ChainIds,
     offerId: "",
     dstEid: 0,
     srcSellerAddress: "",
@@ -91,19 +90,13 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
   const { switchChainAsync } = useSwitchChain();
 
   // State of approval
-  const [approvingStatus, setApprovingStatus] =
-    useState<ApprovingStatus>("idle");
+  const [approvingStatus, setApprovingStatus] = useState<Status>("idle");
   const [approvingErrorMessage, setApprovingErrorMessage] = useState("");
 
   // State of transaction proccess
-  const [transactionStatus, setTransactionStatus] = useState<
-    "idle" | "pending" | "success"
-  >("idle");
+  const [transactionStatus, setTransactionStatus] = useState<Status>("idle");
 
   const isValidDestinationWallet = isValidCryptoAddress(destinationWallet);
-
-  const isValidTokenAmount = !isValueOutOfBounds(srcTokenAmount);
-  const isValidExchangeRate = !isValueOutOfBounds(exchangeRate);
 
   const handleClose = () => {
     setOpenModal(false);
@@ -151,10 +144,6 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
       _srcAmountLD,
       _exchangeRateSD,
     };
-  };
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setIsDstWalletChange(true);
-    setDestinationWallet(e.target.value);
   };
 
   const handleCreateSwap = async () => {
@@ -285,7 +274,7 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
               ...prevState,
               txHash,
               srcEid: Number(srcToken.eid),
-              srcChainId: Number(srcToken.chainId),
+              srcChainId: Number(srcToken.chainId) as ChainIds,
               dstEid: _dstEid,
               srcSellerAddress: _srcSellerAddress,
               dstSellerAddress: _dstSellerAddress,
@@ -310,10 +299,9 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
   const stepsContent = {
     main: (
       <FormStep
-        isDstWalletChange={isDstWalletChange}
         srcAddress={address}
         destinationWallet={destinationWallet}
-        handleInputChange={handleInputChange}
+        setDestinationWallet={setDestinationWallet}
         srcTokenAmount={srcTokenAmount}
         setSrcTokenAmount={setSrcTokenAmount}
         exchangeRate={exchangeRate}
@@ -326,8 +314,6 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
         setSelectedDstToken={setSelectedDstToken}
         isWalletConnected={isWalletConnected}
         isValidDestinationWallet={isValidDestinationWallet}
-        isValidTokenAmount={isValidTokenAmount}
-        isValidExchangeRate={isValidExchangeRate}
         approvingStatus={approvingStatus}
         approvingErrorMessage={approvingErrorMessage}
       />

@@ -20,7 +20,7 @@ import {
 import { useAccount, useSwitchChain } from "wagmi";
 import { FormStep } from "./form-step";
 import { TransactionStep } from "./transaction-step";
-import { ApprovingStatus, LzFee } from "@/types/contracts";
+import { Status, LzFee } from "@/types/contracts";
 import { OrderProps } from "@/types/order";
 import { erc20Abi, formatUnits, parseUnits } from "viem";
 import {
@@ -43,11 +43,10 @@ export const AcceptModal = ({ order, refetch }: Props) => {
   const [openModal, setOpenModal] = useState(false);
   const [step, setStep] = useState<ConnectModalStep>("main");
 
-  const [srcTokenAmount, setSrcTokenAmount] = useState("0.000001");
-  const [dstTokenAmount, setDstTokenAmount] = useState("0.000001");
+  const [srcTokenAmount, setSrcTokenAmount] = useState("");
+  const [dstTokenAmount, setDstTokenAmount] = useState("");
 
   const [destinationWallet, setDestinationWallet] = useState("");
-  const [isDstWalletChange, setIsDstWalletChange] = useState(false);
 
   const isValidDestinationWallet = isValidCryptoAddress(destinationWallet);
 
@@ -56,14 +55,11 @@ export const AcceptModal = ({ order, refetch }: Props) => {
   const isWalletConnected = !!address;
 
   // State of approval
-  const [approvingStatus, setApprovingStatus] =
-    useState<ApprovingStatus>("idle");
+  const [approvingStatus, setApprovingStatus] = useState<Status>("idle");
   const [approvingErrorMessage, setApprovingErrorMessage] = useState("");
 
   // State of transaction proccess
-  const [transactionStatus, setTransactionStatus] = useState<
-    "idle" | "pending" | "success"
-  >("idle");
+  const [transactionStatus, setTransactionStatus] = useState<Status>("idle");
 
   // State for transaction step
   const [infoForTransactionStep, setInfoForTransactionStep] = useState({
@@ -290,8 +286,6 @@ export const AcceptModal = ({ order, refetch }: Props) => {
     inputField: "src" | "dst",
   ) => {
     try {
-      setIsDstWalletChange(true);
-
       const inputValue = e.target.value;
 
       if (!isValidTokenAmount(inputValue)) {
@@ -411,7 +405,6 @@ export const AcceptModal = ({ order, refetch }: Props) => {
           approvingStatus={approvingStatus}
           approvingErrorMessage={approvingErrorMessage}
           order={order}
-          isDstWalletChange={isDstWalletChange}
           handleInputChange={handleInputChange}
         />
       ),

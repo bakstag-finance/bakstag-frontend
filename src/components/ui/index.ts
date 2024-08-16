@@ -30,6 +30,7 @@ import { VisuallyHidden } from "./visually-hidden";
 import { Copy } from "./copy";
 import { SelectCoin } from "./select-coin";
 import { Skeleton } from "./skeleton";
+import { AddressInput } from "./address-input";
 
 import {
   Table,
@@ -83,4 +84,5 @@ export {
   TableCell,
   TableCaption,
   Skeleton,
+  AddressInput,
 };
