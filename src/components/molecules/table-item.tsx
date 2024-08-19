@@ -18,16 +18,11 @@ export const TableItem = ({ order, refetch }: Props) => {
     srcToken.network,
     "decimals",
   );
-  const dstTokenDecimals = getTokenField(
-    dstToken.ticker,
-    dstToken.network,
-    "decimals",
-  );
 
   const formatedSrcAmount = formatUnits(BigInt(srcAmountLD), srcTokenDecimals);
   const formatedDstAmount = formatUnits(
     BigInt(exchangeRateSD),
-    dstTokenDecimals,
+    6,
   );
 
   return (
