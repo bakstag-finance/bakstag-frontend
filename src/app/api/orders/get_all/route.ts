@@ -22,6 +22,13 @@ export async function GET(req: Request) {
     const whereCondition: any = {};
 
     if (srcAddress && srcAddress.length > 0) {
+      if(srcAddress === "undefined") {
+        return NextResponse.json({
+          status: 200,
+          orders: [],
+        });
+      }
+
       whereCondition.srcSellerAddress = hexZeroPadTo32(srcAddress as any);
     }
 

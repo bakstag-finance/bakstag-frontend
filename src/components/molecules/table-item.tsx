@@ -20,10 +20,7 @@ export const TableItem = ({ order, refetch }: Props) => {
   );
 
   const formatedSrcAmount = formatUnits(BigInt(srcAmountLD), srcTokenDecimals);
-  const formatedDstAmount = formatUnits(
-    BigInt(exchangeRateSD),
-    6,
-  );
+  const formatedDstAmount = formatUnits(BigInt(exchangeRateSD), 6);
 
   return (
     <>
