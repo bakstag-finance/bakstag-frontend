@@ -33,5 +33,5 @@ export {
   isNumericOrCommaSeparated,
   getTokenField,
   hexStripsAddr,
-  getScanLink
+  getScanLink,
 };
