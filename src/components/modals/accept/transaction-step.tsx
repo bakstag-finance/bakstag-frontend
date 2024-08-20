@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import { ChainIds, Status } from "@/types/contracts";
 import { LAYER_ZERO_SCAN } from "@/lib/constants";
+import { getTransactionReceipt } from "@wagmi/core";
+import { wagmiConfig } from "@/lib/wagmi/config";
 
 interface Props {
   srcWalletAddress: string;
@@ -37,6 +39,38 @@ interface Props {
   refetch: () => void;
 }
 
+const handleTransaction = async (
+  txHash: string,
+  srcEid: string,
+  offerId: string,
+  srcChainId: ChainIds,
+  srcAmountLD: string,
+  setTransactionStatus: Dispatch<SetStateAction<Status>>,
+  isMonochain: boolean,
+  refetch: () => void,
+) => {
+  if (isMonochain) {
+    const receipt = await getTransactionReceipt(wagmiConfig, {
+      hash: txHash as `0x${string}`,
+      chainId: srcChainId as any,
+    });
+
+    if (receipt.status == "reverted") {
+      throw new Error("Reverted Transaction");
+    }
+  } else {
+    await axios.get(`/api/offer_info?txHash=${txHash}&srcEid=${srcEid}`);
+  }
+
+  await axios.post("/api/orders/update", {
+    offerId: offerId,
+    srcAmountLD: srcAmountLD,
+  });
+  setTransactionStatus("success");
+  await refetch();
+  return null;
+};
+
 export const TransactionStep = ({
   srcWalletAddress,
   destinationWallet,
@@ -46,22 +80,31 @@ export const TransactionStep = ({
   setTransactionStatus,
   refetch,
 }: Props) => {
-  const { srcToken, srcTokenAmount, txHash } = transactionData;
+  const {
+    srcToken,
+    dstToken,
+    srcAmountLD,
+    srcEid,
+    txHash,
+    srcChainId,
+    offerId,
+  } = transactionData;
+
+  const isMonochain = srcToken.network === dstToken.network;
 
   const { data, isLoading, isError, isSuccess } = useQuery({
     queryKey: ["create-offer", txHash],
-    queryFn: async () => {
-      await axios.get(
-        `/api/offer_info?txHash=${txHash}&srcEid=${transactionData.srcEid}`,
-      );
-      await axios.post("/api/orders/update", {
-        offerId: transactionData.offerId,
-        srcAmountLD: transactionData.srcAmountLD,
-      });
-      setTransactionStatus("success");
-      await refetch();
-      return null;
-    },
+    queryFn: () =>
+      handleTransaction(
+        txHash,
+        srcEid,
+        offerId,
+        srcChainId,
+        srcAmountLD,
+        setTransactionStatus,
+        isMonochain,
+        refetch,
+      ),
   });
 
   const buttonHandler = () => (isError ? handleRetry() : handleClose());

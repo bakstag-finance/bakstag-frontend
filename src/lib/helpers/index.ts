@@ -17,6 +17,7 @@ import {
   hexStripsAddr,
 } from "./string-converter";
 import { getTokenField } from "./token-info";
+import { getScanLink } from "./get-scan-link";
 
 export {
   toSD,
@@ -32,4 +33,5 @@ export {
   isNumericOrCommaSeparated,
   getTokenField,
   hexStripsAddr,
+  getScanLink
 };
