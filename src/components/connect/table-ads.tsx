@@ -68,7 +68,7 @@ export const TableComponent = ({ setIsDeletingStep }: Props) => {
             </Select>
           </div>
         )}
-        <div className="mt-5 w-full flex flex-col h-64 overflow-scroll rounded-xl border border-gray-800 p-2">
+        <div className="mt-5 w-full flex flex-col h-64 overflow-y-scroll no-scrollbar rounded-xl border border-gray-800 p-2">
           {tableData &&
             tableData.length > 0 &&
             tableData.map((item: any, i: number) => {

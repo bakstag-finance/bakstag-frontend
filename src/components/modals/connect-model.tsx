@@ -1,5 +1,5 @@
 "use client";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Button,
   Dialog,
@@ -7,30 +7,19 @@ import {
   DialogDescription,
   DialogTitle,
   DialogTrigger,
-  Select,
-  SelectCoin,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
   VisuallyHidden,
-  Copy,
 } from "@/components/ui";
 import { useConnect, useAccount, useDisconnect, useWriteContract } from "wagmi";
 import { metaMask } from "wagmi/connectors";
-import { Ghost, LogOut, Trash, X } from "lucide-react";
+import { LogOut, X } from "lucide-react";
 import { addressFormat } from "@/lib/helpers";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { PhantomWalletName } from "@solana/wallet-adapter-wallets";
-import { cn } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
 import { DeletingStep } from "./components/deleting";
-import { CreateModal } from "./create";
-import axios from "axios";
 import { TableComponent } from "../connect/table-ads";
 
 type ConnectModalStep = "main" | "wallet-choose";
@@ -45,7 +34,7 @@ export const ConnectModal = () => {
 
   const solanaWallet = useWallet();
 
-  const { connect, status, error, failureReason } = useConnect();
+  const { connect, status } = useConnect();
 
   const { disconnect } = useDisconnect();
 
