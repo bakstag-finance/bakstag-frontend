@@ -16,6 +16,7 @@ export async function POST(req: Request) {
       dstTokenAddress,
       dstTokenTicker,
       dstTokenNetwork,
+      srcSellerAddress,
       srcAmountLD,
       exchangeRateSD,
     } = data;
@@ -36,7 +37,7 @@ export async function POST(req: Request) {
     await prisma.order.create({
       data: {
         offerId,
-        srcSellerAddress: "",
+        srcSellerAddress: srcSellerAddress,
         dstSellerAddress,
         dstEid: parseInt(dstEid),
         srcTokenTicker,
