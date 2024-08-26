@@ -2,6 +2,7 @@ import { tokensData } from "@/lib/constants";
 import { hexZeroPadTo32 } from "@/lib/helpers";
 import { prisma } from "@/lib/prisma/prisma";
 import { NextResponse } from "next/server";
+import { parseUnits } from "viem";
 
 export const dynamic = "force-dynamic";
 
@@ -16,9 +17,8 @@ export async function GET(req: Request) {
     const tokenToSell = searchParams.get("tokenToSell") || "";
     const srcAddress = searchParams.get("address") || "";
 
-    const amountToBuyInSmallestUnit = BigInt(
-      Math.floor(parseFloat(amountToBuy) * 1e18),
-    );
+    const amountToBuyInSmallestUnit = parseUnits(amountToBuy, 6);
+
     const whereCondition: any = {};
 
     if (srcAddress && srcAddress.length > 0) {
@@ -42,11 +42,13 @@ export async function GET(req: Request) {
       whereCondition.srcTokenNetwork = tokensData[tokenToSell].network;
     }
 
+    console.log("WhereCondition", whereCondition);
+
     const result = await prisma.order.findMany({
       where: whereCondition,
     });
 
-    const filteredOrders = result.filter((order) => {
+    const filteredOrders = result.filter((order, index) => {
       return BigInt(order.exchangeRateSD) >= amountToBuyInSmallestUnit;
     });
 
