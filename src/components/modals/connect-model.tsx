@@ -305,7 +305,7 @@ export const ConnectModal = () => {
           <DialogDescription></DialogDescription>
         </VisuallyHidden>
         <div
-          className={"w-full flex justify-center items-center flex-col pt-5"}
+          className={"w-full flex justify-center items-center flex-col"}
         >
           {!isDeletingStep ? walletStepRender() : <DeletingStep />}
 

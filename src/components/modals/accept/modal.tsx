@@ -450,7 +450,7 @@ export const AcceptModal = ({ order, refetch }: Props) => {
           <DialogDescription></DialogDescription>
         </VisuallyHidden>
         <div
-          className={"w-full flex justify-center items-center flex-col pt-5"}
+          className={"w-full flex justify-center items-center flex-col"}
         >
           {walletStepRender()}
           <span className={"text-gray-700 text-xs mt-3 text-justify"}>
