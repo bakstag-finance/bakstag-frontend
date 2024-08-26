@@ -15,7 +15,6 @@ import {
   isValidCryptoAddress,
   hexZeroPadTo32,
   toSD,
-  isValueOutOfBounds,
 } from "@/lib/helpers";
 import { useAccount, useSwitchChain } from "wagmi";
 import { tokensData } from "@/lib/constants";
@@ -36,20 +35,6 @@ import { otcMarketConfig } from "@/lib/wagmi/contracts/abi";
 import { TokenData } from "@/lib/constants/tokens";
 
 type CreateModalStep = "main" | "transaction";
-
-interface ContractProps {
-  abiConfig: typeof otcMarketConfig;
-  _srcSellerAddress: `0x${string}`;
-  _dstSellerAddress: `0x${string}`;
-  srcToken: TokenData;
-  _dstEid: any;
-  _srcTokenAddress: `0x${string}`;
-  _dstTokenAddress: `0x${string}`;
-  _srcAmountLD: string;
-  _exchangeRateSD: string;
-  _lzFee: LzFee;
-  _value: bigint;
-}
 
 interface Props {
   buttonText: string;
@@ -356,7 +341,7 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
         <Button className={"bg-white text-black w-full"}>{buttonText}</Button>
       </DialogTrigger>
       <DialogOverlay>
-        <DialogContent className={"w-full max-w-[370px]"}>
+        <DialogContent className={"w-full max-w-[370px] rounded-3xl"}>
           <VisuallyHidden>
             <DialogTitle></DialogTitle>
           </VisuallyHidden>

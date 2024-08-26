@@ -20,7 +20,7 @@ import {
 import { useAccount, useSwitchChain } from "wagmi";
 import { FormStep } from "./form-step";
 import { TransactionStep } from "./transaction-step";
-import { Status, LzFee } from "@/types/contracts";
+import { Status } from "@/types/contracts";
 import { OrderProps } from "@/types/order";
 import { erc20Abi, formatUnits, parseUnits } from "viem";
 import {
@@ -43,8 +43,8 @@ export const AcceptModal = ({ order, refetch }: Props) => {
   const [openModal, setOpenModal] = useState(false);
   const [step, setStep] = useState<ConnectModalStep>("main");
 
-  const [srcTokenAmount, setSrcTokenAmount] = useState("");
-  const [dstTokenAmount, setDstTokenAmount] = useState("");
+  const [srcTokenAmount, setSrcTokenAmount] = useState("0.0");
+  const [dstTokenAmount, setDstTokenAmount] = useState("0.0");
 
   const [destinationWallet, setDestinationWallet] = useState("");
 
@@ -442,7 +442,7 @@ export const AcceptModal = ({ order, refetch }: Props) => {
           Accept
         </Button>
       </DialogTrigger>
-      <DialogContent className={"w-full max-w-[370px]"}>
+      <DialogContent className={"w-full max-w-[370px] rounded-3xl"}>
         <VisuallyHidden>
           <DialogTitle></DialogTitle>
         </VisuallyHidden>
