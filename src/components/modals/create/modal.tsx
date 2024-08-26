@@ -363,9 +363,7 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
           <VisuallyHidden>
             <DialogDescription></DialogDescription>
           </VisuallyHidden>
-          <div
-            className={"w-full flex justify-center items-center flex-col"}
-          >
+          <div className={"w-full flex justify-center items-center flex-col"}>
             {renderStepContent()}
             <span className={"text-gray-700 text-xs mt-3 text-justify"}>
               Assets will be locked. After the transaction is successfully
