@@ -1,6 +1,8 @@
 import { AddressInput, Button, Copy, Input, Skeleton } from "@/components/ui";
 import {
   addressFormat,
+  calculateSrcAmountPerOneDst,
+  formatNumber,
   isValidCryptoAddress,
   isValidTokenAmount,
 } from "@/lib/helpers";
@@ -88,7 +90,7 @@ export const FormStep = ({
       />
       {srcWalletAddress ? (
         <Button
-          className="w-full mt-5"
+          className="w-full mt-5 rounded-xl"
           disabled={!isValidDestinationWallet}
           variant={getButtonVariant(approvingStatus)}
           onClick={submitHandler}
@@ -99,7 +101,7 @@ export const FormStep = ({
         <WalletConnect />
       )}
       <Button
-        className="w-full mt-5 bg-black text-gray-700 border border-white border-opacity-50 hover:bg-gray-800"
+        className="w-full mt-5 bg-black text-gray-700 border border-white border-opacity-50 hover:bg-gray-800 rounded-xl"
         onClick={closeModalHandler}
       >
         Cancel
@@ -174,24 +176,59 @@ const Summary = ({
   dstTokenAmount: string;
   srcWalletAddress: string;
   destinationWallet: string;
+}) => {
+  const isSrcAmountExist = srcTokenAmount.length > 0;
+  const isDstAmountExist = dstTokenAmount.length > 0;
+
+  const srcAmountPerOneDst =
+    isSrcAmountExist && isDstAmountExist
+      ? formatNumber(
+          calculateSrcAmountPerOneDst(srcTokenAmount, dstTokenAmount),
+        )
+      : "";
+  return (
+    <div className="w-full flex flex-col text-xs mt-3">
+      <SummaryRow
+        label="Amount to pay"
+        value={isSrcAmountExist ? `${srcTokenAmount} ${srcToken.ticker}` : ""}
+        network={srcToken.network}
+      />
+      <AddressSummaryRow label="to Wallet" value={destinationWallet} />
+      <AddressSummaryRow label="from Wallet" value={srcWalletAddress} />
+      <SummaryRow
+        label="Amount to receive"
+        value={isDstAmountExist ? `${dstTokenAmount} ${dstToken.ticker}` : ""}
+        network={dstToken.network}
+      />
+      <SummaryRow
+        label="Exchange Rate"
+        value={
+          isSrcAmountExist && isDstAmountExist
+            ? `${srcAmountPerOneDst} ${dstToken.ticker} = ${srcTokenAmount} ${srcToken.ticker}`
+            : ""
+        }
+      />
+    </div>
+  );
+};
+
+const AddressSummaryRow = ({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
 }) => (
-  <div className="w-full flex flex-col text-xs mt-3">
-    <SummaryRow
-      label="Amount to pay"
-      value={`${srcTokenAmount} ${srcToken.ticker}`}
-      network={srcToken.network}
-    />
-    <SummaryRow label="to Wallet" value={destinationWallet} isAddress={true} />
-    <SummaryRow label="from Wallet" value={srcWalletAddress} isAddress={true} />
-    <SummaryRow
-      label="Amount to receive"
-      value={`${dstTokenAmount} ${dstToken.ticker}`}
-      network={dstToken.network}
-    />
-    <SummaryRow
-      label="Exchange Rate"
-      value={`${dstTokenAmount} ${dstToken.ticker} = ${srcTokenAmount} ${srcToken.ticker}`}
-    />
+  <div className="w-full flex flex-row justify-between items-center my-2">
+    <span>{label}</span>
+    {value?.length > 0 ? (
+      <div className="flex flex-row items-center text-gray-800">
+        {addressFormat(value)}
+        <Copy textToCopy={value} />
+      </div>
+    ) : (
+      <Skeleton className="w-16 h-4" />
+    )}
   </div>
 );
 
@@ -199,29 +236,20 @@ const SummaryRow = ({
   label,
   value,
   network,
-  isAddress = false,
 }: {
   label: string;
   value: string;
   network?: string;
-  isAddress?: boolean;
 }) => (
   <div className="w-full flex flex-row justify-between items-center my-2">
     <span>{label}</span>
-    {isAddress ? (
-      value?.length > 8 && isValidCryptoAddress(value) ? (
-        <div className="flex flex-row items-center text-gray-800">
-          {addressFormat(value)}
-          <Copy textToCopy={value} />
-        </div>
-      ) : (
-        <Skeleton className="w-16 h-4" />
-      )
-    ) : (
+    {value?.length > 0 ? (
       <span>
         {value}
         {network && <span className="text-gray-700"> ({network})</span>}
       </span>
+    ) : (
+      <Skeleton className="w-16 h-4" />
     )}
   </div>
 );

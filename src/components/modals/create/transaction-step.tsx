@@ -1,7 +1,12 @@
 "use client";
 
 import { Button, Copy } from "@/components/ui";
-import { addressFormat, getScanLink } from "@/lib/helpers";
+import {
+  addressFormat,
+  calculateSrcAmountPerOneDst,
+  formatNumber,
+  getScanLink,
+} from "@/lib/helpers";
 import { useQuery } from "@tanstack/react-query";
 import {
   ArrowUpRight,
@@ -176,6 +181,13 @@ const ButtonContent = ({
   return null;
 };
 
+const calculateTotalReceiveAmount = (
+  srcTokenAmount: string,
+  exchangeRate: string,
+) => {
+  return Number(srcTokenAmount) * Number(exchangeRate) * 0.99;
+};
+
 export const TransactionStep = ({
   destinationWallet,
   srcAddress,
@@ -240,7 +252,7 @@ export const TransactionStep = ({
       />
 
       <Button
-        className="w-full mt-5"
+        className="w-full mt-5 rounded-xl"
         onClick={buttonHandler}
         variant={
           (isError && "destructive") || (isLoading && "secondary") || "default"
@@ -277,6 +289,10 @@ const TransactionDetails = ({
     srcNetwork,
     txHash: transactionData.txHash,
   });
+
+  const srcAmountPerOneDst = formatNumber(
+    calculateSrcAmountPerOneDst(srcTokenAmount, exchangeRate),
+  );
   return (
     <div className="w-full flex flex-col text-xs mt-5 text-white">
       <TransactionRow label="TX ID">
@@ -322,7 +338,7 @@ const TransactionDetails = ({
       </TransactionRow>
 
       <TransactionRow label="Exchange Rate">
-        {exchangeRate} {tokensData[selectedSrcToken]?.token}{" "}
+        {srcAmountPerOneDst} {tokensData[selectedSrcToken]?.token}{" "}
         <span className="text-gray-700">
           ({tokensData[selectedSrcToken]?.network})
         </span>{" "}
@@ -330,6 +346,15 @@ const TransactionDetails = ({
         <span className="text-gray-700">
           ({tokensData[selectedDstToken]?.network})
         </span>
+      </TransactionRow>
+
+      <TransactionRow label="Protocol Fee">
+        <span className="text-gray-700">1 %</span>
+      </TransactionRow>
+      <TransactionRow label="Total Receive Amount">
+        {formatNumber(
+          calculateTotalReceiveAmount(srcTokenAmount, exchangeRate),
+        )}
       </TransactionRow>
     </div>
   );

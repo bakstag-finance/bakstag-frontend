@@ -268,7 +268,7 @@ const ActionButton = ({
 
   return (
     <Button
-      className="w-full mt-5"
+      className="w-full mt-5 rounded-xl"
       onClick={buttonHandler}
       variant={
         (isError && "destructive") || (isLoading && "secondary") || "default"

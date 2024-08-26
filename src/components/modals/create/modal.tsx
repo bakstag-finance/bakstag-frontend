@@ -11,11 +11,7 @@ import {
   DialogTrigger,
   VisuallyHidden,
 } from "@/components/ui";
-import {
-  isValidCryptoAddress,
-  hexZeroPadTo32,
-  toSD,
-} from "@/lib/helpers";
+import { isValidCryptoAddress, hexZeroPadTo32, toSD } from "@/lib/helpers";
 import { useAccount, useSwitchChain } from "wagmi";
 import { tokensData } from "@/lib/constants";
 import { wagmiConfig } from "@/lib/wagmi/config";
@@ -338,7 +334,9 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
   return (
     <Dialog open={openModal} onOpenChange={onOpenChangeHandler}>
       <DialogTrigger asChild>
-        <Button className={"bg-white text-black w-full"}>{buttonText}</Button>
+        <Button className={"bg-white text-black w-full rounded-xl"}>
+          {buttonText}
+        </Button>
       </DialogTrigger>
       <DialogOverlay>
         <DialogContent className={"w-full max-w-[370px] rounded-3xl"}>

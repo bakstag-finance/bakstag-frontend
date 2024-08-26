@@ -9,6 +9,8 @@ import {
 import { tokensData } from "@/lib/constants";
 import {
   addressFormat,
+  calculateSrcAmountPerOneDst,
+  formatNumber,
   isValidTokenAmount,
   isValueOutOfBounds,
 } from "@/lib/helpers";
@@ -195,31 +197,65 @@ const Summary = ({
   exchangeRate: string;
   destinationWallet: string;
   srcAddress: `0x${string}` | undefined;
-  totalReceiveAmount: string;
+  totalReceiveAmount: number;
+}) => {
+  const isShowExchangeRate =
+    selectedDstToken && selectedSrcToken && exchangeRate && srcTokenAmount;
+
+  const isShowTotalReceiveAmount = exchangeRate && selectedDstToken;
+
+  const srcAmountPerOneDst = formatNumber(
+    calculateSrcAmountPerOneDst(srcTokenAmount, exchangeRate),
+  );
+
+  return (
+    <div className="w-full flex flex-col text-xs mt-5">
+      <SummaryRow
+        label="Locked Amount"
+        value={exchangeRate}
+        token={selectedSrcToken}
+      />
+      <AddressSummaryRow label="to Wallet" value={destinationWallet} />
+      <AddressSummaryRow
+        label="from Wallet"
+        value={srcAddress ?? "Connect Wallet"}
+      />
+      <SummaryRow
+        label="Exchange Rate"
+        value={
+          isShowExchangeRate
+            ? `${srcAmountPerOneDst + " " + tokensData[selectedDstToken].token} = 1 ${tokensData[selectedSrcToken].token}`
+            : ""
+        }
+        token={selectedDstToken}
+      />
+      <SummaryRow label="Protocol Fee" value="1%" />
+      <SummaryRow
+        label="Total Receive amount"
+        value={isShowTotalReceiveAmount ? formatNumber(totalReceiveAmount) : ""}
+        token={selectedDstToken}
+      />
+    </div>
+  );
+};
+
+const AddressSummaryRow = ({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
 }) => (
-  <div className="w-full flex flex-col text-xs mt-5">
-    <SummaryRow
-      label="Locked Amount"
-      value={exchangeRate}
-      token={selectedSrcToken}
-    />
-    <SummaryRow label="to Wallet" value={destinationWallet} isAddress={true} />
-    <SummaryRow
-      label="from Wallet"
-      value={srcAddress ?? "Connect Wallet"}
-      isAddress={true}
-    />
-    <SummaryRow
-      label="Exchange Rate"
-      value={`${exchangeRate} = 1`}
-      token={selectedDstToken}
-    />
-    <SummaryRow label="Protocol Fee" value="1%" />
-    <SummaryRow
-      label="Total Receive amount"
-      value={totalReceiveAmount}
-      token={selectedDstToken}
-    />
+  <div className="w-full flex flex-row justify-between items-center my-2">
+    <span>{label}</span>
+    {value?.length > 8 ? (
+      <div className="flex flex-row items-center text-gray-800">
+        {addressFormat(value)}
+        <Copy textToCopy={value} />
+      </div>
+    ) : (
+      <Skeleton className="w-16 h-4" />
+    )}
   </div>
 );
 
@@ -227,31 +263,22 @@ const SummaryRow = ({
   label,
   value,
   token,
-  isAddress = false,
 }: {
   label: string;
   value: string;
   token?: string;
-  isAddress?: boolean;
 }) => (
   <div className="w-full flex flex-row justify-between items-center my-2">
     <span>{label}</span>
-    {isAddress ? (
-      value?.length > 8 ? (
-        <div className="flex flex-row items-center text-gray-800">
-          {addressFormat(value)}
-          <Copy textToCopy={value} />
-        </div>
-      ) : (
-        <Skeleton className="w-16 h-4" />
-      )
-    ) : (
+    {value?.length > 0 ? (
       <span>
         {value}
         {token && (
-          <span className="text-gray-700"> ({tokensData[token]?.network})</span>
+          <span className="text-gray-700"> {tokensData[token]?.token}</span>
         )}
       </span>
+    ) : (
+      <Skeleton className="w-16 h-4" />
     )}
   </div>
 );
@@ -271,7 +298,7 @@ const ActionButton = ({
 }) => (
   <>
     <Button
-      className="w-full mt-5"
+      className="w-full mt-5 rounded-xl"
       disabled={buttonDisabled}
       onClick={handleCreateSwap}
       variant={
@@ -283,7 +310,7 @@ const ActionButton = ({
       {getButtonText(approvingStatus, approvingErrorMessage)}
     </Button>
     <Button
-      className="w-full mt-5 bg-black text-gray-700 border border-white border-opacity-50 hover:bg-gray-800"
+      className="w-full mt-5 bg-black text-gray-700 border border-white border-opacity-50 hover:bg-gray-800 rounded-xl"
       onClick={handleClose}
     >
       Cancel
@@ -295,13 +322,7 @@ const calculateTotalReceiveAmount = (
   srcTokenAmount: string,
   exchangeRate: string,
 ) => {
-  const _totalReceiveAmount =
-    Number(srcTokenAmount) * Number(exchangeRate) * 0.99;
-  return new Intl.NumberFormat("ru-RU", {
-    style: "decimal",
-    minimumFractionDigits: 14,
-    maximumFractionDigits: 14,
-  }).format(_totalReceiveAmount);
+  return Number(srcTokenAmount) * Number(exchangeRate) * 0.99;
 };
 
 const validateTokenAmount = (amount: string) =>

@@ -1,4 +1,8 @@
-import { addressFormat } from "./address_format";
+import {
+  addressFormat,
+  calculateSrcAmountPerOneDst,
+  formatNumber,
+} from "./address_format";
 import {
   isEthAddress,
   isSolanaAddress,
@@ -34,4 +38,6 @@ export {
   getTokenField,
   hexStripsAddr,
   getScanLink,
+  formatNumber,
+  calculateSrcAmountPerOneDst,
 };

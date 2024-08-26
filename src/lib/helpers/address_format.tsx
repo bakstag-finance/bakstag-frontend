@@ -8,3 +8,17 @@ export const addressFormat = (str: string): string => {
 
   return `${start}...${end}`;
 };
+
+export const calculateSrcAmountPerOneDst = (
+  srcAmount: string,
+  dstAmount: string,
+) => {
+  return Number(srcAmount) / Number(dstAmount);
+};
+
+export const formatNumber = (num: number, decimals: number = 2): string => {
+  return num
+    .toFixed(decimals)
+    .replace(/\.?0+$/, "")
+    .toLocaleString();
+};

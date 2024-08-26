@@ -43,8 +43,8 @@ export const AcceptModal = ({ order, refetch }: Props) => {
   const [openModal, setOpenModal] = useState(false);
   const [step, setStep] = useState<ConnectModalStep>("main");
 
-  const [srcTokenAmount, setSrcTokenAmount] = useState("0.0");
-  const [dstTokenAmount, setDstTokenAmount] = useState("0.0");
+  const [srcTokenAmount, setSrcTokenAmount] = useState("0");
+  const [dstTokenAmount, setDstTokenAmount] = useState("0");
 
   const [destinationWallet, setDestinationWallet] = useState("");
 

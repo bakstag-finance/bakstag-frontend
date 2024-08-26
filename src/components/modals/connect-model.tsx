@@ -88,7 +88,7 @@ export const ConnectModal = () => {
           onValueChange={(step) => setMainTabsStep(step)}
           className="w-full flex flex-col items-center text-white"
         >
-          <TabsList className={"w-full"}>
+          <TabsList className={"w-full rounded-xl"}>
             <TabsTrigger value="wallet" className={"w-full"}>
               Wallet
             </TabsTrigger>
@@ -308,7 +308,7 @@ export const ConnectModal = () => {
           {!isDeletingStep ? walletStepRender() : <DeletingStep />}
 
           <Button
-            className="w-full mt-5 bg-black text-gray-700 border border-white border-opacity-50 hover:bg-gray-800"
+            className="w-full mt-5 bg-black text-gray-700 border border-white border-opacity-50 hover:bg-gray-800 rounded-xl"
             onClick={() =>
               step === "main" ? cancelHandler() : setStep("main")
             }
