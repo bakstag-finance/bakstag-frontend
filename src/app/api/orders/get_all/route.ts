@@ -42,8 +42,6 @@ export async function GET(req: Request) {
       whereCondition.srcTokenNetwork = tokensData[tokenToSell].network;
     }
 
-    console.log("WhereCondition", whereCondition);
-
     const result = await prisma.order.findMany({
       where: whereCondition,
     });
