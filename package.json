@@ -20,6 +20,8 @@
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"}  prisma/seed.ts"
   },
   "dependencies": {
+    "@layerzerolabs/lz-evm-oapp-v2": "^2.3.38",
+    "@layerzerolabs/lz-v2-utilities": "^2.3.38",
     "@layerzerolabs/scan-client": "^0.0.8",
     "@prisma/client": "^5.18.0",
     "@radix-ui/react-dialog": "^1.1.1",

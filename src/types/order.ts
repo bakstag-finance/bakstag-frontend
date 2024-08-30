@@ -2,6 +2,7 @@ export interface Order {
   offerId: string;
   dstSellerAddress: string;
   dstEid: number;
+  srcSellerAddress: string;
   srcTokenAddress: string;
   srcTokenTicker: string;
   srcTokenNetwork: string;
@@ -11,7 +12,6 @@ export interface Order {
   srcAmountLD: bigint;
   exchangeRateSD: bigint;
 }
-
 export interface OrderProps {
   srcToken: {
     ticker: string;

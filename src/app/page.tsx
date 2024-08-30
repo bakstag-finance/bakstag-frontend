@@ -90,7 +90,7 @@ export default function Home() {
               />
             </div>
             <div className="px-0 mt-6 flex justify-center items-center h-full w-full lg:pl-5">
-              <ConnectModal />
+              <ConnectModal refetch={refetch} />
             </div>
           </div>
         </div>

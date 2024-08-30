@@ -1,4 +1,4 @@
-import { ConnectModal } from "./connect-model";
+import { ConnectModal } from "./connect";
 import { AcceptModal } from "./accept";
 import { CreateModal } from "./create";
 
