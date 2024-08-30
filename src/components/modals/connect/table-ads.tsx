@@ -28,7 +28,12 @@ export const TableComponent = ({ setStep, setOrderData }: Props) => {
   const { address } = useAccount();
   const [tokenToBuy, setTokenToBuy] = useState("");
 
-  const { data: tableData, isLoading, isError, refetch } = useQuery<Order[]>({
+  const {
+    data: tableData,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery<Order[]>({
     queryKey: ["table-ads", tokenToBuy, address],
     queryFn: async () => {
       const result = await axios.get(
@@ -73,7 +78,10 @@ const FilterSection = ({
       <SelectTrigger className="w-full ml-2 border rounded-md">
         <SelectValue placeholder="Most Recent" />
       </SelectTrigger>
-      <SelectContent className="bg-black text-white p-2 hover:border-gray-800 focus:border-gray-800" defaultValue="most">
+      <SelectContent
+        className="bg-black text-white p-2 hover:border-gray-800 focus:border-gray-800"
+        defaultValue="most"
+      >
         <SelectGroup>
           <SelectItem value="most">Most Recent</SelectItem>
           <SelectItem value="new">Newest</SelectItem>
@@ -90,7 +98,7 @@ const TableContent = ({
   isError,
   refetch,
   setStep,
-  setOrderData
+  setOrderData,
 }: {
   tableData: Order[];
   isLoading: boolean;
@@ -102,11 +110,16 @@ const TableContent = ({
   <div className="mt-5 w-full flex flex-col h-64 overflow-y-scroll no-scrollbar rounded-xl border border-gray-800 p-2">
     {isLoading && <LoadingState />}
     {isError && <ErrorState refetch={refetch} />}
-    {tableData && !isLoading &&  tableData.length === 0 && <EmptyState />}
+    {tableData && !isLoading && tableData.length === 0 && <EmptyState />}
     {tableData && tableData.length > 0 && (
       <>
         {tableData.map((item, i) => (
-          <TableRow key={i} item={item} setStep={setStep} setOrderData={setOrderData} />
+          <TableRow
+            key={i}
+            item={item}
+            setStep={setStep}
+            setOrderData={setOrderData}
+          />
         ))}
       </>
     )}
@@ -116,7 +129,7 @@ const TableContent = ({
 const TableRow = ({
   item,
   setStep,
-  setOrderData
+  setOrderData,
 }: {
   item: Order;
   setStep: Dispatch<SetStateAction<ConnectModalStep>>;
@@ -129,7 +142,9 @@ const TableRow = ({
     <div className="w-full flex flex-row h-28 px-2 py-2 border-b border-gray-800">
       <div className="flex flex-col w-full justify-between">
         <div className="flex flex-col">
-          <span className="text-xs text-gray-700 font-semibold">Exchange Rate</span>
+          <span className="text-xs text-gray-700 font-semibold">
+            Exchange Rate
+          </span>
           <span className="text-lg flex items-start">
             {formattedDstAmount}{" "}
             <span className="ml-1 mt-1 text-gray-700 text-sm">
@@ -139,7 +154,9 @@ const TableRow = ({
         </div>
         <div className="flex w-full justify-between">
           <div className="flex flex-col mt-1">
-            <span className="text-xs text-gray-700 font-semibold">Available Amount</span>
+            <span className="text-xs text-gray-700 font-semibold">
+              Available Amount
+            </span>
             <span className="text-lg flex items-start">
               {formattedSrcAmount}{" "}
               <span className="ml-1 mt-1 text-gray-700 text-sm">
@@ -148,17 +165,19 @@ const TableRow = ({
             </span>
           </div>
           <div className="flex justify-center items-end w-10">
-            <Trash className="cursor-pointer" onClick={() => {
-              setStep("delete");
-              setOrderData(item)
-            }} />
+            <Trash
+              className="cursor-pointer"
+              onClick={() => {
+                setStep("delete");
+                setOrderData(item);
+              }}
+            />
           </div>
         </div>
       </div>
     </div>
   );
 };
-
 
 const LoadingState = () => (
   <div className="w-full h-full flex flex-col justify-center items-center text-sm">
@@ -168,7 +187,6 @@ const LoadingState = () => (
   </div>
 );
 
-
 const ErrorState = ({ refetch }: { refetch: () => void }) => (
   <div className="w-full h-full flex flex-col justify-center items-center text-sm">
     <Button variant="destructive" onClick={refetch}>
@@ -176,7 +194,6 @@ const ErrorState = ({ refetch }: { refetch: () => void }) => (
     </Button>
   </div>
 );
-
 
 const EmptyState = () => (
   <div className="w-full h-full flex flex-col justify-center items-center text-sm">

@@ -193,7 +193,7 @@ export const DeletingStep = ({ order, setStep, refetch }: Props) => {
         throw new Error("No txHash");
       }
     } catch (e) {
-      setStatus("error")
+      setStatus("error");
       console.log(e);
     }
   };

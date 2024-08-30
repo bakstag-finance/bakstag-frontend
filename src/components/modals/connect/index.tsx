@@ -1,5 +1,3 @@
 import { ConnectModal } from "./modal";
 
-export  {
-    ConnectModal
-}
+export { ConnectModal };

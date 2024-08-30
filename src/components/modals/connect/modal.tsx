@@ -293,7 +293,9 @@ export const ConnectModal = ({ refetch }: Props) => {
         </Tabs>
       </>
     ),
-    delete: <DeletingStep order={orderData} setStep={setStep} refetch={refetch} />,
+    delete: (
+      <DeletingStep order={orderData} setStep={setStep} refetch={refetch} />
+    ),
   };
 
   const walletStepRender = () => {

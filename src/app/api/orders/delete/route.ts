@@ -6,13 +6,11 @@ export const dynamic = "force-dynamic";
 export async function POST(req: Request) {
   try {
     const data = await req.json();
-    const {
-      offerId,
-    } = data;
+    const { offerId } = data;
     const _result = await prisma.order.delete({
-        where: {
-            offerId: offerId
-        }
+      where: {
+        offerId: offerId,
+      },
     });
 
     return NextResponse.json({
