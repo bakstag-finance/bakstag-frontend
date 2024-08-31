@@ -339,7 +339,7 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
         </Button>
       </DialogTrigger>
       <DialogOverlay>
-        <DialogContent className={"w-full max-w-[370px] rounded-3xl"}>
+        <DialogContent className={"w-full max-w-[380px] rounded-3xl"}>
           <VisuallyHidden>
             <DialogTitle></DialogTitle>
           </VisuallyHidden>

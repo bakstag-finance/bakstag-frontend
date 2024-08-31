@@ -27,7 +27,7 @@ export const SelectCoin = ({
   return (
     <Select value={value} onValueChange={setValue}>
       <SelectTrigger className={cn("w-full", className)}>
-        <SelectValue placeholder={placeholder} />
+        <SelectValue placeholder={placeholder} className="border border-red"/>
       </SelectTrigger>
       <SelectContent
         className={
@@ -64,7 +64,7 @@ export const SelectCoin = ({
         </SelectGroup> */}
         <SelectSeparator className={"bg-gray-800"} />
         <SelectGroup>
-          <SelectLabel>Base Tokens</SelectLabel>
+          <SelectLabel className="text-gray-700">Base Tokens</SelectLabel>
           <SelectItem value="eth-base">
             ETH <span className="text-gray-700">(Base)</span>
           </SelectItem>
