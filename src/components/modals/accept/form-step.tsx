@@ -3,7 +3,6 @@ import {
   addressFormat,
   calculateSrcAmountPerOneDst,
   formatNumber,
-  isValidCryptoAddress,
   isValidTokenAmount,
 } from "@/lib/helpers";
 import { cn } from "@/lib/utils";

@@ -136,7 +136,7 @@ const TableRow = ({
   setOrderData: Dispatch<SetStateAction<Order>>;
 }) => {
   const formattedSrcAmount = formatUnits(BigInt(item.srcAmountLD), 18);
-  const formattedDstAmount = formatUnits(BigInt(item.exchangeRateSD), 18);
+  const formattedDstAmount = formatUnits(BigInt(item.exchangeRateSD), 6);
 
   return (
     <div className="w-full flex flex-row h-28 px-2 py-2 border-b border-gray-800">

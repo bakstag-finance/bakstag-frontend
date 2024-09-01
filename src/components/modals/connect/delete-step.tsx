@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useState } from "react";
-import { Copy, Button, Skeleton } from "@/components/ui";
+import { Copy, Button } from "@/components/ui";
 import {
   Trash,
   ArrowUpRight,
@@ -320,7 +320,7 @@ const InfoSection = ({
       />
       <InfoRow
         label="Exchange Rate"
-        value={`${order.exchangeRateSD.toString()} ${order.dstTokenNetwork} = 1 ${order.srcTokenNetwork}`}
+        value={`${order.exchangeRateSD.toString()} ${order.dstTokenTicker} = 1 ${order.dstTokenTicker}`}
       />
     </div>
   );
@@ -350,7 +350,7 @@ const InfoRow = ({
           )}
         </>
       ) : (
-        <Skeleton className={"w-20 h-4"} />
+        <span className="text-gray-800">N/A</span>
       )}
     </div>
   </div>

@@ -195,8 +195,16 @@ const TransactionDetails = ({
       label="Amount to pay"
       value={`${transactionData.srcTokenAmount} ${transactionData.srcToken.ticker}`}
     />
-    <DetailRow label="to Wallet" value={destinationWallet} />
-    <DetailRow label="from Wallet" value={srcWalletAddress} />
+    <DetailRow
+      label="to Wallet"
+      value={addressFormat(destinationWallet)}
+      isCopy
+    />
+    <DetailRow
+      label="from Wallet"
+      value={addressFormat(srcWalletAddress)}
+      isCopy
+    />
     <DetailRow
       label="Amount to receive"
       value={`${transactionData.exchangeRate} ${transactionData.dstToken.ticker}`}
@@ -212,20 +220,24 @@ const DetailRow = ({
   label,
   value,
   isLink = false,
+  isCopy = false,
 }: {
   label: string;
   value: string;
   isLink?: boolean;
+  isCopy?: boolean;
 }) => (
   <div className="w-full flex flex-row justify-between items-center my-2">
     <span>{label}</span>
-    {isLink ? (
+    {isLink || isCopy ? (
       <div className="flex flex-row items-center justify-center text-gray-800">
         {addressFormat(value)}
         <Copy textToCopy={value} />
-        <Link href={LAYER_ZERO_SCAN + value} target="_blank">
-          <ArrowUpRight className="w-5 h-5 ml-1 text-gray-700 cursor-pointer hover:text-white" />
-        </Link>
+        {isLink && (
+          <Link href={LAYER_ZERO_SCAN + value} target="_blank">
+            <ArrowUpRight className="w-5 h-5 ml-1 text-gray-700 cursor-pointer hover:text-white" />
+          </Link>
+        )}
       </div>
     ) : (
       <span>{value}</span>
