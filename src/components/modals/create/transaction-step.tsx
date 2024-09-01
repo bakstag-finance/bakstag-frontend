@@ -41,7 +41,7 @@ interface TransactionData {
 interface Props {
   destinationWallet: string;
   srcAddress: `0x${string}` | undefined;
-  exchangeRate: string;
+  dstTokenAmount: string;
   srcTokenAmount: string;
   selectedSrcToken: string;
   selectedDstToken: string;
@@ -191,7 +191,7 @@ const calculateTotalReceiveAmount = (
 export const TransactionStep = ({
   destinationWallet,
   srcAddress,
-  exchangeRate,
+  dstTokenAmount,
   srcTokenAmount,
   selectedDstToken,
   selectedSrcToken,
@@ -242,7 +242,7 @@ export const TransactionStep = ({
         srcTokenAmount={srcTokenAmount}
         selectedSrcToken={selectedSrcToken}
         selectedDstToken={selectedDstToken}
-        exchangeRate={exchangeRate}
+        dstTokenAmount={dstTokenAmount}
         handleClose={handleClose}
         handleRetry={handleRetry}
         setTransactionStatus={setTransactionStatus}
@@ -280,7 +280,7 @@ const TransactionDetails = ({
   srcTokenAmount,
   selectedSrcToken,
   selectedDstToken,
-  exchangeRate,
+  dstTokenAmount,
   isMonochain,
   srcNetwork,
 }: DetailsProps) => {
@@ -291,7 +291,7 @@ const TransactionDetails = ({
   });
 
   const srcAmountPerOneDst = formatNumber(
-    calculateSrcAmountPerOneDst(srcTokenAmount, exchangeRate),
+    calculateSrcAmountPerOneDst(srcTokenAmount, dstTokenAmount),
   );
   return (
     <div className="w-full flex flex-col text-xs mt-5 text-white">
@@ -331,7 +331,7 @@ const TransactionDetails = ({
       </TransactionRow>
 
       <TransactionRow label="Amount to receive">
-        {exchangeRate} {tokensData[selectedDstToken]?.token}{" "}
+        {dstTokenAmount} {tokensData[selectedDstToken]?.token}{" "}
         <span className="text-gray-700">
           ({tokensData[selectedDstToken]?.network})
         </span>
@@ -353,7 +353,7 @@ const TransactionDetails = ({
       </TransactionRow>
       <TransactionRow label="Total Receive Amount">
         {formatNumber(
-          calculateTotalReceiveAmount(srcTokenAmount, exchangeRate),
+          calculateTotalReceiveAmount(srcTokenAmount, dstTokenAmount),
         )}
       </TransactionRow>
     </div>

@@ -25,8 +25,8 @@ interface FormStepProps {
   setSelectedDstToken: Dispatch<SetStateAction<string>>;
   srcTokenAmount: string;
   setSrcTokenAmount: Dispatch<SetStateAction<string>>;
-  exchangeRate: string;
-  setExchangeRate: Dispatch<SetStateAction<string>>;
+  dstTokenAmount: string;
+  setDstTokenAmount: Dispatch<SetStateAction<string>>;
   destinationWallet: string;
   setDestinationWallet: Dispatch<SetStateAction<string>>;
   srcAddress: `0x${string}` | undefined;
@@ -45,8 +45,8 @@ export const FormStep = ({
   setSrcTokenAmount,
   selectedDstToken,
   setSelectedDstToken,
-  exchangeRate,
-  setExchangeRate,
+  dstTokenAmount,
+  setDstTokenAmount,
   destinationWallet,
   setDestinationWallet,
   srcAddress,
@@ -64,11 +64,11 @@ export const FormStep = ({
 
   const totalReceiveAmount = calculateTotalReceiveAmount(
     srcTokenAmount,
-    exchangeRate,
+    dstTokenAmount,
   );
 
   const isCorrectSrcTokenAmount = validateTokenAmount(srcTokenAmount);
-  const isCorrectExchangeRate = validateTokenAmount(exchangeRate);
+  const isCorrectExchangeRate = validateTokenAmount(dstTokenAmount);
 
   const buttonDisabled = checkButtonDisabled(
     isWalletConnected,
@@ -93,8 +93,8 @@ export const FormStep = ({
         label="Token to Receive"
         selectedToken={selectedDstToken}
         setSelectedToken={setSelectedDstToken}
-        tokenAmount={exchangeRate}
-        setTokenAmount={setExchangeRate}
+        tokenAmount={dstTokenAmount}
+        setTokenAmount={setDstTokenAmount}
         isValidAmount={isCorrectExchangeRate}
         placeholder="Set Exchange Rate"
       />
@@ -107,7 +107,7 @@ export const FormStep = ({
         selectedSrcToken={selectedSrcToken}
         srcTokenAmount={srcTokenAmount}
         selectedDstToken={selectedDstToken}
-        exchangeRate={exchangeRate}
+        exchangeRate={dstTokenAmount}
         destinationWallet={destinationWallet}
         srcAddress={srcAddress}
         totalReceiveAmount={totalReceiveAmount}

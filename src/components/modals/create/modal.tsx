@@ -11,7 +11,13 @@ import {
   DialogTrigger,
   VisuallyHidden,
 } from "@/components/ui";
-import { isValidCryptoAddress, hexZeroPadTo32, toSD } from "@/lib/helpers";
+import {
+  isValidCryptoAddress,
+  hexZeroPadTo32,
+  toSD,
+  formatNumber,
+  calculateSrcAmountPerOneDst,
+} from "@/lib/helpers";
 import { useAccount, useSwitchChain } from "wagmi";
 import { tokensData } from "@/lib/constants";
 import { wagmiConfig } from "@/lib/wagmi/config";
@@ -43,7 +49,7 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
 
   // State of form
   const [selectedDstToken, setSelectedDstToken] = useState("");
-  const [exchangeRate, setExchangeRate] = useState("0.000001");
+  const [dstTokenAmount, setDstTokenAmount] = useState("0.000001");
 
   const [selectedSrcToken, setSelectedSrcToken] = useState("");
   const [srcTokenAmount, setSrcTokenAmount] = useState("0.000001");
@@ -89,7 +95,7 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
     handleRetry();
     setSelectedSrcToken("");
     setSrcTokenAmount("0.000001");
-    setExchangeRate("0.000001");
+    setDstTokenAmount("0.000001");
     setSelectedDstToken("");
     setDestinationWallet("");
   };
@@ -111,7 +117,12 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
       srcTokenAmount.toString(),
       srcToken.decimals,
     ).toString();
-    const _exchangeRateSD = parseUnits(exchangeRate.toString(), 6).toString();
+
+    const srcAmountPerOneDst = formatNumber(
+      calculateSrcAmountPerOneDst(srcTokenAmount, dstTokenAmount),
+    );
+
+    const _exchangeRateSD = parseUnits(srcAmountPerOneDst, 6).toString();
 
     return {
       srcToken,
@@ -285,8 +296,8 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
         setDestinationWallet={setDestinationWallet}
         srcTokenAmount={srcTokenAmount}
         setSrcTokenAmount={setSrcTokenAmount}
-        exchangeRate={exchangeRate}
-        setExchangeRate={setExchangeRate}
+        dstTokenAmount={dstTokenAmount}
+        setDstTokenAmount={setDstTokenAmount}
         handleClose={handleClose}
         handleCreateSwap={handleCreateSwap}
         selectedDstToken={selectedDstToken}
@@ -304,7 +315,7 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
         destinationWallet={destinationWallet}
         srcAddress={address}
         transactionData={infoForTransactionStep}
-        exchangeRate={exchangeRate}
+        dstTokenAmount={dstTokenAmount}
         handleRetry={handleRetry}
         srcTokenAmount={srcTokenAmount}
         selectedSrcToken={selectedSrcToken}
