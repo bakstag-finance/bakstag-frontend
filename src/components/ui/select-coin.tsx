@@ -27,7 +27,7 @@ export const SelectCoin = ({
   return (
     <Select value={value} onValueChange={setValue}>
       <SelectTrigger className={cn("w-full", className)}>
-        <SelectValue placeholder={placeholder} className="border border-red"/>
+        <SelectValue placeholder={placeholder} className="border border-red" />
       </SelectTrigger>
       <SelectContent
         className={
