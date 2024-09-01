@@ -21,6 +21,37 @@ export async function POST(req: Request) {
       exchangeRateSD,
     } = data;
 
+    console.log(
+      " {\n" +
+        "        offerId,\n" +
+        "        srcSellerAddress: srcSellerAddress,\n" +
+        "        dstSellerAddress,\n" +
+        "        dstEid: parseInt(dstEid),\n" +
+        "        srcTokenTicker,\n" +
+        "        srcTokenNetwork,\n" +
+        "        srcTokenAddress,\n" +
+        "        dstTokenTicker,\n" +
+        "        dstTokenNetwork,\n" +
+        "        dstTokenAddress,\n" +
+        "        srcAmountLD: BigInt(srcAmountLD),\n" +
+        "        exchangeRateSD: BigInt(exchangeRateSD),\n" +
+        "      }",
+      {
+        offerId,
+        srcSellerAddress: srcSellerAddress,
+        dstSellerAddress,
+        dstEid: parseInt(dstEid),
+        srcTokenTicker,
+        srcTokenNetwork,
+        srcTokenAddress,
+        dstTokenTicker,
+        dstTokenNetwork,
+        dstTokenAddress,
+        srcAmountLD: BigInt(srcAmountLD),
+        exchangeRateSD: BigInt(exchangeRateSD),
+      },
+    );
+
     const _prev = await prisma.order.findFirst({
       where: {
         offerId: offerId,
