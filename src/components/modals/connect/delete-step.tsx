@@ -302,41 +302,42 @@ const InfoSection = ({
     srcTokenDecimals,
   );
 
-  const exchangeRate = formatUnits(
-      BigInt(order.exchangeRateSD),
-      6,
-  )
+  const exchangeRate = formatUnits(BigInt(order.exchangeRateSD), 6);
 
   return (
     <div className="w-full flex flex-col justify-center items-center">
-      <InfoRow
-        label="Termination TX ID"
-      >
-        { txId.length > 0 ? (
-            <div className={"flex flex-row"}>
-              <span>{addressFormat(txId)}</span>
-              <Copy textToCopy={txId}/>
-              <ArrowUpRight className="w-5 h-5 ml-1 text-gray-700 cursor-pointer hover:text-white"/>
-            </div>
-        ) : <span className={"text-gray-700"}>N/A</span>}
+      <InfoRow label="Termination TX ID">
+        {txId.length > 0 ? (
+          <div className={"flex flex-row"}>
+            <span>{addressFormat(txId)}</span>
+            <Copy textToCopy={txId} />
+            <ArrowUpRight className="w-5 h-5 ml-1 text-gray-700 cursor-pointer hover:text-white" />
+          </div>
+        ) : (
+          <span className={"text-gray-700"}>N/A</span>
+        )}
       </InfoRow>
-      <InfoRow
-          label="Available Amount"
-      >
-        <span>{formatedSrcAmount + " " + order.srcTokenTicker + " "}<span className={"text-gray-700"}>({order.srcTokenNetwork})</span></span>
+      <InfoRow label="Available Amount">
+        <span>
+          {formatedSrcAmount + " " + order.srcTokenTicker + " "}
+          <span className={"text-gray-700"}>({order.srcTokenNetwork})</span>
+        </span>
       </InfoRow>
-      <InfoRow
-        label="from Wallet"
-      >
+      <InfoRow label="from Wallet">
         <div className={"flex flex-row items-center justify-center"}>
-          <span className={"text-gray-700"}>{addressFormat(walletAddress)}</span>
-          <Copy textToCopy={walletAddress}/></div>
+          <span className={"text-gray-700"}>
+            {addressFormat(walletAddress)}
+          </span>
+          <Copy textToCopy={walletAddress} />
+        </div>
       </InfoRow>
-      <InfoRow
-          label="Exchange Rate"
-      >
-        <span>{exchangeRate + " " + order.dstTokenTicker + " "}<span className={"text-gray-700"}>({order.dstTokenNetwork})</span></span>
-        {" "}= 1 { order.srcTokenTicker } <span className={"text-gray-700"}>({order.srcTokenNetwork})</span>
+      <InfoRow label="Exchange Rate">
+        <span>
+          {exchangeRate + " " + order.dstTokenTicker + " "}
+          <span className={"text-gray-700"}>({order.dstTokenNetwork})</span>
+        </span>{" "}
+        = 1 {order.srcTokenTicker}{" "}
+        <span className={"text-gray-700"}>({order.srcTokenNetwork})</span>
       </InfoRow>
     </div>
   );
@@ -347,7 +348,7 @@ const InfoRow = ({
   children,
 }: {
   label: string;
-  children: React.ReactNode
+  children: React.ReactNode;
 }) => (
   <div className="mt-5 w-full flex flex-row justify-between items-center">
     <span>{label}</span>

@@ -134,8 +134,8 @@ const TokenAmountInput = ({
   setTokenAmount,
   isValidAmount,
   placeholder,
-    className,
-    isExchangeRate = false
+  className,
+  isExchangeRate = false,
 }: {
   label: string;
   selectedToken: string;
@@ -145,9 +145,14 @@ const TokenAmountInput = ({
   isValidAmount: boolean;
   placeholder: string;
   className?: string;
-  isExchangeRate: boolean
+  isExchangeRate: boolean;
 }) => (
-  <div className={cn("flex flex-row justify-between items-center text-xs", className)}>
+  <div
+    className={cn(
+      "flex flex-row justify-between items-center text-xs",
+      className,
+    )}
+  >
     <div className="w-full flex flex-col justify-between items-start">
       <span className="text-gray-700 ml-3">{label}</span>
       <SelectCoin
@@ -158,7 +163,9 @@ const TokenAmountInput = ({
       />
     </div>
     <div className="ml-2 w-full flex flex-col justify-between items-start">
-      <span className="text-gray-700 ml-3">{isExchangeRate ? "Set Exchange Rate" : "Amount"}</span>
+      <span className="text-gray-700 ml-3">
+        {isExchangeRate ? "Set Exchange Rate" : "Amount"}
+      </span>
       <Input
         className={cn(
           "mt-2 bg-black border rounded-lg border-gray-800",
@@ -217,10 +224,17 @@ const Summary = ({
 
   return (
     <div className="w-full flex flex-col text-xs mt-5">
-      <SummaryRow
-        label="Locked Amount"
-      >
-        { exchangeRate.length > 0 && selectedSrcToken ? <span>{exchangeRate + " " + tokensData[selectedSrcToken]?.token} <span className={"text-gray-700"}>({tokensData[selectedSrcToken].network})</span></span> : <span className={"text-gray-700"}>N/A</span>}
+      <SummaryRow label="Locked Amount">
+        {exchangeRate.length > 0 && selectedSrcToken ? (
+          <span>
+            {exchangeRate + " " + tokensData[selectedSrcToken]?.token}{" "}
+            <span className={"text-gray-700"}>
+              ({tokensData[selectedSrcToken].network})
+            </span>
+          </span>
+        ) : (
+          <span className={"text-gray-700"}>N/A</span>
+        )}
       </SummaryRow>
       <AddressSummaryRow label="to Wallet" value={destinationWallet} />
       <AddressSummaryRow
@@ -231,22 +245,37 @@ const Summary = ({
         label="Exchange Rate"
         // token={selectedDstToken}
       >
-          {isShowExchangeRate && selectedSrcToken && selectedDstToken
-              ? <span><span>{srcAmountPerOneDst + " " + tokensData[selectedDstToken].token + " "}<span
-                  className={"text-gray-700"}>({tokensData[selectedDstToken].network})</span></span> =
-                  1 <span>{tokensData[selectedSrcToken].token}</span> <span
-                      className={"text-gray-700"}>({tokensData[selectedSrcToken].network})</span></span>
-              : <span className={"text-gray-700"}>Set Exchange Rate</span>}
+        {isShowExchangeRate && selectedSrcToken && selectedDstToken ? (
+          <span>
+            <span>
+              {srcAmountPerOneDst +
+                " " +
+                tokensData[selectedDstToken].token +
+                " "}
+              <span className={"text-gray-700"}>
+                ({tokensData[selectedDstToken].network})
+              </span>
+            </span>{" "}
+            = 1 <span>{tokensData[selectedSrcToken].token}</span>{" "}
+            <span className={"text-gray-700"}>
+              ({tokensData[selectedSrcToken].network})
+            </span>
+          </span>
+        ) : (
+          <span className={"text-gray-700"}>Set Exchange Rate</span>
+        )}
       </SummaryRow>
       <SummaryRow label="Protocol Fee">
         <span>1%</span>
       </SummaryRow>
-      <SummaryRow
-        label="Total Receive amount"
-      >
-          {isShowTotalReceiveAmount ? <span>{formatNumber(totalReceiveAmount)}</span> : <span className={"text-gray-700"}>Set Exchange Rate</span>}
-          {/*value={isShowTotalReceiveAmount ? formatNumber(totalReceiveAmount) : ""}*/}
-          {/*token={selectedDstToken}*/}
+      <SummaryRow label="Total Receive amount">
+        {isShowTotalReceiveAmount ? (
+          <span>{formatNumber(totalReceiveAmount)}</span>
+        ) : (
+          <span className={"text-gray-700"}>Set Exchange Rate</span>
+        )}
+        {/*value={isShowTotalReceiveAmount ? formatNumber(totalReceiveAmount) : ""}*/}
+        {/*token={selectedDstToken}*/}
       </SummaryRow>
     </div>
   );
@@ -274,7 +303,7 @@ const AddressSummaryRow = ({
 
 const SummaryRow = ({
   label,
-  children
+  children,
 }: {
   label: string;
   children: React.ReactNode;

@@ -187,25 +187,42 @@ const Summary = ({
       : "";
   return (
     <div className="w-full flex flex-col text-xs mt-3">
-      <SummaryRow
-        label="Amount to pay"
-      >
-          { isSrcAmountExist ? <span>{srcTokenAmount} {srcToken.ticker} <span className={"text-gray-700"}>({srcToken.network})</span></span> : <span className={"text-gray-700"}>Provide amount to pay</span>}
+      <SummaryRow label="Amount to pay">
+        {isSrcAmountExist ? (
+          <span>
+            {srcTokenAmount} {srcToken.ticker}{" "}
+            <span className={"text-gray-700"}>({srcToken.network})</span>
+          </span>
+        ) : (
+          <span className={"text-gray-700"}>Provide amount to pay</span>
+        )}
       </SummaryRow>
       <AddressSummaryRow label="to Wallet" value={destinationWallet} />
       <AddressSummaryRow label="from Wallet" value={srcWalletAddress} />
-      <SummaryRow
-        label="Amount to receive"
-      >
-          { isDstAmountExist ? <span>{dstTokenAmount} {dstToken.ticker} <span className={"text-gray-700"}>({dstToken.network})</span></span> : <span className={"text-gray-700"}>Provide amount to receive</span>}
-      </SummaryRow>
-      <SummaryRow
-        label="Exchange Rate"
-      >
-          {isSrcAmountExist && srcAmountPerOneDst.length > 0 && (srcAmountPerOneDst !== "NaN" || Number(srcAmountPerOneDst) > 0 )&&  isDstAmountExist ?
+      <SummaryRow label="Amount to receive">
+        {isDstAmountExist ? (
           <span>
-              {srcAmountPerOneDst} {dstToken.ticker} <span className={"text-gray-700"}>({dstToken.network})</span> = 1 {srcToken.ticker} <span className={"text-gray-700"}>({srcToken.network})</span>
-          </span> : <span>Provide amounts</span>}
+            {dstTokenAmount} {dstToken.ticker}{" "}
+            <span className={"text-gray-700"}>({dstToken.network})</span>
+          </span>
+        ) : (
+          <span className={"text-gray-700"}>Provide amount to receive</span>
+        )}
+      </SummaryRow>
+      <SummaryRow label="Exchange Rate">
+        {isSrcAmountExist &&
+        srcAmountPerOneDst.length > 0 &&
+        (srcAmountPerOneDst !== "NaN" || Number(srcAmountPerOneDst) > 0) &&
+        isDstAmountExist ? (
+          <span>
+            {srcAmountPerOneDst} {dstToken.ticker}{" "}
+            <span className={"text-gray-700"}>({dstToken.network})</span> = 1{" "}
+            {srcToken.ticker}{" "}
+            <span className={"text-gray-700"}>({srcToken.network})</span>
+          </span>
+        ) : (
+          <span>Provide amounts</span>
+        )}
       </SummaryRow>
     </div>
   );
@@ -233,7 +250,7 @@ const AddressSummaryRow = ({
 
 const SummaryRow = ({
   label,
-    children
+  children,
 }: {
   label: string;
   children: React.ReactNode;

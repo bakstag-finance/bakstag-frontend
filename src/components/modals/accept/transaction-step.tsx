@@ -142,7 +142,8 @@ const StatusDisplay = ({
 }) => {
   const renderStatusIcon = () => {
     if (isError) return <FileWarning className="size-16 stroke-[0.5]" />;
-    if (isLoading) return <Clock11 className="size-16 text-white stroke-[0.5]" />;
+    if (isLoading)
+      return <Clock11 className="size-16 text-white stroke-[0.5]" />;
     if (isSuccess) return <CircleCheck className="size-16 stroke-[0.5]" />;
     return null;
   };
@@ -191,51 +192,60 @@ const TransactionDetails = ({
 }) => (
   <div className={"w-full flex flex-col text-xs mt-5 text-white"}>
     <DetailRow label="TX ID">
-         <div className={"flex flex-row items-center justify-center"}>
-           {addressFormat(transactionData.txHash)}
-           <Copy textToCopy={transactionData.txHash} />
-           <Link href={LAYER_ZERO_SCAN + transactionData.txHash} target="_blank">
-             <ArrowUpRight className="w-5 h-5 ml-1 text-gray-700 cursor-pointer hover:text-white" />
-           </Link>
-         </div>
+      <div className={"flex flex-row items-center justify-center"}>
+        {addressFormat(transactionData.txHash)}
+        <Copy textToCopy={transactionData.txHash} />
+        <Link href={LAYER_ZERO_SCAN + transactionData.txHash} target="_blank">
+          <ArrowUpRight className="w-5 h-5 ml-1 text-gray-700 cursor-pointer hover:text-white" />
+        </Link>
+      </div>
     </DetailRow>
-    <DetailRow
-      label="Amount to pay"
-    >
-      <span>{transactionData.srcTokenAmount} {transactionData.srcToken.ticker} <span className={"text-gray-700"}>({transactionData.srcToken.network})</span></span>
+    <DetailRow label="Amount to pay">
+      <span>
+        {transactionData.srcTokenAmount} {transactionData.srcToken.ticker}{" "}
+        <span className={"text-gray-700"}>
+          ({transactionData.srcToken.network})
+        </span>
+      </span>
     </DetailRow>
-    <DetailRow
-      label="to Wallet"
-    >
+    <DetailRow label="to Wallet">
       <div className={"flex flex-row items-center justify-center"}>
         {addressFormat(destinationWallet)}
         <Copy textToCopy={destinationWallet} />
       </div>
     </DetailRow>
-    <DetailRow
-        label="from Wallet"
-    >
+    <DetailRow label="from Wallet">
       <div className={"flex flex-row items-center justify-center"}>
         {addressFormat(srcWalletAddress)}
-        <Copy textToCopy={srcWalletAddress}/>
+        <Copy textToCopy={srcWalletAddress} />
       </div>
     </DetailRow>
-    <DetailRow
-        label="Amount to receive"
-    >
-      <span>{transactionData.exchangeRate} {transactionData.dstToken.ticker} <span className={"text-gray-700"}>({transactionData.dstToken.network})</span></span>
+    <DetailRow label="Amount to receive">
+      <span>
+        {transactionData.exchangeRate} {transactionData.dstToken.ticker}{" "}
+        <span className={"text-gray-700"}>
+          ({transactionData.dstToken.network})
+        </span>
+      </span>
     </DetailRow>
-    <DetailRow
-        label="Exchange Rate"
-    >
-      <span>{transactionData.exchangeRate} {transactionData.dstToken.ticker} <span className={"text-gray-700"}>({transactionData.dstToken.network})</span> = 1 {transactionData.srcToken.ticker} <span className={"text-gray-700"}>({transactionData.srcToken.network})</span></span>
-  </DetailRow>
+    <DetailRow label="Exchange Rate">
+      <span>
+        {transactionData.exchangeRate} {transactionData.dstToken.ticker}{" "}
+        <span className={"text-gray-700"}>
+          ({transactionData.dstToken.network})
+        </span>{" "}
+        = 1 {transactionData.srcToken.ticker}{" "}
+        <span className={"text-gray-700"}>
+          ({transactionData.srcToken.network})
+        </span>
+      </span>
+    </DetailRow>
   </div>
 );
 
 const DetailRow = ({
   label,
-  children
+  children,
 }: {
   label: string;
   children: React.ReactNode;

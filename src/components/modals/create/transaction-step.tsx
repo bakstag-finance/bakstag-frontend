@@ -145,12 +145,14 @@ const StatusMessage = ({
   }
 
   if (isSuccess) {
-    return  <>
-      <span className="mt-5">Ad Successfully Created & Listed</span>
-      <span className="text-gray-700 mt-2">
+    return (
+      <>
+        <span className="mt-5">Ad Successfully Created & Listed</span>
+        <span className="text-gray-700 mt-2">
           might need 2 mins to appear in a list
         </span>
-    </>;
+      </>
+    );
   }
 
   return null;
@@ -340,9 +342,10 @@ const TransactionDetails = ({
         <span className="text-gray-700">
           ({tokensData[selectedSrcToken]?.network})
         </span>{" "}
-        = 1{" "}{tokensData[selectedDstToken]?.token}
+        = 1 {tokensData[selectedDstToken]?.token}
         <span className="text-gray-700">
-          {" "}({tokensData[selectedDstToken]?.network})
+          {" "}
+          ({tokensData[selectedDstToken]?.network})
         </span>
       </TransactionRow>
 

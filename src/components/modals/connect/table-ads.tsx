@@ -75,8 +75,11 @@ const FilterSection = ({
       setValue={setTokenToBuy}
     />
     <Select>
-      <SelectTrigger className="w-full ml-2 border rounded-md" showChevronUpDown>
-        <SelectValue placeholder="Most Recent"  />
+      <SelectTrigger
+        className="w-full ml-2 border rounded-md"
+        showChevronUpDown
+      >
+        <SelectValue placeholder="Most Recent" />
       </SelectTrigger>
       <SelectContent
         className="bg-black text-white p-2 hover:border-gray-800 focus:border-gray-800"
