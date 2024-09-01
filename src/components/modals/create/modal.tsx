@@ -49,10 +49,10 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
 
   // State of form
   const [selectedDstToken, setSelectedDstToken] = useState("");
-  const [dstTokenAmount, setDstTokenAmount] = useState("0.000001");
+  const [dstTokenAmount, setDstTokenAmount] = useState("0.01");
 
   const [selectedSrcToken, setSelectedSrcToken] = useState("");
-  const [srcTokenAmount, setSrcTokenAmount] = useState("0.000001");
+  const [srcTokenAmount, setSrcTokenAmount] = useState("0.01");
 
   const [destinationWallet, setDestinationWallet] = useState("");
 
@@ -350,7 +350,7 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
         </Button>
       </DialogTrigger>
       <DialogOverlay>
-        <DialogContent className={"w-full max-w-[380px] rounded-3xl"}>
+        <DialogContent className={"w-full max-w-[380px] bg-black"}>
           <VisuallyHidden>
             <DialogTitle></DialogTitle>
           </VisuallyHidden>

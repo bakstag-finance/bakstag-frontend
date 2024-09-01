@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import {
   Button,
   Dialog,
@@ -15,13 +15,14 @@ import {
 } from "@/components/ui";
 import { useConnect, useAccount, useDisconnect } from "wagmi";
 import { metaMask } from "wagmi/connectors";
-import { LogOut, X } from "lucide-react";
+import {LogIn, X} from "lucide-react";
 import { addressFormat } from "@/lib/helpers";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { PhantomWalletName } from "@solana/wallet-adapter-wallets";
 import { DeletingStep } from "./delete-step";
 import { TableComponent } from "./table-ads";
 import { Order } from "@/types/order";
+import {cn} from "@/lib/utils";
 
 type ConnectModalStep = "main" | "wallet-choose" | "delete";
 
@@ -49,7 +50,6 @@ export const ConnectModal = ({ refetch }: Props) => {
     srcAmountLD: BigInt(0),
     exchangeRateSD: BigInt(0),
   });
-
   const solanaWallet = useWallet();
 
   const { connect, status } = useConnect();
@@ -112,154 +112,163 @@ export const ConnectModal = ({ refetch }: Props) => {
           className="w-full flex flex-col items-center text-white"
         >
           <TabsList className={"w-full rounded-xl"}>
-            <TabsTrigger value="wallet" className={"w-full"}>
+            <TabsTrigger value="wallet" className={"w-full rounded-lg"}>
               Wallet
             </TabsTrigger>
-            <TabsTrigger value="ads" className={"w-full"}>
+            <TabsTrigger value="ads" className={"w-full rounded-lg"}>
               Ads
             </TabsTrigger>
           </TabsList>
           <TabsContent value="wallet" className="w-full">
             <div className="w-full flex flex-col">
               <div
-                className={`mt-2 border border-gray-800 rounded-xl  h-20  px-5 ${isWalletConnected ? "h-24" : "pt-5"}`}
+                  className={`mt-2 border border-gray-800 rounded-xl  px-5 ${isWalletConnected ? "h-22 py-3" : "h-20"}`}
               >
                 <div className={"flex w-full justify-between items-center"}>
-                  <div className="flex flex-col text-white text-sm">
-                    <span>Ethereum</span>
+                  <div className="flex flex-col">
+                    <span className={"font-semibold text-sm text-white"}>Ethereum</span>
                   </div>
                   <Button
-                    onClick={() => {
-                      if (isWalletConnected) {
-                        void metamaskWalletHandler();
-                      } else {
-                        setWalletTabStep("ethereum");
-                        setStep("wallet-choose");
-                      }
-                    }}
-                    className={
-                      isWalletConnected
-                        ? "bg-transparent group  border border-gray-800 w-10 h-10 self-start mt-5 rounded-lg justify-center"
-                        : ""
-                    }
+                      onClick={() => {
+                        if (isWalletConnected) {
+                          void metamaskWalletHandler();
+                        } else {
+                          setWalletTabStep("ethereum");
+                          setStep("wallet-choose");
+                        }
+                      }}
+                      className={cn(
+                          "group  border border-gray-800 self-start justify-center rounded-xl w-10 h-10",
+                          isWalletConnected ? "bg-transparent mt-3" : "bg-white"
+                      )}
                   >
                     {isWalletConnected ? (
-                      <span>
+                        <span>
                         <X
-                          className={
-                            "text-muted-foreground group-hover:text-white"
-                          }
-                          size={20}
+                            className={
+                              "text-gray-700 group-hover:text-white"
+                            }
+                            size={20}
                         />
                       </span>
                     ) : (
-                      <LogOut />
+                        <span>
+                          <LogIn size={15} className={
+                            "group-hover:text-white"
+                          }
+                          />
+                        </span>
                     )}
                   </Button>
                 </div>
                 <span
-                  className={`text-muted-foreground mt-5 ${!isWalletConnected && "hidden"}`}
+                    className={`text-gray-700 ${!isWalletConnected && "hidden"}`}
                 >
                   {isWalletConnected && addressFormat(account.address!)}
                 </span>
               </div>
               <div
-                className={`mt-2 border border-gray-800 rounded-xl  h-20  px-5 ${isSolanaWalletConnected ? "h-24" : "pt-5"}`}
+                  className={`mt-2 border border-gray-800 rounded-xl  px-5 ${isSolanaWalletConnected ? "h-22 py-3" : "h-20 flex justify-center items-center"}`}
               >
                 <div className={"flex w-full justify-between items-center"}>
-                  <div className="flex flex-col text-white text-sm">
-                    <span>Solana</span>
+                  <div className="flex flex-col">
+                    <span className={"font-semibold text-sm text-white"}>Solana</span>
                   </div>
                   <Button
-                    onClick={() => {
-                      if (isSolanaWalletConnected) {
-                        void solanaWalletHandler();
-                      } else {
-                        setWalletTabStep("solana");
-                        setStep("wallet-choose");
-                      }
-                    }}
-                    className={
-                      isSolanaWalletConnected
-                        ? "bg-transparent group  border border-gray-800 w-10 h-10 self-start mt-5 rounded-lg justify-center"
-                        : ""
-                    }
+                      onClick={() => {
+                        if (isSolanaWalletConnected) {
+                          void solanaWalletHandler();
+                        } else {
+                          setWalletTabStep("solana");
+                          setStep("wallet-choose");
+                        }}}
+                      className={cn(
+                          "group  border border-gray-800 self-start justify-center rounded-xl w-10 h-10",
+                          isSolanaWalletConnected ? "bg-transparent mt-3" : "bg-white"
+                      )}
                   >
                     {isSolanaWalletConnected ? (
-                      <span>
+                        <span>
                         <X
-                          className={
-                            "text-muted-foreground group-hover:text-white"
-                          }
-                          size={20}
+                            className={
+                              "text-gray-700 group-hover:text-white"
+                            }
+                            size={20}
                         />
                       </span>
                     ) : (
-                      <LogOut />
+                        <span>
+                          <LogIn size={15} className={
+                            "group-hover:text-white"
+                          }
+                          />
+                        </span>
                     )}
                   </Button>
                 </div>
                 <span
-                  className={`text-muted-foreground mt-5 ${!isSolanaWalletConnected && "hidden"}`}
+                    className={`text-gray-700 ${!isSolanaWalletConnected && "hidden"}`}
                 >
-                  {isSolanaWalletConnected &&
-                    addressFormat(solanaWallet.publicKey!.toString())}
+                    {isSolanaWalletConnected &&
+                        addressFormat(solanaWallet.publicKey!.toString())}
                 </span>
               </div>
-              <div className="my-2 border border-gray-800 text-gray-800 rounded-xl flex w-full h-10 justify-between items-center px-5">
+
+              <div
+                  className="my-2 border border-gray-800 text-gray-800 rounded-xl flex w-full h-10 justify-between items-center px-5">
                 <span>Tron (in development )</span>
               </div>
             </div>
           </TabsContent>
           <TabsContent value="ads" className="w-full">
-            <TableComponent setStep={setStep} setOrderData={setOrderData} />
+            <TableComponent setStep={setStep} setOrderData={setOrderData}/>
           </TabsContent>
         </Tabs>
       </>
     ),
     "wallet-choose": (
-      <>
-        <Tabs
-          defaultValue="ethereum"
-          value={walletTabStep}
-          onValueChange={(step) => setWalletTabStep(step)}
-          className="w-full flex flex-col items-center text-white"
-        >
-          <TabsList className={"w-full"}>
-            <TabsTrigger
-              value="ethereum"
-              className={"w-full"}
-              disabled={isWalletConnected}
-            >
-              Ethereum
-            </TabsTrigger>
-            <TabsTrigger
-              value="solana"
-              className={"w-full"}
-              disabled={isSolanaWalletConnected}
-            >
-              Solana
-            </TabsTrigger>
-            <TabsTrigger value="tron" className={"w-full"}>
-              Tron
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="ethereum" className="w-full">
-            <div className="w-full flex flex-col">
-              {status === "pending" ? (
-                <div className={"text-center w-full text-sm"}>
-                  <span className={"text-white-800"}>Pending Approval</span>{" "}
-                  <br />
-                  <span className={"text-muted-foreground mt-2 block"}>
+        <>
+          <Tabs
+              defaultValue="ethereum"
+              value={walletTabStep}
+              onValueChange={(step) => setWalletTabStep(step)}
+              className="w-full flex flex-col items-center text-white"
+          >
+            <TabsList className={"w-full"}>
+              <TabsTrigger
+                  value="ethereum"
+                  className={"w-full"}
+                  disabled={isWalletConnected || status === "pending"}
+              >
+                Ethereum
+              </TabsTrigger>
+              <TabsTrigger
+                  value="solana"
+                  className={"w-full"}
+                  disabled={isSolanaWalletConnected || status === "pending"}
+              >
+                Solana
+              </TabsTrigger>
+              <TabsTrigger value="tron" className={"w-full"} disabled={status === "pending"}>
+                Tron
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="ethereum" className="w-full">
+              <div className="w-full flex flex-col">
+                {status === "pending" ? (
+                    <div className={"text-center w-full text-sm mt-3"}>
+                      <span className={"text-white-800"}>Pending Approval</span>{" "}
+                      <br/>
+                      <span className={"text-gray-700 mt-3 block"}>
                     Please sign the message in your wallet to complete
                     authentication process.
                   </span>
-                </div>
-              ) : (
-                <>
-                  <div
-                    className="border border-gray-800 rounded-xl flex w-full p-3 mt-5 justify-between items-start px-5 cursor-pointer"
-                    onClick={metamaskWalletHandler}
+                    </div>
+                ) : (
+                    <>
+                      <div
+                          className="border border-gray-800 rounded-xl flex w-full p-3 mt-5 justify-between items-start px-5 cursor-pointer"
+                          onClick={metamaskWalletHandler}
                   >
                     Metamask
                   </div>
@@ -322,30 +331,35 @@ export const ConnectModal = ({ refetch }: Props) => {
             : "+ Connect"}
         </Button>
       </DialogTrigger>
-      <DialogContent className={"w-full max-w-[380px]"}>
-        <VisuallyHidden>
-          <DialogTitle></DialogTitle>
-        </VisuallyHidden>
-        <VisuallyHidden>
-          <DialogDescription></DialogDescription>
-        </VisuallyHidden>
-        <div className={"w-full flex justify-center items-center flex-col"}>
-          {walletStepRender()}
+      <DialogContent
+          className="w-full max-w-[380px] bg-black transition-all duration-1000 ease-linear"
+      >
+         <VisuallyHidden>
+           <DialogTitle></DialogTitle>
+         </VisuallyHidden>
+         <VisuallyHidden>
+           <DialogDescription></DialogDescription>
+         </VisuallyHidden>
+         <div
+             className={"w-full flex justify-center items-center flex-col"}
+         >
+           {walletStepRender()}
 
-          <Button
-            className="w-full mt-5 bg-black text-gray-700 border border-white border-opacity-50 hover:bg-gray-800 rounded-xl"
-            onClick={cancelHandler}
-          >
-            {step === "main" ? "Cancel" : "Back"}
-          </Button>
-          {step === "delete" ? (
-            <span className="text-xs text-gray-700 mt-5">
+           <Button
+               className="w-full mt-5 bg-black text-gray-700 border border-white border-opacity-50 hover:bg-gray-800 rounded-xl"
+               onClick={cancelHandler}
+               disabled={status==="pending"}
+           >
+             {step === "main" ? "Cancel" : "Back"}
+           </Button>
+           {step === "delete" ? (
+               <span className="text-xs text-gray-700 mt-5">
               After the AD offer is terminated, the remaining assets will be
               automatically unlocked. Termination is irreversible and cannot be
               undone.
             </span>
-          ) : null}
-        </div>
+           ) : null}
+         </div>
       </DialogContent>
     </Dialog>
   );

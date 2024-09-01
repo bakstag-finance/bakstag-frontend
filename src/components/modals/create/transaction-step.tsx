@@ -109,9 +109,9 @@ const StatusIcon = ({
   isLoading: boolean;
   isSuccess: boolean;
 }) => {
-  if (isError) return <FileWarning className="size-12" />;
-  if (isLoading) return <Clock11 className="size-12 text-white" />;
-  if (isSuccess) return <CircleCheck className="size-12" />;
+  if (isError) return <FileWarning className="size-16 stroke-[0.5]" />;
+  if (isLoading) return <Clock11 className="size-16 text-white stroke-[0.5]" />;
+  if (isSuccess) return <CircleCheck className="size-16 stroke-[0.5]" />;
   return null;
 };
 
@@ -128,7 +128,7 @@ const StatusMessage = ({
     return (
       <>
         <span className="mt-5">Ad Acceptance Failed</span>
-        <span className="text-gray-700">Please Retry</span>
+        <span className="text-gray-700 mt-2">Please Retry</span>
       </>
     );
   }
@@ -137,7 +137,7 @@ const StatusMessage = ({
     return (
       <>
         <span className="mt-5">Pending Transaction</span>
-        <span className="text-gray-700">
+        <span className="text-gray-700 mt-2">
           You can already view the transaction in the explorer
         </span>
       </>
@@ -145,7 +145,12 @@ const StatusMessage = ({
   }
 
   if (isSuccess) {
-    return <span className="mt-5">Success</span>;
+    return  <>
+      <span className="mt-5">Ad Successfully Created & Listed</span>
+      <span className="text-gray-700 mt-2">
+          might need 2 mins to appear in a list
+        </span>
+    </>;
   }
 
   return null;
@@ -222,7 +227,7 @@ export const TransactionStep = ({
 
   return (
     <div className="w-full flex flex-col items-center">
-      <div className="w-full h-24 flex flex-col justify-center items-center mt-2 text-xs text-white">
+      <div className="w-full h-44 flex flex-col justify-center items-center mt-2 text-xs text-white">
         <StatusIcon
           isError={isError}
           isLoading={isLoading}
@@ -305,7 +310,7 @@ const TransactionDetails = ({
         </div>
       </TransactionRow>
 
-      <TransactionRow label="Amount to pay">
+      <TransactionRow label="Amount to sell">
         {srcTokenAmount} {tokensData[selectedSrcToken]?.token}{" "}
         <span className="text-gray-700">
           ({tokensData[selectedSrcToken]?.network})
@@ -330,26 +335,19 @@ const TransactionDetails = ({
         )}
       </TransactionRow>
 
-      <TransactionRow label="Amount to receive">
-        {dstTokenAmount} {tokensData[selectedDstToken]?.token}{" "}
-        <span className="text-gray-700">
-          ({tokensData[selectedDstToken]?.network})
-        </span>
-      </TransactionRow>
-
       <TransactionRow label="Exchange Rate">
         {srcAmountPerOneDst} {tokensData[selectedSrcToken]?.token}{" "}
         <span className="text-gray-700">
           ({tokensData[selectedSrcToken]?.network})
         </span>{" "}
-        = 1{" "}
+        = 1{" "}{tokensData[selectedDstToken]?.token}
         <span className="text-gray-700">
-          ({tokensData[selectedDstToken]?.network})
+          {" "}({tokensData[selectedDstToken]?.network})
         </span>
       </TransactionRow>
 
       <TransactionRow label="Protocol Fee">
-        <span className="text-gray-700">1 %</span>
+        <span>1 %</span>
       </TransactionRow>
       <TransactionRow label="Total Receive Amount">
         {formatNumber(

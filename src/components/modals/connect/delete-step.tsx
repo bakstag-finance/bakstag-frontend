@@ -226,7 +226,7 @@ export const DeletingStep = ({ order, setStep, refetch }: Props) => {
       <ConfirmationSection status={status} />
       <InfoSection txId={txHash} walletAddress={walletAddress} order={order} />
       <Button
-        className="w-full mt-5 font-light"
+        className="w-full mt-5 font-light rounded-xl"
         variant={getButtonVariant(status)}
         disabled={status === "loading"}
         onClick={buttonHandler}
@@ -260,7 +260,7 @@ const ConfirmationSection = ({ status }: { status: Status }) => {
   const isSuccess = status === "success";
 
   return (
-    <div className="flex flex-col items-center h-[200px]">
+    <div className="flex flex-col items-center justify-center h-[200px]">
       {isError ? (
         <FileWarning className="w-20 h-20 stroke-[0.5]" />
       ) : (
@@ -273,7 +273,7 @@ const ConfirmationSection = ({ status }: { status: Status }) => {
             ? "Ad Successfully Terminated"
             : "Are You Sure about Terminating this Ad?"}
       </span>
-      <span className="text-gray-700 text-xs text-center">
+      <span className="text-gray-700 text-xs text-center mt-1">
         {isError || isSuccess
           ? "this action is irreversible."
           : "This action is irreversible. Make a confident decision."}
@@ -302,56 +302,55 @@ const InfoSection = ({
     srcTokenDecimals,
   );
 
+  const exchangeRate = formatUnits(
+      BigInt(order.exchangeRateSD),
+      6,
+  )
+
   return (
     <div className="w-full flex flex-col justify-center items-center">
       <InfoRow
-        label="Termination Tx ID"
-        value={addressFormat(txId)}
-        copyValue={txId}
-      />
+        label="Termination TX ID"
+      >
+        { txId.length > 0 ? (
+            <div className={"flex flex-row"}>
+              <span>{addressFormat(txId)}</span>
+              <Copy textToCopy={txId}/>
+              <ArrowUpRight className="w-5 h-5 ml-1 text-gray-700 cursor-pointer hover:text-white"/>
+            </div>
+        ) : <span className={"text-gray-700"}>N/A</span>}
+      </InfoRow>
       <InfoRow
-        label="Available Amount"
-        value={`${formatedSrcAmount} ${order.srcTokenNetwork}`}
-      />
+          label="Available Amount"
+      >
+        <span>{formatedSrcAmount + " " + order.srcTokenTicker + " "}<span className={"text-gray-700"}>({order.srcTokenNetwork})</span></span>
+      </InfoRow>
       <InfoRow
-        label="From Wallet"
-        value={addressFormat(walletAddress)}
-        copyValue={walletAddress}
-      />
+        label="from Wallet"
+      >
+        <div className={"flex flex-row items-center justify-center"}>
+          <span className={"text-gray-700"}>{addressFormat(walletAddress)}</span>
+          <Copy textToCopy={walletAddress}/></div>
+      </InfoRow>
       <InfoRow
-        label="Exchange Rate"
-        value={`${order.exchangeRateSD.toString()} ${order.dstTokenTicker} = 1 ${order.dstTokenTicker}`}
-      />
+          label="Exchange Rate"
+      >
+        <span>{exchangeRate + " " + order.dstTokenTicker + " "}<span className={"text-gray-700"}>({order.dstTokenNetwork})</span></span>
+        {" "}= 1 { order.srcTokenTicker } <span className={"text-gray-700"}>({order.srcTokenNetwork})</span>
+      </InfoRow>
     </div>
   );
 };
 
 const InfoRow = ({
   label,
-  value,
-  copyValue,
+  children,
 }: {
   label: string;
-  value: string;
-  copyValue?: string;
+  children: React.ReactNode
 }) => (
   <div className="mt-5 w-full flex flex-row justify-between items-center">
     <span>{label}</span>
-    <div className="flex flex-row items-center justify-center text-gray-700">
-      {value.length > 0 ? (
-        <>
-          {" "}
-          <span>{value}</span>
-          {copyValue && (
-            <>
-              <Copy textToCopy={copyValue} />
-              <ArrowUpRight className="w-5 h-5 ml-1 text-gray-700 cursor-pointer hover:text-white" />
-            </>
-          )}
-        </>
-      ) : (
-        <span className="text-gray-800">N/A</span>
-      )}
-    </div>
+    <span>{children}</span>
   </div>
 );

@@ -189,24 +189,24 @@ const Summary = ({
     <div className="w-full flex flex-col text-xs mt-3">
       <SummaryRow
         label="Amount to pay"
-        value={isSrcAmountExist ? `${srcTokenAmount} ${srcToken.ticker}` : ""}
-        network={srcToken.network}
-      />
+      >
+          { isSrcAmountExist ? <span>{srcTokenAmount} {srcToken.ticker} <span className={"text-gray-700"}>({srcToken.network})</span></span> : <span className={"text-gray-700"}>Provide amount to pay</span>}
+      </SummaryRow>
       <AddressSummaryRow label="to Wallet" value={destinationWallet} />
       <AddressSummaryRow label="from Wallet" value={srcWalletAddress} />
       <SummaryRow
         label="Amount to receive"
-        value={isDstAmountExist ? `${dstTokenAmount} ${dstToken.ticker}` : ""}
-        network={dstToken.network}
-      />
+      >
+          { isDstAmountExist ? <span>{dstTokenAmount} {dstToken.ticker} <span className={"text-gray-700"}>({dstToken.network})</span></span> : <span className={"text-gray-700"}>Provide amount to receive</span>}
+      </SummaryRow>
       <SummaryRow
         label="Exchange Rate"
-        value={
-          isSrcAmountExist && isDstAmountExist
-            ? `${srcAmountPerOneDst} ${dstToken.ticker} = ${srcTokenAmount} ${srcToken.ticker}`
-            : ""
-        }
-      />
+      >
+          {isSrcAmountExist && srcAmountPerOneDst.length > 0 && (srcAmountPerOneDst !== "NaN" || Number(srcAmountPerOneDst) > 0 )&&  isDstAmountExist ?
+          <span>
+              {srcAmountPerOneDst} {dstToken.ticker} <span className={"text-gray-700"}>({dstToken.network})</span> = 1 {srcToken.ticker} <span className={"text-gray-700"}>({srcToken.network})</span>
+          </span> : <span>Provide amounts</span>}
+      </SummaryRow>
     </div>
   );
 };
@@ -233,23 +233,14 @@ const AddressSummaryRow = ({
 
 const SummaryRow = ({
   label,
-  value,
-  network,
+    children
 }: {
   label: string;
-  value: string;
-  network?: string;
+  children: React.ReactNode;
 }) => (
   <div className="w-full flex flex-row justify-between items-center my-2">
     <span>{label}</span>
-    {value?.length > 0 ? (
-      <span>
-        {value}
-        {network && <span className="text-gray-700"> ({network})</span>}
-      </span>
-    ) : (
-      <Skeleton className="w-16 h-4" />
-    )}
+    <span>{children}</span>
   </div>
 );
 

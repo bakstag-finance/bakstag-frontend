@@ -58,7 +58,7 @@ export default function Home() {
                 }}
               />
             </div>
-            <div className="flex flex-col w-full lg:pl-5">
+            <div className="flex flex-col w-full lg:pl-4">
               <label className="text-xs mb-2 ml-2 text-gray-700">
                 Amount to Buy
               </label>
@@ -77,7 +77,7 @@ export default function Home() {
             </div>
           </div>
           <div className="flex flex-col-reverse lg:flex-row w-full ml-3 lg:ml-0">
-            <div className="flex flex-col w-full lg:pl-5 mt-5 lg:mt-0">
+            <div className="flex flex-col w-full lg:pl-4 mt-5 lg:mt-0">
               <label className="text-xs mb-2 ml-2 text-gray-700">
                 Token to Sell
               </label>
@@ -89,14 +89,14 @@ export default function Home() {
                 }}
               />
             </div>
-            <div className="px-0 mt-6 flex justify-center items-center h-full w-full lg:pl-5">
+            <div className="px-0 mt-6 flex justify-center items-center h-full w-full lg:pl-4">
               <ConnectModal refetch={refetch} />
             </div>
           </div>
         </div>
         <div
           className={cn(
-            "mt-5 w-full border overflow-y-auto scroll-smooth border-gray-800 rounded-xl flex flex-col justify-start items-center",
+            "mt-5 lg:mt-2 w-full border overflow-y-auto scroll-smooth border-gray-800 rounded-xl flex flex-col justify-start items-center",
             heightOfTable,
           )}
         >
@@ -149,7 +149,7 @@ export default function Home() {
 const LoadingComponent = () => {
   return (
     <div className="flex justify-center items-center h-full my-full">
-      <Button variant="secondary">
+      <Button variant="secondary" className={"rounded-xl"}>
         <Clock10 className="w-5 h-5 mr-2" /> Fetching Ads
       </Button>
     </div>
@@ -159,7 +159,7 @@ const LoadingComponent = () => {
 const ErrorComponent = ({ refetch }: { refetch: () => void }) => {
   return (
     <div className="flex justify-center items-center h-full my-full">
-      <Button variant="destructive" onClick={() => refetch()}>
+      <Button variant="destructive" onClick={refetch} className={"rounded-xl"}>
         Fetching Failed (Retry)
       </Button>
     </div>

@@ -88,6 +88,7 @@ export const FormStep = ({
         setTokenAmount={setSrcTokenAmount}
         isValidAmount={isCorrectSrcTokenAmount}
         placeholder="0.0"
+        isExchangeRate={false}
       />
       <TokenAmountInput
         label="Token to Receive"
@@ -97,6 +98,8 @@ export const FormStep = ({
         setTokenAmount={setDstTokenAmount}
         isValidAmount={isCorrectExchangeRate}
         placeholder="Set Exchange Rate"
+        className={"mt-5"}
+        isExchangeRate={true}
       />
       <WalletAddressInput
         label="Destination Wallet Address"
@@ -131,6 +134,8 @@ const TokenAmountInput = ({
   setTokenAmount,
   isValidAmount,
   placeholder,
+    className,
+    isExchangeRate = false
 }: {
   label: string;
   selectedToken: string;
@@ -139,10 +144,12 @@ const TokenAmountInput = ({
   setTokenAmount: Dispatch<SetStateAction<string>>;
   isValidAmount: boolean;
   placeholder: string;
+  className?: string;
+  isExchangeRate: boolean
 }) => (
-  <div className="flex flex-row justify-between items-center text-xs">
+  <div className={cn("flex flex-row justify-between items-center text-xs", className)}>
     <div className="w-full flex flex-col justify-between items-start">
-      <span className="text-gray-700">{label}</span>
+      <span className="text-gray-700 ml-3">{label}</span>
       <SelectCoin
         placeholder={label}
         className="mt-2"
@@ -151,7 +158,7 @@ const TokenAmountInput = ({
       />
     </div>
     <div className="ml-2 w-full flex flex-col justify-between items-start">
-      <span className="text-gray-700">Amount</span>
+      <span className="text-gray-700 ml-3">{isExchangeRate ? "Set Exchange Rate" : "Amount"}</span>
       <Input
         className={cn(
           "mt-2 bg-black border rounded-lg border-gray-800",
@@ -177,7 +184,7 @@ const WalletAddressInput = ({
   setValue: Dispatch<SetStateAction<string>>;
 }) => (
   <div className="w-full flex flex-col mt-5">
-    <span className="text-xs text-gray-700">{label}</span>
+    <span className="text-xs text-gray-700 ml-3">{label}</span>
     <AddressInput value={value} setValue={setValue} />
   </div>
 );
@@ -212,9 +219,9 @@ const Summary = ({
     <div className="w-full flex flex-col text-xs mt-5">
       <SummaryRow
         label="Locked Amount"
-        value={exchangeRate}
-        token={selectedSrcToken}
-      />
+      >
+        { exchangeRate.length > 0 && selectedSrcToken ? <span>{exchangeRate + " " + tokensData[selectedSrcToken]?.token} <span className={"text-gray-700"}>({tokensData[selectedSrcToken].network})</span></span> : <span className={"text-gray-700"}>N/A</span>}
+      </SummaryRow>
       <AddressSummaryRow label="to Wallet" value={destinationWallet} />
       <AddressSummaryRow
         label="from Wallet"
@@ -222,19 +229,25 @@ const Summary = ({
       />
       <SummaryRow
         label="Exchange Rate"
-        value={
-          isShowExchangeRate
-            ? `${srcAmountPerOneDst + " " + tokensData[selectedDstToken].token} = 1 ${tokensData[selectedSrcToken].token}`
-            : ""
-        }
-        token={selectedDstToken}
-      />
-      <SummaryRow label="Protocol Fee" value="1%" />
+        // token={selectedDstToken}
+      >
+          {isShowExchangeRate && selectedSrcToken && selectedDstToken
+              ? <span><span>{srcAmountPerOneDst + " " + tokensData[selectedDstToken].token + " "}<span
+                  className={"text-gray-700"}>({tokensData[selectedDstToken].network})</span></span> =
+                  1 <span>{tokensData[selectedSrcToken].token}</span> <span
+                      className={"text-gray-700"}>({tokensData[selectedSrcToken].network})</span></span>
+              : <span className={"text-gray-700"}>Set Exchange Rate</span>}
+      </SummaryRow>
+      <SummaryRow label="Protocol Fee">
+        <span>1%</span>
+      </SummaryRow>
       <SummaryRow
         label="Total Receive amount"
-        value={isShowTotalReceiveAmount ? formatNumber(totalReceiveAmount) : ""}
-        token={selectedDstToken}
-      />
+      >
+          {isShowTotalReceiveAmount ? <span>{formatNumber(totalReceiveAmount)}</span> : <span className={"text-gray-700"}>Set Exchange Rate</span>}
+          {/*value={isShowTotalReceiveAmount ? formatNumber(totalReceiveAmount) : ""}*/}
+          {/*token={selectedDstToken}*/}
+      </SummaryRow>
     </div>
   );
 };
@@ -261,25 +274,14 @@ const AddressSummaryRow = ({
 
 const SummaryRow = ({
   label,
-  value,
-  token,
+  children
 }: {
   label: string;
-  value: string;
-  token?: string;
+  children: React.ReactNode;
 }) => (
   <div className="w-full flex flex-row justify-between items-center my-2">
     <span>{label}</span>
-    {value?.length > 0 ? (
-      <span>
-        {value}
-        {token && (
-          <span className="text-gray-700"> {tokensData[token]?.token}</span>
-        )}
-      </span>
-    ) : (
-      <Skeleton className="w-16 h-4" />
-    )}
+    {children}
   </div>
 );
 
