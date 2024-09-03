@@ -122,7 +122,7 @@ export const ConnectModal = ({ refetch }: Props) => {
           <TabsContent value="wallet" className="w-full">
             <div className="w-full flex flex-col">
               <div
-                className={`mt-2 border border-gray-800 rounded-xl  px-5 ${isWalletConnected ? "h-22 py-3" : "h-20"}`}
+                className={`mt-2 border border-gray-800 rounded-xl  px-5  ${isWalletConnected ? "h-22 py-3" : "h-20 flex justify-center items-center"}`}
               >
                 <div className={"flex w-full justify-between items-center"}>
                   <div className="flex flex-col">
@@ -164,6 +164,7 @@ export const ConnectModal = ({ refetch }: Props) => {
                   {isWalletConnected && addressFormat(account.address!)}
                 </span>
               </div>
+
               <div
                 className={`mt-2 border border-gray-800 rounded-xl  px-5 ${isSolanaWalletConnected ? "h-22 py-3" : "h-20 flex justify-center items-center"}`}
               >
