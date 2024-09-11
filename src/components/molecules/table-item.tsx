@@ -30,7 +30,7 @@ export const TableItem = ({ order, refetch, isLast }: Props) => {
         <div
           className={cn(
             "flex flex-row items-end justify-center text-white h-36 px-5 py-3 w-full",
-              isLast ? "" : "border-b border-gray-800"
+            isLast ? "" : "border-b border-gray-800",
           )}
         >
           <div className="flex w-full h-full flex-col justify-between">
@@ -60,7 +60,7 @@ export const TableItem = ({ order, refetch, isLast }: Props) => {
           <div
             className={cn(
               "p-5 w-[95%] flex justify-around items-center border-gray-800 border-b",
-                isLast && "border-none"
+              isLast && "border-none",
             )}
           >
             <span className="w-full">{formatedAddress}</span>

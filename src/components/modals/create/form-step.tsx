@@ -243,9 +243,7 @@ const Summary = ({
         label="from Wallet"
         value={srcAddress ?? "Connect Wallet"}
       />
-      <SummaryRow
-        label="Exchange Rate"
-      >
+      <SummaryRow label="Exchange Rate">
         {isShowExchangeRate && selectedSrcToken && selectedDstToken ? (
           <span>
             <span>

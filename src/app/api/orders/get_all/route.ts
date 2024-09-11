@@ -49,7 +49,8 @@ export async function GET(req: Request) {
 
     const filteredOrders = result.filter((order) => {
       const isOrderEmpty = BigInt(order.srcAmountLD) === BigInt(0);
-      const isValidAmount = BigInt(order.srcAmountLD) >= amountToBuyInSmallestUnit;
+      const isValidAmount =
+        BigInt(order.srcAmountLD) >= amountToBuyInSmallestUnit;
 
       if (showEmpty === "true") {
         console.log("AmountToBuyInSmallUnit", amountToBuyInSmallestUnit);

@@ -16,7 +16,7 @@ import { Dispatch, SetStateAction, useState } from "react";
 import { useAccount } from "wagmi";
 import { formatUnits } from "viem";
 import { Order } from "@/types/order";
-import {cn} from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 type ConnectModalStep = "main" | "wallet-choose" | "delete";
 
@@ -135,7 +135,7 @@ const TableRow = ({
   item,
   setStep,
   setOrderData,
-    isLast
+  isLast,
 }: {
   item: Order;
   setStep: Dispatch<SetStateAction<ConnectModalStep>>;
@@ -146,7 +146,12 @@ const TableRow = ({
   const formattedDstAmount = formatUnits(BigInt(item.exchangeRateSD), 6);
 
   return (
-    <div className={cn("w-full flex flex-row h-28 px-2 py-2", isLast ? "" : " border-b border-gray-800")}>
+    <div
+      className={cn(
+        "w-full flex flex-row h-28 px-2 py-2",
+        isLast ? "" : " border-b border-gray-800",
+      )}
+    >
       <div className="flex flex-col w-full justify-between">
         <div className="flex flex-col">
           <span className="text-xs text-gray-700 font-semibold">
