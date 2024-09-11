@@ -16,8 +16,9 @@ export async function GET(req: Request) {
     const amountToBuy = searchParams.get("amountToBuy") || "";
     const tokenToSell = searchParams.get("tokenToSell") || "";
     const srcAddress = searchParams.get("address") || "";
+    const showEmpty = searchParams.get("showEmpty") || "";
 
-    const amountToBuyInSmallestUnit = parseUnits(amountToBuy, 6);
+    const amountToBuyInSmallestUnit = parseUnits(amountToBuy, 18);
 
     const whereCondition: any = {};
 
@@ -46,8 +47,16 @@ export async function GET(req: Request) {
       where: whereCondition,
     });
 
-    const filteredOrders = result.filter((order, index) => {
-      return BigInt(order.exchangeRateSD) >= amountToBuyInSmallestUnit;
+    const filteredOrders = result.filter((order) => {
+      const isOrderEmpty = BigInt(order.srcAmountLD) === BigInt(0);
+      const isValidAmount = BigInt(order.srcAmountLD) >= amountToBuyInSmallestUnit;
+
+      if (showEmpty === "true") {
+        console.log("AmountToBuyInSmallUnit", amountToBuyInSmallestUnit);
+        return isValidAmount;
+      } else {
+        return !isOrderEmpty && isValidAmount;
+      }
     });
 
     const orders = filteredOrders.map((order) => ({

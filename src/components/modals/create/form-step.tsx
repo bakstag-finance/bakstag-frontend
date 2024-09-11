@@ -78,6 +78,8 @@ export const FormStep = ({
     approvingStatus,
   );
 
+  const exchangeRate = Number(srcTokenAmount) / Number(dstTokenAmount);
+
   return (
     <div className="max-w-[320px] w-full flex flex-col text-white">
       <TokenAmountInput
@@ -110,7 +112,7 @@ export const FormStep = ({
         selectedSrcToken={selectedSrcToken}
         srcTokenAmount={srcTokenAmount}
         selectedDstToken={selectedDstToken}
-        exchangeRate={dstTokenAmount}
+        exchangeRate={exchangeRate.toString()}
         destinationWallet={destinationWallet}
         srcAddress={srcAddress}
         totalReceiveAmount={totalReceiveAmount}
@@ -243,7 +245,6 @@ const Summary = ({
       />
       <SummaryRow
         label="Exchange Rate"
-        // token={selectedDstToken}
       >
         {isShowExchangeRate && selectedSrcToken && selectedDstToken ? (
           <span>

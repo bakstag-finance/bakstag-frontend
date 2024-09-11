@@ -25,7 +25,7 @@ export default function Home() {
     queryKey: ["home-page-ads", tokenToBuy, tokenToSell, amountToBuy],
     queryFn: async () => {
       const result = await axios.get(
-        `/api/orders/get_all?tokenToBuy=${tokenToBuy}&tokenToSell=${tokenToSell}&amountToBuy=${amountToBuy}`,
+        `/api/orders/get_all?tokenToBuy=${tokenToBuy}&tokenToSell=${tokenToSell}&amountToBuy=${amountToBuy}&showEmpty=${false}`,
       );
       return result.data.orders;
     },
@@ -137,6 +137,7 @@ export default function Home() {
                     dstSellerAddress: item.dstSellerAddress,
                   }}
                   key={`order-id-${i}`}
+                  isLast={i === tableData.length - 1}
                 />
               </>
             ))}

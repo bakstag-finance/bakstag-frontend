@@ -7,8 +7,9 @@ import { OrderProps } from "@/types/order";
 interface Props {
   order: OrderProps;
   refetch: () => void;
+  isLast: boolean;
 }
-export const TableItem = ({ order, refetch }: Props) => {
+export const TableItem = ({ order, refetch, isLast }: Props) => {
   const { dstSellerAddress, srcAmountLD, exchangeRateSD, srcToken, dstToken } =
     order;
   const formatedAddress = addressFormat(dstSellerAddress);
@@ -22,12 +23,14 @@ export const TableItem = ({ order, refetch }: Props) => {
   const formatedSrcAmount = formatUnits(BigInt(srcAmountLD), srcTokenDecimals);
   const formatedDstAmount = formatUnits(BigInt(exchangeRateSD), 6);
 
+  const exchangeRate = Number(formatedSrcAmount) / Number(formatedDstAmount);
   return (
     <>
       <div className="lg:hidden w-full">
         <div
           className={cn(
-            "flex flex-row items-end justify-center text-white h-36 border-gray-800 px-5 py-3 w-full border-b",
+            "flex flex-row items-end justify-center text-white h-36 px-5 py-3 w-full",
+              isLast ? "" : "border-b border-gray-800"
           )}
         >
           <div className="flex w-full h-full flex-col justify-between">
@@ -35,15 +38,15 @@ export const TableItem = ({ order, refetch }: Props) => {
               {formatedAddress}
             </span>
             <span className="font-semibold w-full text-lg">
-              {formatedSrcAmount}{" "}
-              <span className="text-gray-700">{srcToken.ticker}</span>
+              {formatedDstAmount}{" "}
+              <span className="text-gray-700">{dstToken.ticker}</span>
             </span>
             <div className="flex flex-col w-full font-normal">
               <span className="text-gray-700 text-xs">Max Amount:</span>
               <span className="w-full">
-                {formatedDstAmount}{" "}
+                {formatedSrcAmount}{" "}
                 <span className="text-gray-700">
-                  {dstToken.ticker} ({dstToken.network})
+                  {srcToken.ticker} ({srcToken.network})
                 </span>
               </span>
             </div>
@@ -57,17 +60,18 @@ export const TableItem = ({ order, refetch }: Props) => {
           <div
             className={cn(
               "p-5 w-[95%] flex justify-around items-center border-gray-800 border-b",
+                isLast && "border-none"
             )}
           >
             <span className="w-full">{formatedAddress}</span>
             <span className="w-full text-center">
-              {formatedSrcAmount}{" "}
+              {formatedDstAmount}{" "}
               <span className="text-gray-700">{srcToken.ticker}</span>
             </span>
             <span className="w-full text-center">
-              {formatedDstAmount}{" "}
+              {formatedSrcAmount}{" "}
               <span className="text-gray-700">
-                {dstToken.ticker} ({dstToken.network})
+                {srcToken.ticker} ({srcToken.network})
               </span>
             </span>
             <div className="w-full flex justify-end">
