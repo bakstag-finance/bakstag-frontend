@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { Options } from "@layerzerolabs/lz-v2-utilities";
 import { Order } from "@/types/order";
-import { addressFormat, getTokenField, hexZeroPadTo32 } from "@/lib/helpers";
+import {addressFormat, getScanLink, getTokenField, hexZeroPadTo32} from "@/lib/helpers";
 import {
   getTransactionReceipt,
   readContract,
@@ -22,6 +22,8 @@ import { otcMarketAbi, otcMarketAddress } from "@/lib/wagmi/contracts/abi";
 import { useSwitchChain } from "wagmi";
 import axios from "axios";
 import { formatUnits } from "viem";
+import {useRouter} from "next/router";
+import Link from "next/link";
 
 type Status =
   | "loading"
@@ -188,6 +190,7 @@ export const DeletingStep = ({ order, setStep, refetch }: Props) => {
 
           void deleteQuery();
           void refetch();
+          setStatus("success");
         }
       } else {
         throw new Error("No txHash");
@@ -304,6 +307,14 @@ const InfoSection = ({
 
   const exchangeRate = formatUnits(BigInt(order.exchangeRateSD), 6);
 
+  const isMonochain = order.srcTokenNetwork === order.dstTokenNetwork;
+
+  const linkToScan = getScanLink({
+    isMonochain,
+    srcNetwork: order.srcTokenNetwork,
+    txHash: txId,
+  });
+
   return (
     <div className="w-full flex flex-col justify-center items-center">
       <InfoRow label="Termination TX ID">
@@ -311,7 +322,9 @@ const InfoSection = ({
           <div className={"flex flex-row"}>
             <span>{addressFormat(txId)}</span>
             <Copy textToCopy={txId} />
-            <ArrowUpRight className="w-5 h-5 ml-1 text-gray-700 cursor-pointer hover:text-white" />
+           <Link href={linkToScan} target={"_blank"}>
+             <ArrowUpRight className="w-5 h-5 ml-1 text-gray-700 cursor-pointer hover:text-white" />
+           </Link>
           </div>
         ) : (
           <span className={"text-gray-700"}>N/A</span>
