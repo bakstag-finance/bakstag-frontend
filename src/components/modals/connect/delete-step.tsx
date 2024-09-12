@@ -10,7 +10,12 @@ import {
 } from "lucide-react";
 import { Options } from "@layerzerolabs/lz-v2-utilities";
 import { Order } from "@/types/order";
-import {addressFormat, getScanLink, getTokenField, hexZeroPadTo32} from "@/lib/helpers";
+import {
+  addressFormat,
+  getScanLink,
+  getTokenField,
+  hexZeroPadTo32,
+} from "@/lib/helpers";
 import {
   getTransactionReceipt,
   readContract,
@@ -22,7 +27,7 @@ import { otcMarketAbi, otcMarketAddress } from "@/lib/wagmi/contracts/abi";
 import { useSwitchChain } from "wagmi";
 import axios from "axios";
 import { formatUnits } from "viem";
-import {useRouter} from "next/router";
+import { useRouter } from "next/router";
 import Link from "next/link";
 
 type Status =
@@ -322,9 +327,9 @@ const InfoSection = ({
           <div className={"flex flex-row"}>
             <span>{addressFormat(txId)}</span>
             <Copy textToCopy={txId} />
-           <Link href={linkToScan} target={"_blank"}>
-             <ArrowUpRight className="w-5 h-5 ml-1 text-gray-700 cursor-pointer hover:text-white" />
-           </Link>
+            <Link href={linkToScan} target={"_blank"}>
+              <ArrowUpRight className="w-5 h-5 ml-1 text-gray-700 cursor-pointer hover:text-white" />
+            </Link>
           </div>
         ) : (
           <span className={"text-gray-700"}>N/A</span>
