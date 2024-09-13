@@ -10,7 +10,7 @@ export default defineConfig({
       contracts: [
         {
           name: "OtcMarket",
-          address: "0x25BC5fb512Fd3BDbd53420D258AA6f84DA723700",
+          address: "0x718D998514B2d09167398fa9477c3b3c6f2BBbd3",
         },
       ],
       getAddress({ address }) {

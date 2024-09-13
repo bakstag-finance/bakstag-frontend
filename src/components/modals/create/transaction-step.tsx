@@ -96,7 +96,7 @@ const handleTransaction = async (
   });
 
   setTransactionStatus("success");
-  await refetch();
+  void refetch();
   return null;
 };
 

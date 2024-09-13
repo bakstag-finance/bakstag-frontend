@@ -229,7 +229,7 @@ const Summary = ({
       <SummaryRow label="Locked Amount">
         {exchangeRate.length > 0 && selectedSrcToken ? (
           <span>
-            {exchangeRate + " " + tokensData[selectedSrcToken]?.token}{" "}
+            {srcTokenAmount + " " + tokensData[selectedSrcToken]?.token}{" "}
             <span className={"text-gray-700"}>
               ({tokensData[selectedSrcToken].network})
             </span>
@@ -247,10 +247,7 @@ const Summary = ({
         {isShowExchangeRate && selectedSrcToken && selectedDstToken ? (
           <span>
             <span>
-              {srcAmountPerOneDst +
-                " " +
-                tokensData[selectedDstToken].token +
-                " "}
+              {exchangeRate + " " + tokensData[selectedDstToken].token + " "}
               <span className={"text-gray-700"}>
                 ({tokensData[selectedDstToken].network})
               </span>
@@ -269,7 +266,17 @@ const Summary = ({
       </SummaryRow>
       <SummaryRow label="Total Receive amount">
         {isShowTotalReceiveAmount ? (
-          <span>{formatNumber(totalReceiveAmount)}</span>
+          <span>
+            {formatNumber(totalReceiveAmount) + " " +
+            (
+              <span>
+                {tokensData[selectedDstToken].token}{" "}
+                <span className={"text-gray-700"}>
+                  (tokensData[selectedDstToken].network)
+                </span>
+              </span>
+            )}
+          </span>
         ) : (
           <span className={"text-gray-700"}>Set Exchange Rate</span>
         )}

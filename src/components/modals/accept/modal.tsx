@@ -442,7 +442,11 @@ export const AcceptModal = ({ order, refetch }: Props) => {
           Accept
         </Button>
       </DialogTrigger>
-      <DialogContent className={"w-full max-w-[380px] rounded-3xl bg-black"}>
+      <DialogContent
+        className={
+          "w-full h-[90%] md:h-auto overflow-y-scroll max-w-[380px] rounded-3xl bg-black"
+        }
+      >
         <VisuallyHidden>
           <DialogTitle></DialogTitle>
         </VisuallyHidden>

@@ -53,7 +53,6 @@ export async function GET(req: Request) {
         BigInt(order.srcAmountLD) >= amountToBuyInSmallestUnit;
 
       if (showEmpty === "true") {
-        console.log("AmountToBuyInSmallUnit", amountToBuyInSmallestUnit);
         return isValidAmount;
       } else {
         return !isOrderEmpty && isValidAmount;

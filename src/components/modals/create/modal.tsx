@@ -98,6 +98,7 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
     setDstTokenAmount("0.000001");
     setSelectedDstToken("");
     setDestinationWallet("");
+    setApprovingStatus("idle");
   };
 
   const prepareDataForContracts = () => {
@@ -140,6 +141,13 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
 
   const handleCreateSwap = async () => {
     if (!isWalletConnected || approvingStatus === "success") {
+      console.log("BEFOR RETUR");
+      console.log(
+        "isWalletConnected",
+        isWalletConnected,
+        "approvingStatus",
+        approvingStatus,
+      );
       return null;
     }
     try {
@@ -350,7 +358,11 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
         </Button>
       </DialogTrigger>
       <DialogOverlay>
-        <DialogContent className={"w-full max-w-[380px] bg-black"}>
+        <DialogContent
+          className={
+            "w-full h-[90%] md:h-auto overflow-y-scroll max-w-[380px] bg-black"
+          }
+        >
           <VisuallyHidden>
             <DialogTitle></DialogTitle>
           </VisuallyHidden>
