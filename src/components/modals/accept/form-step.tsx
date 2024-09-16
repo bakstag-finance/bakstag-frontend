@@ -58,14 +58,14 @@ export const FormStep = ({
     <div className="w-full flex flex-col text-white">
       <TokenInput
         label="You Pay"
-        token={srcToken}
+        token={dstToken}
         amount={srcTokenAmount}
         isCorrectAmount={isCorrectSrcTokenAmount}
         handleInputChange={(e) => handleInputChange(e, "src")}
       />
       <TokenInput
         label="Token to Receive"
-        token={dstToken}
+        token={srcToken}
         amount={dstTokenAmount}
         isCorrectAmount={isCorrectExchangeRate}
         handleInputChange={(e) => handleInputChange(e, "dst")}

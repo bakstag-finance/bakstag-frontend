@@ -332,7 +332,7 @@ export const ConnectModal = ({ refetch }: Props) => {
             : "+ Connect"}
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-full max-w-[380px] bg-black transition-all duration-1000 ease-linear">
+      <DialogContent className="no-scrollbar w-full max-w-[380px] bg-black transition-all duration-1000 ease-linear">
         <VisuallyHidden>
           <DialogTitle></DialogTitle>
         </VisuallyHidden>

@@ -419,7 +419,7 @@ export const AcceptModal = ({ order, refetch }: Props) => {
       </DialogTrigger>
       <DialogContent
         className={
-          "w-full h-[90%] md:h-auto overflow-y-scroll max-w-[380px] rounded-3xl bg-black"
+          "no-scrollbar w-full h-[90%] md:h-auto overflow-y-scroll max-w-[380px] rounded-3xl bg-black"
         }
       >
         <VisuallyHidden>

@@ -360,7 +360,7 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
       <DialogOverlay>
         <DialogContent
           className={
-            "w-full h-[90%] md:h-auto overflow-y-scroll max-w-[380px] bg-black"
+            "no-scrollbar w-full h-[90%] md:h-auto overflow-y-scroll max-w-[380px] bg-black"
           }
         >
           <VisuallyHidden>
