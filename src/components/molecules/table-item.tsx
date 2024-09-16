@@ -43,7 +43,7 @@ export const TableItem = ({ order, refetch, isLast }: Props) => {
               </span>{" "}
               = 1{" "}
               <span className={"text-gray-700"}>
-                {srcToken.ticker} ({dstToken.network})
+                {srcToken.ticker} ({srcToken.network})
               </span>
             </span>
             <div className="flex flex-col w-full font-normal">
@@ -76,7 +76,7 @@ export const TableItem = ({ order, refetch, isLast }: Props) => {
               </span>{" "}
               = 1{" "}
               <span className={"text-gray-700"}>
-                {srcToken.ticker} ({dstToken.network})
+                {srcToken.ticker} ({srcToken.network})
               </span>
             </span>
             <span className="w-full text-center mr-5">

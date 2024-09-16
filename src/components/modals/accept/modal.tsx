@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
 import {
   Button,
   Dialog,
@@ -281,6 +281,22 @@ export const AcceptModal = ({ order, refetch }: Props) => {
     handleResetState();
   };
 
+  const handleMaxExceededAmount = (
+    inputValue: string,
+    orderAmount: string,
+    setApprovingStatus: Dispatch<SetStateAction<Status>>,
+    setApprovingErrorMessage: Dispatch<SetStateAction<string>>,
+  ) => {
+    const MAX_VALUE = Number(formatUnits(BigInt(orderAmount), 18));
+    const parsedValue = Number(inputValue);
+
+    if (MAX_VALUE < parsedValue) {
+      setApprovingStatus("error");
+      setApprovingErrorMessage("Insufficient Balance");
+      return;
+    }
+  };
+
   const handleInputChange = async (
     e: ChangeEvent<HTMLInputElement>,
     inputField: "src" | "dst",
@@ -307,77 +323,36 @@ export const AcceptModal = ({ order, refetch }: Props) => {
         return;
       }
 
-      const {
-        _abiConfig,
-        _offerId,
-        _dstTokenAddress,
-        _dstTokenChainId,
-        _dstTokenDecimals,
-        _srcTokenDecimals,
-        _srcAmountLD,
-      } = prepareDataForContracts();
-
       inputField === "src"
         ? setSrcTokenAmount(inputValue)
         : setDstTokenAmount(inputValue);
 
-      const MAX_VALUE = BigInt(_srcAmountLD);
-      const parsedValue = parseUnits(inputValue, 6);
-
-      if (MAX_VALUE < parsedValue) {
-        setApprovingStatus("error");
-        setApprovingErrorMessage("Value exceeds maximum allowed amount");
-        return;
-      }
-
-      const contractArgs = [
-        _dstTokenAddress as `0x${string}`,
-        {
-          offerId: _offerId as `0x${string}`,
-          srcAmountSD: BigInt(parsedValue),
-          srcBuyerAddress: hexZeroPadTo32(address!),
-        },
-        false,
-      ];
+      const exchangeRate = Number(formatUnits(BigInt(order.exchangeRateSD), 6));
 
       if (inputField === "src") {
-        const [_, { dstAmountLD: exchangeRate }] = (await readContract(
-          wagmiConfig,
-          {
-            abi: _abiConfig.abi,
-            address: _abiConfig.address,
-            functionName: "quoteAcceptOffer",
-            args: contractArgs as any,
-            chainId: _dstTokenChainId as any,
-          },
-        ).catch((e) => {
-          const error = e as ReadContractErrorType;
-          console.log("Error read", error);
-          setApprovingStatus("error");
-          setApprovingErrorMessage(e.name);
-        })) as any;
+        const newDstTokenAmount = (
+          parseFloat(inputValue) * exchangeRate
+        ).toString();
+        setDstTokenAmount(newDstTokenAmount);
 
-        const newExchangeRate = formatUnits(exchangeRate, _dstTokenDecimals);
-        setDstTokenAmount(newExchangeRate);
+        handleMaxExceededAmount(
+          inputValue,
+          order.srcAmountLD,
+          setApprovingStatus,
+          setApprovingErrorMessage,
+        );
       } else {
-        const [_, { dstAmountLD: exchangeRate }] = (await readContract(
-          wagmiConfig,
-          {
-            abi: _abiConfig.abi,
-            address: _abiConfig.address,
-            functionName: "quoteAcceptOffer",
-            args: contractArgs as any,
-            chainId: _dstTokenChainId as any,
-          },
-        ).catch((e) => {
-          const error = e as ReadContractErrorType;
-          console.log("Error read", error);
-          setApprovingStatus("error");
-          setApprovingErrorMessage(e.name);
-        })) as any;
+        const newSrcTokenAmount = (
+          parseFloat(inputValue) / exchangeRate
+        ).toString();
+        setSrcTokenAmount(newSrcTokenAmount);
 
-        const newExchangeRate = formatUnits(exchangeRate, _srcTokenDecimals);
-        setSrcTokenAmount(newExchangeRate);
+        handleMaxExceededAmount(
+          newSrcTokenAmount,
+          order.srcAmountLD,
+          setApprovingStatus,
+          setApprovingErrorMessage,
+        );
       }
     } catch (e) {
       const error = e as ReadContractErrorType;

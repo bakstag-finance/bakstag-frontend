@@ -1,14 +1,10 @@
 import { AddressInput, Button, Copy, Input, Skeleton } from "@/components/ui";
-import {
-  addressFormat,
-  calculateSrcAmountPerOneDst,
-  formatNumber,
-  isValidTokenAmount,
-} from "@/lib/helpers";
+import { addressFormat, isValidTokenAmount } from "@/lib/helpers";
 import { cn } from "@/lib/utils";
 import { ChangeEvent, Dispatch, SetStateAction } from "react";
 import { WalletConnect } from "../wallet-connect";
 import { OrderProps } from "@/types/order";
+import { formatUnits } from "viem";
 
 interface Props {
   approvingStatus: string;
@@ -86,11 +82,17 @@ export const FormStep = ({
         dstTokenAmount={dstTokenAmount}
         srcWalletAddress={srcWalletAddress}
         destinationWallet={destinationWallet}
+        exchangeRate={order.exchangeRateSD}
       />
       {srcWalletAddress ? (
         <Button
           className="w-full mt-5 rounded-xl"
-          disabled={!isValidDestinationWallet}
+          disabled={
+            !isValidDestinationWallet &&
+            approvingStatus !== "error" &&
+            !isCorrectSrcTokenAmount &&
+            !isCorrectExchangeRate
+          }
           variant={getButtonVariant(approvingStatus)}
           onClick={submitHandler}
         >
@@ -168,6 +170,7 @@ const Summary = ({
   dstTokenAmount,
   srcWalletAddress,
   destinationWallet,
+  exchangeRate,
 }: {
   srcToken: { ticker: string; network: string };
   dstToken: { ticker: string; network: string };
@@ -175,16 +178,13 @@ const Summary = ({
   dstTokenAmount: string;
   srcWalletAddress: string;
   destinationWallet: string;
+  exchangeRate: string;
 }) => {
   const isSrcAmountExist = srcTokenAmount.length > 0;
   const isDstAmountExist = dstTokenAmount.length > 0;
 
-  const srcAmountPerOneDst =
-    isSrcAmountExist && isDstAmountExist
-      ? formatNumber(
-          calculateSrcAmountPerOneDst(srcTokenAmount, dstTokenAmount),
-        )
-      : "";
+  const parseExchangeRate = formatUnits(BigInt(exchangeRate), 6);
+
   return (
     <div className="w-full flex flex-col text-xs mt-3">
       <SummaryRow label="Amount to pay">
@@ -210,19 +210,12 @@ const Summary = ({
         )}
       </SummaryRow>
       <SummaryRow label="Exchange Rate">
-        {isSrcAmountExist &&
-        srcAmountPerOneDst.length > 0 &&
-        (srcAmountPerOneDst !== "NaN" || Number(srcAmountPerOneDst) > 0) &&
-        isDstAmountExist ? (
-          <span>
-            {srcAmountPerOneDst} {dstToken.ticker}{" "}
-            <span className={"text-gray-700"}>({dstToken.network})</span> = 1{" "}
-            {srcToken.ticker}{" "}
-            <span className={"text-gray-700"}>({srcToken.network})</span>
-          </span>
-        ) : (
-          <span>Provide amounts</span>
-        )}
+        <span>
+          {parseExchangeRate} {dstToken.ticker}{" "}
+          <span className={"text-gray-700"}>({dstToken.network})</span> = 1{" "}
+          {srcToken.ticker}{" "}
+          <span className={"text-gray-700"}>({srcToken.network})</span>
+        </span>
       </SummaryRow>
     </div>
   );
@@ -268,9 +261,9 @@ const getButtonText = (
   approvingErrorMessage: string,
 ) => {
   if (!isWalletConnected) return "+ Connect Wallet";
+  if (approvingStatus === "error") return approvingErrorMessage;
   if (!isValidDestinationWallet) return "Add Destination Wallet Address";
   if (approvingStatus === "pending") return "Pending Approval";
-  if (approvingStatus === "error") return approvingErrorMessage;
   return "Sign & Transact";
 };
 
