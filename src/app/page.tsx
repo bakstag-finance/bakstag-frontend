@@ -12,8 +12,8 @@ import { Order } from "@/types/order";
 import { TableItem } from "@/components/molecules";
 
 export default function Home() {
-  const [tokenToBuy, setTokenToBuy] = useState("");
-  const [tokenToSell, setTokenToSell] = useState("");
+  const [tokenToBuy, setTokenToBuy] = useState("eth-opt");
+  const [tokenToSell, setTokenToSell] = useState("eth-opt");
   const [amountToBuy, setAmountToBuy] = useState("0.0");
 
   const {
@@ -102,10 +102,10 @@ export default function Home() {
         >
           <div className="hidden border-b border-gray-800 w-full lg:flex justify-center items-center text-sm">
             <div className="py-2 px-5 w-[95%] flex justify-around items-center h-10 text-gray-700">
-              <span className="w-full">Advertiser</span>
-              <span className="w-full text-center">Exchange Rate</span>
-              <span className="w-full text-center">Max Amount</span>
-              <span className="w-full text-end pr-5">Trade</span>
+              <span className="w-[240px]">Advertiser</span>
+              <span className="w-full text-center ml-5">Exchange Rate</span>
+              <span className="w-full text-center mr-7">Max Amount</span>
+              <span className="text-end pr-5 w-[160px]">Trade</span>
             </div>
           </div>
 

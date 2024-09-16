@@ -23,7 +23,6 @@ export const TableItem = ({ order, refetch, isLast }: Props) => {
   const formatedSrcAmount = formatUnits(BigInt(srcAmountLD), srcTokenDecimals);
   const formatedDstAmount = formatUnits(BigInt(exchangeRateSD), 6);
 
-  const exchangeRate = Number(formatedSrcAmount) / Number(formatedDstAmount);
   return (
     <>
       <div className="lg:hidden w-full">
@@ -39,14 +38,20 @@ export const TableItem = ({ order, refetch, isLast }: Props) => {
             </span>
             <span className="font-semibold w-full text-lg">
               {formatedDstAmount}{" "}
-              <span className="text-gray-700">{dstToken.ticker}</span>
+              <span className="text-gray-700">
+                {dstToken.ticker} ({dstToken.network})
+              </span>{" "}
+              = 1{" "}
+              <span className={"text-gray-700"}>
+                {srcToken.ticker} ({dstToken.network})
+              </span>
             </span>
             <div className="flex flex-col w-full font-normal">
               <span className="text-gray-700 text-xs">Max Amount:</span>
               <span className="w-full">
                 {formatedSrcAmount}{" "}
                 <span className="text-gray-700">
-                  {srcToken.ticker} ({srcToken.network})
+                  {dstToken.ticker} ({dstToken.network})
                 </span>
               </span>
             </div>
@@ -63,18 +68,24 @@ export const TableItem = ({ order, refetch, isLast }: Props) => {
               isLast && "border-none",
             )}
           >
-            <span className="w-full">{formatedAddress}</span>
-            <span className="w-full text-center">
+            <span className="">{formatedAddress}</span>
+            <span className="w-full text-center ml-10">
               {formatedDstAmount}{" "}
-              <span className="text-gray-700">{srcToken.ticker}</span>
+              <span className="text-gray-700">
+                {dstToken.ticker} ({dstToken.network})
+              </span>{" "}
+              = 1{" "}
+              <span className={"text-gray-700"}>
+                {srcToken.ticker} ({dstToken.network})
+              </span>
             </span>
-            <span className="w-full text-center">
+            <span className="w-full text-center mr-5">
               {formatedSrcAmount}{" "}
               <span className="text-gray-700">
                 {srcToken.ticker} ({srcToken.network})
               </span>
             </span>
-            <div className="w-full flex justify-end">
+            <div className="flex justify-end">
               <AcceptModal order={order} refetch={refetch} />
             </div>
           </div>
