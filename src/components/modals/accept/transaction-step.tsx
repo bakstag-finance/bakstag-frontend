@@ -202,9 +202,9 @@ const TransactionDetails = ({
     </DetailRow>
     <DetailRow label="Amount to pay">
       <span>
-        {transactionData.srcTokenAmount} {transactionData.srcToken.ticker}{" "}
+        {transactionData.srcTokenAmount} {transactionData.dstToken.ticker}{" "}
         <span className={"text-gray-700"}>
-          ({transactionData.srcToken.network})
+          ({transactionData.dstToken.network})
         </span>
       </span>
     </DetailRow>
@@ -222,9 +222,9 @@ const TransactionDetails = ({
     </DetailRow>
     <DetailRow label="Amount to receive">
       <span>
-        {transactionData.exchangeRate} {transactionData.dstToken.ticker}{" "}
+        {transactionData.exchangeRate} {transactionData.srcToken.ticker}{" "}
         <span className={"text-gray-700"}>
-          ({transactionData.dstToken.network})
+          ({transactionData.srcToken.network})
         </span>
       </span>
     </DetailRow>

@@ -119,11 +119,7 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
       srcToken.decimals,
     ).toString();
 
-    const srcAmountPerOneDst = formatNumber(
-      calculateSrcAmountPerOneDst(srcTokenAmount, dstTokenAmount),
-    );
-
-    const _exchangeRateSD = parseUnits(srcAmountPerOneDst, 6).toString();
+    const _exchangeRateSD = parseUnits(dstTokenAmount, 6).toString();
 
     return {
       srcToken,

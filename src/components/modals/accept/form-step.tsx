@@ -190,8 +190,8 @@ const Summary = ({
       <SummaryRow label="Amount to pay">
         {isSrcAmountExist ? (
           <span>
-            {srcTokenAmount} {srcToken.ticker}{" "}
-            <span className={"text-gray-700"}>({srcToken.network})</span>
+            {srcTokenAmount} {dstToken.ticker}{" "}
+            <span className={"text-gray-700"}>({dstToken.network})</span>
           </span>
         ) : (
           <span className={"text-gray-700"}>Provide amount to pay</span>
@@ -202,8 +202,8 @@ const Summary = ({
       <SummaryRow label="Amount to receive">
         {isDstAmountExist ? (
           <span>
-            {dstTokenAmount} {dstToken.ticker}{" "}
-            <span className={"text-gray-700"}>({dstToken.network})</span>
+            {dstTokenAmount} {srcToken.ticker}{" "}
+            <span className={"text-gray-700"}>({srcToken.network})</span>
           </span>
         ) : (
           <span className={"text-gray-700"}>Provide amount to receive</span>

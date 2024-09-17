@@ -251,6 +251,12 @@ export const AcceptModal = ({ order, refetch }: Props) => {
             BigInt(order.srcAmountLD) -
             parseUnits(dstTokenAmount, _dstTokenDecimals)
           ).toString();
+
+          const parseExchangeRate = formatUnits(
+            BigInt(order.exchangeRateSD),
+            6,
+          );
+
           setInfoForTransactionStep({
             txHash,
             offerId: _offerId,
@@ -259,7 +265,7 @@ export const AcceptModal = ({ order, refetch }: Props) => {
             srcTokenAddress: _srcTokenAddress,
             dstTokenAddress: _dstTokenAddress,
             srcTokenAmount: srcTokenAmount,
-            exchangeRate: dstTokenAmount,
+            exchangeRate: parseExchangeRate,
             srcAmountLD: srcAmountLD,
             srcToken: order.srcToken,
             dstToken: order.dstToken,
@@ -275,7 +281,15 @@ export const AcceptModal = ({ order, refetch }: Props) => {
     }
   };
 
-  const handleResetState = () => {};
+  const handleResetState = () => {
+    setStep("main");
+    setSrcTokenAmount("0");
+    setDstTokenAmount("0");
+    setDestinationWallet("");
+    setApprovingStatus("idle");
+    setTransactionStatus("idle");
+  };
+
   const handleClose = () => {
     setOpenModal(false);
     handleResetState();
@@ -330,8 +344,9 @@ export const AcceptModal = ({ order, refetch }: Props) => {
       const exchangeRate = Number(formatUnits(BigInt(order.exchangeRateSD), 6));
 
       if (inputField === "src") {
+        console.log("InputValue", inputValue, "exchangeRate", exchangeRate);
         const newDstTokenAmount = (
-          parseFloat(inputValue) * exchangeRate
+          parseFloat(inputValue) / exchangeRate
         ).toString();
         setDstTokenAmount(newDstTokenAmount);
 
@@ -343,7 +358,7 @@ export const AcceptModal = ({ order, refetch }: Props) => {
         );
       } else {
         const newSrcTokenAmount = (
-          parseFloat(inputValue) / exchangeRate
+          parseFloat(inputValue) * exchangeRate
         ).toString();
         setSrcTokenAmount(newSrcTokenAmount);
 

@@ -13,8 +13,8 @@ import { TableItem } from "@/components/molecules";
 
 export default function Home() {
   const [tokenToBuy, setTokenToBuy] = useState("eth-opt");
-  const [tokenToSell, setTokenToSell] = useState("eth-opt");
-  const [amountToBuy, setAmountToBuy] = useState("0.0");
+  const [tokenToSell, setTokenToSell] = useState("eth-base");
+  const [amountToBuy, setAmountToBuy] = useState("0");
 
   const {
     data: tableData,

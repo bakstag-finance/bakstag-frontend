@@ -297,9 +297,7 @@ const TransactionDetails = ({
     txHash: transactionData.txHash,
   });
 
-  const srcAmountPerOneDst = formatNumber(
-    calculateSrcAmountPerOneDst(srcTokenAmount, dstTokenAmount),
-  );
+  const srcAmountPerOneDst = formatNumber(Number(dstTokenAmount));
   return (
     <div className="w-full flex flex-col text-xs mt-5 text-white">
       <TransactionRow label="TX ID">
@@ -312,7 +310,7 @@ const TransactionDetails = ({
         </div>
       </TransactionRow>
 
-      <TransactionRow label="Amount to sell">
+      <TransactionRow label="Locked amount">
         {srcTokenAmount} {tokensData[selectedSrcToken]?.token}{" "}
         <span className="text-gray-700">
           ({tokensData[selectedSrcToken]?.network})
@@ -353,9 +351,14 @@ const TransactionDetails = ({
         <span>1 %</span>
       </TransactionRow>
       <TransactionRow label="Total Receive Amount">
-        {formatNumber(
-          calculateTotalReceiveAmount(srcTokenAmount, dstTokenAmount),
-        )}
+        {calculateTotalReceiveAmount(srcTokenAmount, dstTokenAmount)}
+        <span>
+          {" "}
+          {tokensData[selectedDstToken]?.network}{" "}
+          <span className={"text-gray-700"}>
+            ({tokensData[selectedDstToken]?.network})
+          </span>
+        </span>
       </TransactionRow>
     </div>
   );

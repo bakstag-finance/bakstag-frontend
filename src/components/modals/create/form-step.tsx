@@ -38,6 +38,13 @@ interface FormStepProps {
   handleClose: () => void;
 }
 
+const formatNumberWithCommas = (number: number) => {
+  return number.toLocaleString("en-US", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 7,
+  });
+};
+
 export const FormStep = ({
   selectedSrcToken,
   setSelectedSrcToken,
@@ -78,8 +85,6 @@ export const FormStep = ({
     approvingStatus,
   );
 
-  const exchangeRate = Number(srcTokenAmount) / Number(dstTokenAmount);
-
   return (
     <div className="max-w-[320px] w-full flex flex-col text-white">
       <TokenAmountInput
@@ -112,7 +117,7 @@ export const FormStep = ({
         selectedSrcToken={selectedSrcToken}
         srcTokenAmount={srcTokenAmount}
         selectedDstToken={selectedDstToken}
-        exchangeRate={exchangeRate.toString()}
+        exchangeRate={dstTokenAmount.toString()}
         destinationWallet={destinationWallet}
         srcAddress={srcAddress}
         totalReceiveAmount={totalReceiveAmount}
@@ -220,10 +225,6 @@ const Summary = ({
 
   const isShowTotalReceiveAmount = exchangeRate && selectedDstToken;
 
-  const srcAmountPerOneDst = formatNumber(
-    calculateSrcAmountPerOneDst(srcTokenAmount, exchangeRate),
-  );
-
   return (
     <div className="w-full flex flex-col text-xs mt-5">
       <SummaryRow label="Locked Amount">
@@ -247,7 +248,10 @@ const Summary = ({
         {isShowExchangeRate && selectedSrcToken && selectedDstToken ? (
           <span>
             <span>
-              {exchangeRate + " " + tokensData[selectedDstToken].token + " "}
+              {formatNumberWithCommas(Number(exchangeRate)) +
+                " " +
+                tokensData[selectedDstToken].token +
+                " "}
               <span className={"text-gray-700"}>
                 ({tokensData[selectedDstToken].network})
               </span>
@@ -266,22 +270,18 @@ const Summary = ({
       </SummaryRow>
       <SummaryRow label="Total Receive amount">
         {isShowTotalReceiveAmount ? (
-          <span>
-            {formatNumber(totalReceiveAmount) + " " +
-            (
-              <span>
-                {tokensData[selectedDstToken].token}{" "}
-                <span className={"text-gray-700"}>
-                  (tokensData[selectedDstToken].network)
-                </span>
+          <span className={"max-w-full "}>
+            {formatNumberWithCommas(totalReceiveAmount) + " "}
+            <span>
+              {tokensData[selectedDstToken].token}{" "}
+              <span className={"text-gray-700"}>
+                ({tokensData[selectedDstToken].network})
               </span>
-            )}
+            </span>
           </span>
         ) : (
           <span className={"text-gray-700"}>Set Exchange Rate</span>
         )}
-        {/*value={isShowTotalReceiveAmount ? formatNumber(totalReceiveAmount) : ""}*/}
-        {/*token={selectedDstToken}*/}
       </SummaryRow>
     </div>
   );

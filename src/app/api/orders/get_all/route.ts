@@ -34,15 +34,16 @@ export async function GET(req: Request) {
     }
 
     if (tokenToBuy && tokensData[tokenToBuy]) {
-      whereCondition.dstTokenTicker = tokensData[tokenToBuy].token;
-      whereCondition.dstTokenNetwork = tokensData[tokenToBuy].network;
+      whereCondition.srcTokenTicker = tokensData[tokenToBuy].token;
+      whereCondition.srcTokenNetwork = tokensData[tokenToBuy].network;
     }
 
     if (tokenToSell && tokensData[tokenToSell]) {
-      whereCondition.srcTokenTicker = tokensData[tokenToSell].token;
-      whereCondition.srcTokenNetwork = tokensData[tokenToSell].network;
+      whereCondition.dstTokenTicker = tokensData[tokenToSell].token;
+      whereCondition.dstTokenNetwork = tokensData[tokenToSell].network;
     }
 
+    console.log("WhereCondition", whereCondition);
     const result = await prisma.order.findMany({
       where: whereCondition,
     });

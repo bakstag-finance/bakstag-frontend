@@ -51,7 +51,7 @@ export const TableItem = ({ order, refetch, isLast }: Props) => {
               <span className="w-full">
                 {formatedSrcAmount}{" "}
                 <span className="text-gray-700">
-                  {dstToken.ticker} ({dstToken.network})
+                  {srcToken.ticker} ({srcToken.network})
                 </span>
               </span>
             </div>

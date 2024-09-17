@@ -181,7 +181,7 @@ export const DeletingStep = ({ order, setStep, refetch }: Props) => {
           queryResult = receipt;
         } else {
           const receipt = await axios
-            .get(`/api/offer_info?txHash=${txHash}&srcEid=${order.dstEid}`)
+            .get(`/api/offer_info?txHash=${_txHash}&srcEid=${order.dstEid}`)
             .catch((e) => {
               setStatus("error");
               console.log(e);
@@ -208,7 +208,7 @@ export const DeletingStep = ({ order, setStep, refetch }: Props) => {
 
   const buttonHandler = () => {
     if (status === "idle" || status === "error") {
-      deleteHandler();
+      void deleteHandler();
       return;
     }
 
