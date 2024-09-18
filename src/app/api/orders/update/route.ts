@@ -8,7 +8,6 @@ export async function POST(req: Request) {
     const data = await req.json();
     const { offerId, srcAmountLD } = data;
 
-    console.log("Data", data);
 
     await prisma.order.update({
       where: {

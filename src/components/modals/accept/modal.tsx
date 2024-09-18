@@ -344,7 +344,6 @@ export const AcceptModal = ({ order, refetch }: Props) => {
       const exchangeRate = Number(formatUnits(BigInt(order.exchangeRateSD), 6));
 
       if (inputField === "src") {
-        console.log("InputValue", inputValue, "exchangeRate", exchangeRate);
         const newDstTokenAmount = (
           parseFloat(inputValue) / exchangeRate
         ).toString();

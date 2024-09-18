@@ -37,16 +37,16 @@ export const SelectCoin = ({
         <SelectGroup>
           <SelectLabel className="text-gray-700">Optimism Tokens</SelectLabel>
           <SelectItem value="eth-opt">
-            ETH <span className="text-gray-700">(Optimism)</span>
+            ETH <span className="text-gray-700">(OP)</span>
           </SelectItem>
           <SelectItem value="op-opt">
-            OP <span className="text-gray-700">(Optimism)</span>
+            OP <span className="text-gray-700">(OP)</span>
           </SelectItem>
           <SelectItem value="usdc-opt">
-            USDC <span className="text-gray-700">(Optimism)</span>
+            USDC <span className="text-gray-700">(OP)</span>
           </SelectItem>
           <SelectItem value="usdt-opt">
-            USDT <span className="text-gray-700">(Optimism)</span>
+            USDT <span className="text-gray-700">(OP)</span>
           </SelectItem>
         </SelectGroup>
         {/* <SelectSeparator className={"bg-gray-800"} />

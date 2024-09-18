@@ -48,7 +48,7 @@ export default function Home() {
           <div className="flex flex-col-reverse lg:flex-row w-full justify-between">
             <div className="flex flex-col w-full mt-5 lg:mt-0">
               <label className="text-xs mb-2 ml-2 text-gray-700">
-                Token to Buy
+                You Receive
               </label>
               <SelectCoin
                 placeholder="Token to Buy"
@@ -60,7 +60,7 @@ export default function Home() {
             </div>
             <div className="flex flex-col w-full lg:pl-4">
               <label className="text-xs mb-2 ml-2 text-gray-700">
-                Amount to Buy
+                Amount to Receive
               </label>
               <Input
                 className={cn(
@@ -78,9 +78,7 @@ export default function Home() {
           </div>
           <div className="flex flex-col-reverse lg:flex-row w-full ml-3 lg:ml-0">
             <div className="flex flex-col w-full lg:pl-4 mt-5 lg:mt-0">
-              <label className="text-xs mb-2 ml-2 text-gray-700">
-                Token to Sell
-              </label>
+              <label className="text-xs mb-2 ml-2 text-gray-700">You pay</label>
               <SelectCoin
                 placeholder="Token to Sell"
                 value={tokenToSell}
@@ -170,7 +168,7 @@ const ErrorComponent = ({ refetch }: { refetch: () => void }) => {
 const EmptyComponent = ({ refetch }: { refetch: () => void }) => {
   return (
     <div className="flex justify-center items-center h-full my-full">
-      <CreateModal buttonText={"Create & Publish Ad"} refetch={refetch} />
+      <CreateModal buttonText={"Create Ad"} refetch={refetch} />
     </div>
   );
 };

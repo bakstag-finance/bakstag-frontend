@@ -60,18 +60,20 @@ export const FormStep = ({
         label="You Pay"
         token={dstToken}
         amount={srcTokenAmount}
+        inputLabel={"Amount to pay"}
         isCorrectAmount={isCorrectSrcTokenAmount}
         handleInputChange={(e) => handleInputChange(e, "src")}
       />
       <TokenInput
-        label="Token to Receive"
+        label="You receive"
         token={srcToken}
         amount={dstTokenAmount}
+        inputLabel={"Amount to receive"}
         isCorrectAmount={isCorrectExchangeRate}
         handleInputChange={(e) => handleInputChange(e, "dst")}
       />
       <WalletAddressInput
-        label="Destination Wallet Address"
+        label={`Destination Wallet Address | (${dstToken.network})`}
         walletAddress={destinationWallet}
         setWalletAddress={setDestinationWallet}
       />
@@ -102,7 +104,7 @@ export const FormStep = ({
         <WalletConnect />
       )}
       <Button
-        className="w-full mt-5 bg-black text-gray-700 border border-white border-opacity-50 hover:bg-gray-800 rounded-xl"
+        className="w-full mt-5 bg-black text-gray-700 font-extralight border border-white border-opacity-50 hover:bg-gray-800 rounded-xl"
         onClick={closeModalHandler}
       >
         Cancel
@@ -115,10 +117,12 @@ const TokenInput = ({
   label,
   token,
   amount,
+  inputLabel,
   isCorrectAmount,
   handleInputChange,
 }: {
   label: string;
+  inputLabel: string;
   token: { ticker: string; network: string };
   amount: string;
   isCorrectAmount: boolean;
@@ -132,7 +136,7 @@ const TokenInput = ({
       </span>
     </div>
     <div className="flex flex-col justify-between items-start h-full">
-      <span className="ml-2 text-gray-700">Amount</span>
+      <span className="ml-2 text-gray-700">{inputLabel}</span>
       <Input
         className={cn(
           "mt-2 bg-black border rounded-lg border-gray-800",
@@ -263,8 +267,8 @@ const getButtonText = (
   if (!isWalletConnected) return "+ Connect Wallet";
   if (approvingStatus === "error") return approvingErrorMessage;
   if (!isValidDestinationWallet) return "Add Destination Wallet Address";
-  if (approvingStatus === "pending") return "Pending Approval";
-  return "Sign & Transact";
+  if (approvingStatus === "pending") return "Pending Confirmation";
+  return "Accept Ad";
 };
 
 const getButtonVariant = (approvingStatus: string) => {

@@ -46,7 +46,9 @@ export const TableComponent = ({ setStep, setOrderData }: Props) => {
 
   return (
     <div className="w-full flex flex-col">
-      <FilterSection tokenToBuy={tokenToBuy} setTokenToBuy={setTokenToBuy} />
+      {tableData && tableData.length > 0 && (
+        <FilterSection tokenToBuy={tokenToBuy} setTokenToBuy={setTokenToBuy} />
+      )}
       <TableContent
         tableData={tableData || []}
         isLoading={isLoading}
@@ -56,7 +58,7 @@ export const TableComponent = ({ setStep, setOrderData }: Props) => {
         setOrderData={setOrderData}
       />
       <div className="mt-5">
-        <CreateModal buttonText={"+ Create Ad"} refetch={refetch} />
+        <CreateModal buttonText={"Create Ad"} refetch={refetch} />
       </div>
     </div>
   );
@@ -155,12 +157,17 @@ const TableRow = ({
       <div className="flex flex-col w-full justify-between">
         <div className="flex flex-col">
           <span className="text-xs text-gray-700 font-semibold">
-            Exchange Rate
+            Exchange Rate (SHIT)
           </span>
-          <span className="text-lg flex items-start">
-            {formattedDstAmount}{" "}
-            <span className="ml-1 mt-1 text-gray-700 text-sm">
-              {item.dstTokenTicker} ({item.dstTokenNetwork})
+          <span className="flex items-start text-sm">
+            {formattedDstAmount + " " + item.dstTokenTicker}{" "}
+            <span className="ml-1 text-gray-700">
+              ({item.dstTokenNetwork}){" "}
+            </span>
+            = 1 {item.srcTokenTicker}
+            <span className="ml-1  text-gray-700">
+              {" "}
+              ({item.srcTokenNetwork})
             </span>
           </span>
         </div>
@@ -211,6 +218,6 @@ const EmptyState = () => (
   <div className="w-full h-full flex flex-col justify-center items-center text-sm">
     <Ghost className="w-20 h-28 stroke-[0.25]" />
     <span>No Ads Yet</span>
-    <span className="text-gray-700 text-xs">Create & start advertising</span>
+    <span className="text-gray-700 text-xs">Create your first ad</span>
   </div>
 );

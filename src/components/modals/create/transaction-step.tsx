@@ -136,7 +136,7 @@ const StatusMessage = ({
   if (isLoading) {
     return (
       <>
-        <span className="mt-5">Pending Transaction</span>
+        <span className="mt-5">Creating Your Ad</span>
         <span className="text-gray-700 mt-2">
           You can already view the transaction in the explorer
         </span>
@@ -176,7 +176,7 @@ const ButtonContent = ({
   if (isLoading)
     return (
       <>
-        <Clock10 className="w-5 h-5 mr-2" /> Processing Transaction
+        <Clock10 className="w-5 h-5 mr-2" /> Preparing Your Ad
       </>
     );
   if (isSuccess)

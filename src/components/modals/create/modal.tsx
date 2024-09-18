@@ -49,10 +49,10 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
 
   // State of form
   const [selectedDstToken, setSelectedDstToken] = useState("");
-  const [dstTokenAmount, setDstTokenAmount] = useState("0.01");
+  const [dstTokenAmount, setDstTokenAmount] = useState("0");
 
   const [selectedSrcToken, setSelectedSrcToken] = useState("");
-  const [srcTokenAmount, setSrcTokenAmount] = useState("0.01");
+  const [srcTokenAmount, setSrcTokenAmount] = useState("0");
 
   const [destinationWallet, setDestinationWallet] = useState("");
 
@@ -137,13 +137,6 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
 
   const handleCreateSwap = async () => {
     if (!isWalletConnected || approvingStatus === "success") {
-      console.log("BEFOR RETUR");
-      console.log(
-        "isWalletConnected",
-        isWalletConnected,
-        "approvingStatus",
-        approvingStatus,
-      );
       return null;
     }
     try {
@@ -238,7 +231,6 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
           };
         });
 
-        console.log("OfferId", offerId);
         const txHash = await writeContract(wagmiConfig, {
           abi: abiConfig.abi,
           address: abiConfig.address,
@@ -349,7 +341,9 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
   return (
     <Dialog open={openModal} onOpenChange={onOpenChangeHandler}>
       <DialogTrigger asChild>
-        <Button className={"bg-white text-black w-full rounded-xl"}>
+        <Button
+          className={"bg-white text-black w-full rounded-xl font-extralight"}
+        >
           {buttonText}
         </Button>
       </DialogTrigger>
@@ -368,10 +362,10 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
           <div className={"w-full flex justify-center items-center flex-col"}>
             {renderStepContent()}
             <span className={"text-gray-700 text-xs mt-3 text-justify"}>
-              Assets will be locked. After the transaction is successfully
-              completed, the assets will be automatically sent to the
-              destination wallet address you provided. Verify all details before
-              confirming.
+              Assets will be locked. Once the ad is accepted by the buyer, the
+              assets will be automatically sent to the destination wallet
+              address you provided. Please verify all details before confirming.
+              You can cancel your ad anytime.
             </span>
           </div>
         </DialogContent>

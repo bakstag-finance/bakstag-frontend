@@ -88,7 +88,7 @@ export const FormStep = ({
   return (
     <div className="max-w-[320px] w-full flex flex-col text-white">
       <TokenAmountInput
-        label="Token to Sell"
+        label="You sell"
         selectedToken={selectedSrcToken}
         setSelectedToken={setSelectedSrcToken}
         tokenAmount={srcTokenAmount}
@@ -98,7 +98,7 @@ export const FormStep = ({
         isExchangeRate={false}
       />
       <TokenAmountInput
-        label="Token to Receive"
+        label="You Receive"
         selectedToken={selectedDstToken}
         setSelectedToken={setSelectedDstToken}
         tokenAmount={dstTokenAmount}
@@ -171,7 +171,7 @@ const TokenAmountInput = ({
     </div>
     <div className="ml-2 w-full flex flex-col justify-between items-start">
       <span className="text-gray-700 ml-3">
-        {isExchangeRate ? "Set Exchange Rate" : "Amount"}
+        {isExchangeRate ? "Set Exchange Rate" : "Amount to sell"}
       </span>
       <Input
         className={cn(
@@ -369,9 +369,9 @@ const getButtonText = (
   approvingStatus: Status,
   approvingErrorMessage: string,
 ) => {
-  if (approvingStatus === "pending") return "Pending Approval";
+  if (approvingStatus === "pending") return "Pending Confirmation";
   if (approvingStatus === "error") return approvingErrorMessage;
-  return "Sign & Transact";
+  return "Publish Ad";
 };
 
 const checkButtonDisabled = (

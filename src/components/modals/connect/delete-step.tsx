@@ -239,7 +239,7 @@ export const DeletingStep = ({ order, setStep, refetch }: Props) => {
         disabled={status === "loading"}
         onClick={buttonHandler}
       >
-        {status === "idle" && "Sign & Terminate"}
+        {status === "idle" && "Cancel Ad"}
 
         {isPending && (
           <>
@@ -276,10 +276,10 @@ const ConfirmationSection = ({ status }: { status: Status }) => {
       )}
       <span className="text-center mt-2">
         {isError
-          ? "Ad Termination Failed"
+          ? "Ad Cancellation Failed"
           : isSuccess
-            ? "Ad Successfully Terminated"
-            : "Are You Sure about Terminating this Ad?"}
+            ? "Ad Successfully Cancelled"
+            : "Are you sure about canceling this ad?"}
       </span>
       <span className="text-gray-700 text-xs text-center mt-1">
         {isError || isSuccess
@@ -322,7 +322,7 @@ const InfoSection = ({
 
   return (
     <div className="w-full flex flex-col justify-center items-center">
-      <InfoRow label="Termination TX ID">
+      <InfoRow label="Canellation TX ID">
         {txId.length > 0 ? (
           <div className={"flex flex-row"}>
             <span>{addressFormat(txId)}</span>
@@ -335,7 +335,7 @@ const InfoSection = ({
           <span className={"text-gray-700"}>N/A</span>
         )}
       </InfoRow>
-      <InfoRow label="Available Amount">
+      <InfoRow label="Amount to Unlock">
         <span>
           {formatedSrcAmount + " " + order.srcTokenTicker + " "}
           <span className={"text-gray-700"}>({order.srcTokenNetwork})</span>

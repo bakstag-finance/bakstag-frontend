@@ -328,7 +328,7 @@ export const ConnectModal = ({ refetch }: Props) => {
         >
           {" "}
           {isWalletConnected || isSolanaWalletConnected
-            ? "Connected"
+            ? "Profile"
             : "+ Connect"}
         </Button>
       </DialogTrigger>
@@ -351,9 +351,8 @@ export const ConnectModal = ({ refetch }: Props) => {
           </Button>
           {step === "delete" ? (
             <span className="text-xs text-gray-700 mt-5">
-              After the AD offer is terminated, the remaining assets will be
-              automatically unlocked. Termination is irreversible and cannot be
-              undone.
+              After the Ad is canceled, the remaining assets will be
+              automatically unlocked to your wallet address
             </span>
           ) : null}
         </div>

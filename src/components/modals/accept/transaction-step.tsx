@@ -160,7 +160,7 @@ const StatusDisplay = ({
     if (isLoading) {
       return (
         <>
-          <span className="mt-5">Pending Transaction</span>
+          <span className="mt-5">Ad Acceptance in progress</span>
           <span className="text-gray-700 mt-2">
             You can already view the transaction in the explorer
           </span>
