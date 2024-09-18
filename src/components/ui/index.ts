@@ -31,6 +31,7 @@ import { Copy } from "./copy";
 import { SelectCoin } from "./select-coin";
 import { Skeleton } from "./skeleton";
 import { AddressInput } from "./address-input";
+import { StatusHeader } from "./status-header";
 
 import {
   Table,
@@ -85,4 +86,5 @@ export {
   TableCaption,
   Skeleton,
   AddressInput,
+  StatusHeader,
 };

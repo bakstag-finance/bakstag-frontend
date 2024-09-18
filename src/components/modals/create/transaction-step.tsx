@@ -1,21 +1,14 @@
 "use client";
 
-import { Button, Copy } from "@/components/ui";
+import { Button, Copy, StatusHeader } from "@/components/ui";
 import {
   addressFormat,
-  calculateSrcAmountPerOneDst,
+  calculateTotalReceiveAmount,
   formatNumber,
   getScanLink,
 } from "@/lib/helpers";
 import { useQuery } from "@tanstack/react-query";
-import {
-  ArrowUpRight,
-  CircleCheck,
-  Clock10,
-  Clock11,
-  FileWarning,
-  Redo2,
-} from "lucide-react";
+import { ArrowUpRight, CircleCheck, Clock10, Redo2 } from "lucide-react";
 import axios from "axios";
 import { tokensData } from "@/lib/constants";
 import { getTransactionReceipt, waitForTransactionReceipt } from "@wagmi/core";
@@ -23,6 +16,7 @@ import { wagmiConfig } from "@/lib/wagmi/config";
 import Link from "next/link";
 import { Dispatch, SetStateAction } from "react";
 import { ChainIds, Status } from "@/types/contracts";
+import { DetailRow } from "@/components/molecules";
 
 interface TransactionData {
   txHash: string;
@@ -100,64 +94,6 @@ const handleTransaction = async (
   return null;
 };
 
-const StatusIcon = ({
-  isError,
-  isLoading,
-  isSuccess,
-}: {
-  isError: boolean;
-  isLoading: boolean;
-  isSuccess: boolean;
-}) => {
-  if (isError) return <FileWarning className="size-16 stroke-[0.5]" />;
-  if (isLoading) return <Clock11 className="size-16 text-white stroke-[0.5]" />;
-  if (isSuccess) return <CircleCheck className="size-16 stroke-[0.5]" />;
-  return null;
-};
-
-const StatusMessage = ({
-  isError,
-  isLoading,
-  isSuccess,
-}: {
-  isError: boolean;
-  isLoading: boolean;
-  isSuccess: boolean;
-}) => {
-  if (isError) {
-    return (
-      <>
-        <span className="mt-5">Ad Acceptance Failed</span>
-        <span className="text-gray-700 mt-2">Please Retry</span>
-      </>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <>
-        <span className="mt-5">Creating Your Ad</span>
-        <span className="text-gray-700 mt-2">
-          You can already view the transaction in the explorer
-        </span>
-      </>
-    );
-  }
-
-  if (isSuccess) {
-    return (
-      <>
-        <span className="mt-5">Ad Successfully Created & Listed</span>
-        <span className="text-gray-700 mt-2">
-          might need 2 mins to appear in a list
-        </span>
-      </>
-    );
-  }
-
-  return null;
-};
-
 const ButtonContent = ({
   isError,
   isLoading,
@@ -186,13 +122,6 @@ const ButtonContent = ({
       </>
     );
   return null;
-};
-
-const calculateTotalReceiveAmount = (
-  srcTokenAmount: string,
-  exchangeRate: string,
-) => {
-  return Number(srcTokenAmount) * Number(exchangeRate) * 0.99;
 };
 
 export const TransactionStep = ({
@@ -229,18 +158,23 @@ export const TransactionStep = ({
 
   return (
     <div className="w-full flex flex-col items-center">
-      <div className="w-full h-44 flex flex-col justify-center items-center mt-2 text-xs text-white">
-        <StatusIcon
-          isError={isError}
-          isLoading={isLoading}
-          isSuccess={isSuccess}
-        />
-        <StatusMessage
-          isError={isError}
-          isLoading={isLoading}
-          isSuccess={isSuccess}
-        />
-      </div>
+      <StatusHeader
+        isError={isError}
+        isSuccess={isSuccess}
+        isLoading={isLoading}
+        errorMessage={{
+          title: "Ad Acceptance Failed",
+          subtitle: "Please Retry",
+        }}
+        loadingMessage={{
+          title: "Creating Your Ad",
+          subtitle: "You can already view the transaction in the explorer",
+        }}
+        successMessage={{
+          title: "Ad Successfully Created & Listed",
+          subtitle: "Might need 2 mins to appear in a list",
+        }}
+      />
 
       <TransactionDetails
         transactionData={transactionData}
@@ -276,10 +210,11 @@ export const TransactionStep = ({
   );
 };
 
-interface DetailsProps extends Props {
+interface TransactionDetailsProps extends Props {
   isMonochain: boolean;
   srcNetwork: string;
 }
+
 const TransactionDetails = ({
   transactionData,
   destinationWallet,
@@ -290,17 +225,17 @@ const TransactionDetails = ({
   dstTokenAmount,
   isMonochain,
   srcNetwork,
-}: DetailsProps) => {
+}: TransactionDetailsProps) => {
   const link = getScanLink({
     isMonochain,
     srcNetwork,
     txHash: transactionData.txHash,
   });
 
-  const srcAmountPerOneDst = formatNumber(Number(dstTokenAmount));
+  const exchangeRate = formatNumber(Number(dstTokenAmount));
   return (
     <div className="w-full flex flex-col text-xs mt-5 text-white">
-      <TransactionRow label="TX ID">
+      <DetailRow label="TX ID">
         <div className="flex flex-row items-center justify-center text-gray-800">
           {addressFormat(transactionData.txHash)}
           <Copy textToCopy={transactionData.txHash} />
@@ -308,35 +243,35 @@ const TransactionDetails = ({
             <ArrowUpRight className="w-5 h-5 ml-1 text-gray-700 cursor-pointer hover:text-white" />
           </Link>
         </div>
-      </TransactionRow>
+      </DetailRow>
 
-      <TransactionRow label="Locked amount">
+      <DetailRow label="Locked amount">
         {srcTokenAmount} {tokensData[selectedSrcToken]?.token}{" "}
         <span className="text-gray-700">
           ({tokensData[selectedSrcToken]?.network})
         </span>
-      </TransactionRow>
+      </DetailRow>
 
-      <TransactionRow label="to Wallet">
+      <DetailRow label="to Wallet">
         {destinationWallet.length > 8 && (
           <div className="flex flex-row items-center text-gray-800">
             {addressFormat(destinationWallet)}
             <Copy textToCopy={destinationWallet} />
           </div>
         )}
-      </TransactionRow>
+      </DetailRow>
 
-      <TransactionRow label="from Wallet">
+      <DetailRow label="from Wallet">
         {srcAddress && (
           <div className="flex flex-row text-gray-800">
             {addressFormat(srcAddress)}
             <Copy textToCopy={srcAddress} />
           </div>
         )}
-      </TransactionRow>
+      </DetailRow>
 
-      <TransactionRow label="Exchange Rate">
-        {srcAmountPerOneDst} {tokensData[selectedSrcToken]?.token}{" "}
+      <DetailRow label="Exchange Rate">
+        {exchangeRate} {tokensData[selectedSrcToken]?.token}{" "}
         <span className="text-gray-700">
           ({tokensData[selectedSrcToken]?.network})
         </span>{" "}
@@ -345,12 +280,12 @@ const TransactionDetails = ({
           {" "}
           ({tokensData[selectedDstToken]?.network})
         </span>
-      </TransactionRow>
+      </DetailRow>
 
-      <TransactionRow label="Protocol Fee">
+      <DetailRow label="Protocol Fee">
         <span>1 %</span>
-      </TransactionRow>
-      <TransactionRow label="Total Receive Amount">
+      </DetailRow>
+      <DetailRow label="Total Receive Amount">
         {calculateTotalReceiveAmount(srcTokenAmount, dstTokenAmount)}
         <span>
           {" "}
@@ -359,20 +294,7 @@ const TransactionDetails = ({
             ({tokensData[selectedDstToken]?.network})
           </span>
         </span>
-      </TransactionRow>
+      </DetailRow>
     </div>
   );
 };
-
-const TransactionRow = ({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) => (
-  <div className="w-full flex flex-row justify-between items-center my-2">
-    <span>{label}</span>
-    <span>{children}</span>
-  </div>
-);

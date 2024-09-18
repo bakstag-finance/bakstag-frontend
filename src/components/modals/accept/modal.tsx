@@ -221,7 +221,7 @@ export const AcceptModal = ({ order, refetch }: Props) => {
             chainId: _dstTokenChainId,
           }).catch((e) => {
             const error = e as WriteContractErrorType;
-            console.log("Errpr", e);
+            console.log("Error", e);
             throw new Error(error.name);
           });
         }

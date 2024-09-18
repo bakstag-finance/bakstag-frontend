@@ -23,6 +23,8 @@ import {
 import { getTokenField } from "./token-info";
 import { getScanLink } from "./get-scan-link";
 
+import { calculateTotalReceiveAmount } from "./calculation";
+
 export {
   toSD,
   addressFormat,
@@ -40,4 +42,5 @@ export {
   getScanLink,
   formatNumber,
   calculateSrcAmountPerOneDst,
+  calculateTotalReceiveAmount,
 };

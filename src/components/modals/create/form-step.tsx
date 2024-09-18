@@ -10,6 +10,7 @@ import { tokensData } from "@/lib/constants";
 import {
   addressFormat,
   calculateSrcAmountPerOneDst,
+  calculateTotalReceiveAmount,
   formatNumber,
   isValidTokenAmount,
   isValueOutOfBounds,
@@ -17,6 +18,9 @@ import {
 import { cn } from "@/lib/utils";
 import { Status } from "@/types/contracts";
 import { ChangeEvent, Dispatch, SetStateAction } from "react";
+import { WalletConnect } from "@/components/modals/wallet-connect";
+import { is } from "superstruct";
+import { AddressDetailRow, DetailRow } from "@/components/molecules";
 
 interface FormStepProps {
   selectedSrcToken: string;
@@ -64,11 +68,6 @@ export const FormStep = ({
   approvingStatus,
   approvingErrorMessage,
 }: FormStepProps) => {
-  const handleInputChange = (
-    e: ChangeEvent<HTMLInputElement>,
-    setter: (value: string) => void,
-  ) => setter(e.target.value);
-
   const totalReceiveAmount = calculateTotalReceiveAmount(
     srcTokenAmount,
     dstTokenAmount,
@@ -94,7 +93,7 @@ export const FormStep = ({
         tokenAmount={srcTokenAmount}
         setTokenAmount={setSrcTokenAmount}
         isValidAmount={isCorrectSrcTokenAmount}
-        placeholder="0.0"
+        placeholder="0"
         isExchangeRate={false}
       />
       <TokenAmountInput
@@ -104,7 +103,7 @@ export const FormStep = ({
         tokenAmount={dstTokenAmount}
         setTokenAmount={setDstTokenAmount}
         isValidAmount={isCorrectExchangeRate}
-        placeholder="Set Exchange Rate"
+        placeholder="0"
         className={"mt-5"}
         isExchangeRate={true}
       />
@@ -128,6 +127,7 @@ export const FormStep = ({
         approvingErrorMessage={approvingErrorMessage}
         handleCreateSwap={handleCreateSwap}
         handleClose={handleClose}
+        isWalletConnected={isWalletConnected}
       />
     </div>
   );
@@ -227,7 +227,7 @@ const Summary = ({
 
   return (
     <div className="w-full flex flex-col text-xs mt-5">
-      <SummaryRow label="Locked Amount">
+      <DetailRow label="Locked Amount">
         {exchangeRate.length > 0 && selectedSrcToken ? (
           <span>
             {srcTokenAmount + " " + tokensData[selectedSrcToken]?.token}{" "}
@@ -238,13 +238,10 @@ const Summary = ({
         ) : (
           <span className={"text-gray-700"}>N/A</span>
         )}
-      </SummaryRow>
-      <AddressSummaryRow label="to Wallet" value={destinationWallet} />
-      <AddressSummaryRow
-        label="from Wallet"
-        value={srcAddress ?? "Connect Wallet"}
-      />
-      <SummaryRow label="Exchange Rate">
+      </DetailRow>
+      <AddressDetailRow label="to Wallet" value={destinationWallet} />
+      <AddressDetailRow label="from Wallet" value={srcAddress || ""} />
+      <DetailRow label="Exchange Rate">
         {isShowExchangeRate && selectedSrcToken && selectedDstToken ? (
           <span>
             <span>
@@ -264,11 +261,11 @@ const Summary = ({
         ) : (
           <span className={"text-gray-700"}>Set Exchange Rate</span>
         )}
-      </SummaryRow>
-      <SummaryRow label="Protocol Fee">
+      </DetailRow>
+      <DetailRow label="Protocol Fee">
         <span>1%</span>
-      </SummaryRow>
-      <SummaryRow label="Total Receive amount">
+      </DetailRow>
+      <DetailRow label="Total Receive amount">
         {isShowTotalReceiveAmount ? (
           <span className={"max-w-full "}>
             {formatNumberWithCommas(totalReceiveAmount) + " "}
@@ -282,43 +279,10 @@ const Summary = ({
         ) : (
           <span className={"text-gray-700"}>Set Exchange Rate</span>
         )}
-      </SummaryRow>
+      </DetailRow>
     </div>
   );
 };
-
-const AddressSummaryRow = ({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) => (
-  <div className="w-full flex flex-row justify-between items-center my-2">
-    <span>{label}</span>
-    {value?.length > 8 ? (
-      <div className="flex flex-row items-center text-gray-800">
-        {addressFormat(value)}
-        <Copy textToCopy={value} />
-      </div>
-    ) : (
-      <Skeleton className="w-16 h-4" />
-    )}
-  </div>
-);
-
-const SummaryRow = ({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) => (
-  <div className="w-full flex flex-row justify-between items-center my-2">
-    <span>{label}</span>
-    {children}
-  </div>
-);
 
 const ActionButton = ({
   buttonDisabled,
@@ -326,40 +290,41 @@ const ActionButton = ({
   approvingErrorMessage,
   handleCreateSwap,
   handleClose,
+  isWalletConnected,
 }: {
   buttonDisabled: boolean;
   approvingStatus: Status;
   approvingErrorMessage: string;
   handleCreateSwap: () => void;
   handleClose: () => void;
-}) => (
-  <>
-    <Button
-      className="w-full mt-5 rounded-xl"
-      disabled={buttonDisabled}
-      onClick={handleCreateSwap}
-      variant={
-        (approvingStatus === "pending" && "secondary") ||
-        (approvingStatus === "error" && "destructive") ||
-        "default"
-      }
-    >
-      {getButtonText(approvingStatus, approvingErrorMessage)}
-    </Button>
-    <Button
-      className="w-full mt-5 bg-black text-gray-700 border border-white border-opacity-50 hover:bg-gray-800 rounded-xl"
-      onClick={handleClose}
-    >
-      Cancel
-    </Button>
-  </>
-);
+  isWalletConnected: boolean;
+}) => {
+  if (!isWalletConnected) {
+    return <WalletConnect />;
+  }
 
-const calculateTotalReceiveAmount = (
-  srcTokenAmount: string,
-  exchangeRate: string,
-) => {
-  return Number(srcTokenAmount) * Number(exchangeRate) * 0.99;
+  return (
+    <>
+      <Button
+        className="w-full mt-5 rounded-xl"
+        disabled={buttonDisabled}
+        onClick={handleCreateSwap}
+        variant={
+          (approvingStatus === "pending" && "secondary") ||
+          (approvingStatus === "error" && "destructive") ||
+          "default"
+        }
+      >
+        {getButtonText(approvingStatus, approvingErrorMessage)}
+      </Button>
+      <Button
+        className="w-full mt-5 bg-black text-gray-700 border border-white border-opacity-50 hover:bg-gray-800 rounded-xl"
+        onClick={handleClose}
+      >
+        Cancel
+      </Button>
+    </>
+  );
 };
 
 const validateTokenAmount = (amount: string) =>
