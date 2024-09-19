@@ -1,7 +1,7 @@
 import {
   addressFormat,
   calculateSrcAmountPerOneDst,
-  formatNumberWithCommas
+  formatNumberWithCommas,
 } from "./formating";
 import {
   isEthAddress,
@@ -12,7 +12,7 @@ import {
   isNumericOrCommaSeparated,
   isValidTokenAmount,
   isValueOutOfBounds,
-    validateTokenAmount
+  validateTokenAmount,
 } from "./input-validation";
 import {
   addressToBytes32,
@@ -43,5 +43,5 @@ export {
   getScanLink,
   calculateSrcAmountPerOneDst,
   calculateTotalReceiveAmount,
-  validateTokenAmount
+  validateTokenAmount,
 };

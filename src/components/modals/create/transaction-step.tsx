@@ -16,7 +16,7 @@ import Link from "next/link";
 import { Dispatch, SetStateAction } from "react";
 import { ChainIds, Status } from "@/types/contracts";
 import { DetailRow } from "@/components/molecules";
-import {formatNumberWithCommas} from "@/lib/helpers/formating";
+import { formatNumberWithCommas } from "@/lib/helpers/formating";
 
 interface TransactionData {
   txHash: string;
@@ -233,7 +233,9 @@ const TransactionDetails = ({
   });
 
   const exchangeRate = formatNumberWithCommas(Number(dstTokenAmount));
-  const totatReceiveAmount = formatNumberWithCommas(calculateTotalReceiveAmount(srcTokenAmount, dstTokenAmount));
+  const totatReceiveAmount = formatNumberWithCommas(
+    calculateTotalReceiveAmount(srcTokenAmount, dstTokenAmount),
+  );
 
   return (
     <div className="w-full flex flex-col text-xs mt-5 text-white">

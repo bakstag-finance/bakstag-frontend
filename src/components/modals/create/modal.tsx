@@ -11,11 +11,7 @@ import {
   DialogTrigger,
   VisuallyHidden,
 } from "@/components/ui";
-import {
-  isValidCryptoAddress,
-  hexZeroPadTo32,
-  toSD,
-} from "@/lib/helpers";
+import { isValidCryptoAddress, hexZeroPadTo32, toSD } from "@/lib/helpers";
 import { useAccount, useSwitchChain } from "wagmi";
 import { tokensData } from "@/lib/constants";
 import { wagmiConfig } from "@/lib/wagmi/config";
@@ -101,7 +97,9 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
     const abiConfig = tokensData[selectedSrcToken].otcConfig;
 
     const _srcSellerAddress = hexZeroPadTo32(address!);
-    const _dstSellerAddress = hexZeroPadTo32(destinationWallet as `0x${string}`);
+    const _dstSellerAddress = hexZeroPadTo32(
+      destinationWallet as `0x${string}`,
+    );
 
     const srcToken = tokensData[selectedSrcToken];
     const dstToken = tokensData[selectedDstToken];

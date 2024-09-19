@@ -25,4 +25,4 @@ export const isValueOutOfBounds = (
 };
 
 export const validateTokenAmount = (amount: string) =>
-    isValidTokenAmount(amount) && !isValueOutOfBounds(amount);
+  isValidTokenAmount(amount) && !isValueOutOfBounds(amount);

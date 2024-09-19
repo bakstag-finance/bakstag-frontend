@@ -1,8 +1,4 @@
-import {
-  AddressInput,
-  Button,
-  SelectCoin, TokenInput,
-} from "@/components/ui";
+import { AddressInput, Button, SelectCoin, TokenInput } from "@/components/ui";
 import { tokensData } from "@/lib/constants";
 import {
   calculateTotalReceiveAmount,
@@ -13,7 +9,7 @@ import { Status } from "@/types/contracts";
 import { Dispatch, SetStateAction } from "react";
 import { WalletConnect } from "@/components/modals/wallet-connect";
 import { AddressDetailRow, DetailRow } from "@/components/molecules";
-import {formatNumberWithCommas} from "@/lib/helpers/formating";
+import { formatNumberWithCommas } from "@/lib/helpers/formating";
 
 interface FormStepProps {
   selectedSrcToken: string;
@@ -34,7 +30,6 @@ interface FormStepProps {
   handleCreateSwap: () => void;
   handleClose: () => void;
 }
-
 
 export const FormStep = ({
   selectedSrcToken,
@@ -138,33 +133,33 @@ const TokenAmountInput = ({
   isExchangeRate: boolean;
 }) => {
   return (
-      <div
-          className={cn(
-              "flex flex-row justify-between items-center text-xs",
-              className,
-          )}
-      >
-        <div className="w-full flex flex-col justify-between items-start">
-          <span className="text-gray-700 ml-3">{label}</span>
-          <SelectCoin
-              placeholder={label}
-              className="mt-2"
-              value={selectedToken}
-              setValue={setSelectedToken}
-          />
-        </div>
-        <div className="ml-2 w-full flex flex-col justify-between items-start">
-      <span className="text-gray-700 ml-3">
-        {isExchangeRate ? "Set Exchange Rate" : "Amount to sell"}
-      </span>
-          <TokenInput
-              value={tokenAmount}
-              setValue={setTokenAmount}
-              placeholder={placeholder}
-          />
-        </div>
+    <div
+      className={cn(
+        "flex flex-row justify-between items-center text-xs",
+        className,
+      )}
+    >
+      <div className="w-full flex flex-col justify-between items-start">
+        <span className="text-gray-700 ml-3">{label}</span>
+        <SelectCoin
+          placeholder={label}
+          className="mt-2"
+          value={selectedToken}
+          setValue={setSelectedToken}
+        />
       </div>
-  )
+      <div className="ml-2 w-full flex flex-col justify-between items-start">
+        <span className="text-gray-700 ml-3">
+          {isExchangeRate ? "Set Exchange Rate" : "Amount to sell"}
+        </span>
+        <TokenInput
+          value={tokenAmount}
+          setValue={setTokenAmount}
+          placeholder={placeholder}
+        />
+      </div>
+    </div>
+  );
 };
 
 const WalletAddressInput = ({
@@ -305,7 +300,6 @@ const ActionButton = ({
     </>
   );
 };
-
 
 const getButtonText = (
   approvingStatus: Status,

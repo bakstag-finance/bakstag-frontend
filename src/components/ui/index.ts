@@ -88,5 +88,5 @@ export {
   Skeleton,
   AddressInput,
   StatusHeader,
-  TokenInput
+  TokenInput,
 };
