@@ -65,7 +65,7 @@ const handleTransaction = async (
     }
   } else {
     await axios.get(
-      `/api/offer_info?txHash=${transactionData.txHash}&srcEid=${transactionData.srcEid}`,
+      `/api/offer/info?txHash=${transactionData.txHash}&srcEid=${transactionData.srcEid}`,
     );
   }
 
@@ -74,7 +74,7 @@ const handleTransaction = async (
     hash: transactionData.txHash as `0x${string}`,
   });
 
-  await axios.post("/api/orders/add", {
+  await axios.post("/api/offer/add", {
     offerId: transactionData.offerId,
     srcSellerAddress: transactionData.srcSellerAddress,
     dstSellerAddress: transactionData.dstSellerAddress,

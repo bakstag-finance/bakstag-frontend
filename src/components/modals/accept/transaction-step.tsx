@@ -59,10 +59,10 @@ const handleTransaction = async (
       throw new Error("Reverted Transaction");
     }
   } else {
-    await axios.get(`/api/offer_info?txHash=${txHash}&srcEid=${srcEid}`);
+    await axios.get(`/api/offer/info?txHash=${txHash}&srcEid=${srcEid}`);
   }
 
-  await axios.post("/api/orders/update", {
+  await axios.post("/api/offer/update", {
     offerId: offerId,
     srcAmountLD: srcAmountLD,
   });

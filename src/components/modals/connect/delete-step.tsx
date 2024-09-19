@@ -73,7 +73,7 @@ export const DeletingStep = ({ order, setStep, refetch }: Props) => {
 
   const deleteQuery = async () => {
     try {
-      const deleteQuery = await axios.post(`/api/orders/delete`, {
+      const deleteQuery = await axios.post(`/api/offer/delete`, {
         offerId: order.offerId,
       });
 
@@ -181,7 +181,7 @@ export const DeletingStep = ({ order, setStep, refetch }: Props) => {
           queryResult = receipt;
         } else {
           const receipt = await axios
-            .get(`/api/offer_info?txHash=${_txHash}&srcEid=${order.dstEid}`)
+            .get(`/api/offer/info?txHash=${_txHash}&srcEid=${order.dstEid}`)
             .catch((e) => {
               setStatus("error");
               console.log(e);

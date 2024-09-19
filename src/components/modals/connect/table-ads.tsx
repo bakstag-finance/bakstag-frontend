@@ -38,7 +38,7 @@ export const TableComponent = ({ setStep, setOrderData }: Props) => {
     queryKey: ["table-ads", tokenToBuy, address],
     queryFn: async () => {
       const result = await axios.get(
-        `/api/orders/get_all?tokenToBuy=${tokenToBuy}&address=${address}&amountToBuy=0&showEmpty=true`,
+        `/api/offer/get_all?tokenToBuy=${tokenToBuy}&address=${address}&amountToBuy=0&showEmpty=true`,
       );
       return result.data.orders;
     },
@@ -157,7 +157,7 @@ const TableRow = ({
       <div className="flex flex-col w-full justify-between">
         <div className="flex flex-col">
           <span className="text-xs text-gray-700 font-semibold">
-            Exchange Rate (SHIT)
+            Exchange Rate
           </span>
           <span className="flex items-start text-sm">
             {formattedDstAmount + " " + item.dstTokenTicker}{" "}
