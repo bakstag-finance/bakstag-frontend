@@ -23,3 +23,6 @@ export const isValueOutOfBounds = (
 
   return parsedValue < min || parsedValue > max;
 };
+
+export const validateTokenAmount = (amount: string) =>
+    isValidTokenAmount(amount) && !isValueOutOfBounds(amount);

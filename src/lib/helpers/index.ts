@@ -1,8 +1,8 @@
 import {
   addressFormat,
   calculateSrcAmountPerOneDst,
-  formatNumber,
-} from "./address_format";
+  formatNumberWithCommas
+} from "./formating";
 import {
   isEthAddress,
   isSolanaAddress,
@@ -12,6 +12,7 @@ import {
   isNumericOrCommaSeparated,
   isValidTokenAmount,
   isValueOutOfBounds,
+    validateTokenAmount
 } from "./input-validation";
 import {
   addressToBytes32,
@@ -40,7 +41,7 @@ export {
   getTokenField,
   hexStripsAddr,
   getScanLink,
-  formatNumber,
   calculateSrcAmountPerOneDst,
   calculateTotalReceiveAmount,
+  validateTokenAmount
 };

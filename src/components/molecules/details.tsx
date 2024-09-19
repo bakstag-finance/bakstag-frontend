@@ -1,4 +1,4 @@
-import { addressFormat } from "@/lib/helpers";
+import {addressFormat, isValidCryptoAddress} from "@/lib/helpers";
 import { Copy, Skeleton } from "@/components/ui";
 
 export const DetailRow = ({
@@ -10,7 +10,7 @@ export const DetailRow = ({
 }) => (
   <div className="w-full flex flex-row justify-between items-center my-2">
     <span>{label}</span>
-    {children}
+    <span>{children}</span>
   </div>
 );
 
@@ -20,16 +20,19 @@ export const AddressDetailRow = ({
 }: {
   label: string;
   value: string;
-}) => (
-  <div className="w-full flex flex-row justify-between items-center my-2">
-    <span>{label}</span>
-    {value?.length > 8 ? (
-      <div className="flex flex-row items-center text-gray-800">
-        {addressFormat(value)}
-        <Copy textToCopy={value} />
-      </div>
-    ) : (
-      <Skeleton className="w-16 h-4" />
-    )}
-  </div>
-);
+}) => {
+    const isValidAddress = isValidCryptoAddress(value);
+    return (
+        <div className="w-full flex flex-row justify-between items-center my-2">
+            <span>{label}</span>
+            {value?.length > 8 && isValidAddress ? (
+                <div className="flex flex-row items-center text-gray-800">
+                    {addressFormat(value)}
+                    <Copy textToCopy={value} />
+                </div>
+            ) : (
+                <Skeleton className="w-16 h-4" />
+            )}
+        </div>
+    )
+};

@@ -1,26 +1,19 @@
 import {
   AddressInput,
   Button,
-  Copy,
-  Input,
-  SelectCoin,
-  Skeleton,
+  SelectCoin, TokenInput,
 } from "@/components/ui";
 import { tokensData } from "@/lib/constants";
 import {
-  addressFormat,
-  calculateSrcAmountPerOneDst,
   calculateTotalReceiveAmount,
-  formatNumber,
-  isValidTokenAmount,
-  isValueOutOfBounds,
+  validateTokenAmount,
 } from "@/lib/helpers";
 import { cn } from "@/lib/utils";
 import { Status } from "@/types/contracts";
-import { ChangeEvent, Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction } from "react";
 import { WalletConnect } from "@/components/modals/wallet-connect";
-import { is } from "superstruct";
 import { AddressDetailRow, DetailRow } from "@/components/molecules";
+import {formatNumberWithCommas} from "@/lib/helpers/formating";
 
 interface FormStepProps {
   selectedSrcToken: string;
@@ -42,12 +35,6 @@ interface FormStepProps {
   handleClose: () => void;
 }
 
-const formatNumberWithCommas = (number: number) => {
-  return number.toLocaleString("en-US", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 7,
-  });
-};
 
 export const FormStep = ({
   selectedSrcToken,
@@ -92,7 +79,6 @@ export const FormStep = ({
         setSelectedToken={setSelectedSrcToken}
         tokenAmount={srcTokenAmount}
         setTokenAmount={setSrcTokenAmount}
-        isValidAmount={isCorrectSrcTokenAmount}
         placeholder="0"
         isExchangeRate={false}
       />
@@ -102,7 +88,6 @@ export const FormStep = ({
         setSelectedToken={setSelectedDstToken}
         tokenAmount={dstTokenAmount}
         setTokenAmount={setDstTokenAmount}
-        isValidAmount={isCorrectExchangeRate}
         placeholder="0"
         className={"mt-5"}
         isExchangeRate={true}
@@ -139,7 +124,6 @@ const TokenAmountInput = ({
   setSelectedToken,
   tokenAmount,
   setTokenAmount,
-  isValidAmount,
   placeholder,
   className,
   isExchangeRate = false,
@@ -149,44 +133,39 @@ const TokenAmountInput = ({
   setSelectedToken: Dispatch<SetStateAction<string>>;
   tokenAmount: string;
   setTokenAmount: Dispatch<SetStateAction<string>>;
-  isValidAmount: boolean;
   placeholder: string;
   className?: string;
   isExchangeRate: boolean;
-}) => (
-  <div
-    className={cn(
-      "flex flex-row justify-between items-center text-xs",
-      className,
-    )}
-  >
-    <div className="w-full flex flex-col justify-between items-start">
-      <span className="text-gray-700 ml-3">{label}</span>
-      <SelectCoin
-        placeholder={label}
-        className="mt-2"
-        value={selectedToken}
-        setValue={setSelectedToken}
-      />
-    </div>
-    <div className="ml-2 w-full flex flex-col justify-between items-start">
+}) => {
+  return (
+      <div
+          className={cn(
+              "flex flex-row justify-between items-center text-xs",
+              className,
+          )}
+      >
+        <div className="w-full flex flex-col justify-between items-start">
+          <span className="text-gray-700 ml-3">{label}</span>
+          <SelectCoin
+              placeholder={label}
+              className="mt-2"
+              value={selectedToken}
+              setValue={setSelectedToken}
+          />
+        </div>
+        <div className="ml-2 w-full flex flex-col justify-between items-start">
       <span className="text-gray-700 ml-3">
         {isExchangeRate ? "Set Exchange Rate" : "Amount to sell"}
       </span>
-      <Input
-        className={cn(
-          "mt-2 bg-black border rounded-lg border-gray-800",
-          !isValidAmount &&
-            "border-red-700 focus-visible:ring-red-200 focus-visible:ring-1",
-        )}
-        value={tokenAmount}
-        type="text"
-        placeholder={placeholder}
-        onChange={(e) => setTokenAmount(e.target.value)}
-      />
-    </div>
-  </div>
-);
+          <TokenInput
+              value={tokenAmount}
+              setValue={setTokenAmount}
+              placeholder={placeholder}
+          />
+        </div>
+      </div>
+  )
+};
 
 const WalletAddressInput = ({
   label,
@@ -243,7 +222,7 @@ const Summary = ({
       <AddressDetailRow label="from Wallet" value={srcAddress || ""} />
       <DetailRow label="Exchange Rate">
         {isShowExchangeRate && selectedSrcToken && selectedDstToken ? (
-          <span>
+          <>
             <span>
               {formatNumberWithCommas(Number(exchangeRate)) +
                 " " +
@@ -257,7 +236,7 @@ const Summary = ({
             <span className={"text-gray-700"}>
               ({tokensData[selectedSrcToken].network})
             </span>
-          </span>
+          </>
         ) : (
           <span className={"text-gray-700"}>Set Exchange Rate</span>
         )}
@@ -327,8 +306,6 @@ const ActionButton = ({
   );
 };
 
-const validateTokenAmount = (amount: string) =>
-  isValidTokenAmount(amount) && !isValueOutOfBounds(amount);
 
 const getButtonText = (
   approvingStatus: Status,

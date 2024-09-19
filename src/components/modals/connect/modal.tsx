@@ -70,6 +70,7 @@ export const ConnectModal = ({ refetch }: Props) => {
     }
   }, [isWalletConnected, status]);
 
+
   const metamaskWalletHandler = async () => {
     if (!account.address) {
       await connect({
@@ -320,13 +321,13 @@ export const ConnectModal = ({ refetch }: Props) => {
     setOpenModal(_open);
   };
 
+
   return (
     <Dialog open={openModal} onOpenChange={onOpenChangeHandler}>
       <DialogTrigger asChild>
         <Button
           className={"bg-white text-black w-full rounded-xl font-extralight"}
         >
-          {" "}
           {isWalletConnected || isSolanaWalletConnected
             ? "Profile"
             : "+ Connect"}

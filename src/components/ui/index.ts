@@ -32,6 +32,7 @@ import { SelectCoin } from "./select-coin";
 import { Skeleton } from "./skeleton";
 import { AddressInput } from "./address-input";
 import { StatusHeader } from "./status-header";
+import { TokenInput } from "./token-input";
 
 import {
   Table,
@@ -87,4 +88,5 @@ export {
   Skeleton,
   AddressInput,
   StatusHeader,
+  TokenInput
 };

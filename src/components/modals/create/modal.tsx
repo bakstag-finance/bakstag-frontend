@@ -15,8 +15,6 @@ import {
   isValidCryptoAddress,
   hexZeroPadTo32,
   toSD,
-  formatNumber,
-  calculateSrcAmountPerOneDst,
 } from "@/lib/helpers";
 import { useAccount, useSwitchChain } from "wagmi";
 import { tokensData } from "@/lib/constants";
@@ -33,8 +31,6 @@ import { erc20Abi } from "viem";
 import { TransactionStep } from "./transaction-step";
 import { FormStep } from "./form-step";
 import { Status, LzFee, ChainIds } from "@/types/contracts";
-import { otcMarketConfig } from "@/lib/wagmi/contracts/abi";
-import { TokenData } from "@/lib/constants/tokens";
 
 type CreateModalStep = "main" | "transaction";
 
@@ -80,7 +76,7 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
   const [approvingStatus, setApprovingStatus] = useState<Status>("idle");
   const [approvingErrorMessage, setApprovingErrorMessage] = useState("");
 
-  // State of transaction proccess
+  // State of transaction process
   const [transactionStatus, setTransactionStatus] = useState<Status>("idle");
 
   const isValidDestinationWallet = isValidCryptoAddress(destinationWallet);
@@ -94,8 +90,8 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
   const handleResetState = () => {
     handleRetry();
     setSelectedSrcToken("");
-    setSrcTokenAmount("0.000001");
-    setDstTokenAmount("0.000001");
+    setSrcTokenAmount("0");
+    setDstTokenAmount("0");
     setSelectedDstToken("");
     setDestinationWallet("");
     setApprovingStatus("idle");
@@ -105,7 +101,7 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
     const abiConfig = tokensData[selectedSrcToken].otcConfig;
 
     const _srcSellerAddress = hexZeroPadTo32(address!);
-    const _dstSellerAddress = hexZeroPadTo32(destinationWallet as any); // TODO: Replace any to string
+    const _dstSellerAddress = hexZeroPadTo32(destinationWallet as `0x${string}`);
 
     const srcToken = tokensData[selectedSrcToken];
     const dstToken = tokensData[selectedDstToken];

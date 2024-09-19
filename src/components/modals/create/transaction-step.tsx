@@ -4,7 +4,6 @@ import { Button, Copy, StatusHeader } from "@/components/ui";
 import {
   addressFormat,
   calculateTotalReceiveAmount,
-  formatNumber,
   getScanLink,
 } from "@/lib/helpers";
 import { useQuery } from "@tanstack/react-query";
@@ -17,6 +16,7 @@ import Link from "next/link";
 import { Dispatch, SetStateAction } from "react";
 import { ChainIds, Status } from "@/types/contracts";
 import { DetailRow } from "@/components/molecules";
+import {formatNumberWithCommas} from "@/lib/helpers/formating";
 
 interface TransactionData {
   txHash: string;
@@ -232,7 +232,9 @@ const TransactionDetails = ({
     txHash: transactionData.txHash,
   });
 
-  const exchangeRate = formatNumber(Number(dstTokenAmount));
+  const exchangeRate = formatNumberWithCommas(Number(dstTokenAmount));
+  const totatReceiveAmount = formatNumberWithCommas(calculateTotalReceiveAmount(srcTokenAmount, dstTokenAmount));
+
   return (
     <div className="w-full flex flex-col text-xs mt-5 text-white">
       <DetailRow label="TX ID">
@@ -244,14 +246,12 @@ const TransactionDetails = ({
           </Link>
         </div>
       </DetailRow>
-
       <DetailRow label="Locked amount">
         {srcTokenAmount} {tokensData[selectedSrcToken]?.token}{" "}
         <span className="text-gray-700">
           ({tokensData[selectedSrcToken]?.network})
         </span>
       </DetailRow>
-
       <DetailRow label="to Wallet">
         {destinationWallet.length > 8 && (
           <div className="flex flex-row items-center text-gray-800">
@@ -260,7 +260,6 @@ const TransactionDetails = ({
           </div>
         )}
       </DetailRow>
-
       <DetailRow label="from Wallet">
         {srcAddress && (
           <div className="flex flex-row text-gray-800">
@@ -269,7 +268,6 @@ const TransactionDetails = ({
           </div>
         )}
       </DetailRow>
-
       <DetailRow label="Exchange Rate">
         {exchangeRate} {tokensData[selectedSrcToken]?.token}{" "}
         <span className="text-gray-700">
@@ -281,12 +279,11 @@ const TransactionDetails = ({
           ({tokensData[selectedDstToken]?.network})
         </span>
       </DetailRow>
-
       <DetailRow label="Protocol Fee">
         <span>1 %</span>
       </DetailRow>
       <DetailRow label="Total Receive Amount">
-        {calculateTotalReceiveAmount(srcTokenAmount, dstTokenAmount)}
+        {totatReceiveAmount}
         <span>
           {" "}
           {tokensData[selectedDstToken]?.network}{" "}
