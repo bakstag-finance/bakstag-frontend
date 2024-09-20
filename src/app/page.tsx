@@ -1,15 +1,15 @@
 "use client";
 
 import { ChangeEvent, useState } from "react";
-import { Button, Input, SelectCoin } from "@/components/ui";
+import {Button, Input, LoadingClock, SelectCoin} from "@/components/ui";
 import { ConnectModal, CreateModal } from "@/components/modals";
 import { useQuery } from "@tanstack/react-query";
-import { Clock10 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { isValidTokenAmount } from "@/lib/helpers";
 import axios from "axios";
 import { Order } from "@/types/order";
 import { TableItem } from "@/components/molecules";
+import {Clock10} from "lucide-react";
 
 export default function Home() {
   const [tokenToBuy, setTokenToBuy] = useState("eth-opt");
@@ -149,7 +149,7 @@ const LoadingComponent = () => {
   return (
     <div className="flex justify-center items-center h-full my-full">
       <Button variant="secondary" className={"rounded-xl"}>
-        <Clock10 className="w-5 h-5 mr-2" /> Fetching Ads
+        <LoadingClock className={"w-6 h-6 mr-1"} /> Fetching Ads
       </Button>
     </div>
   );

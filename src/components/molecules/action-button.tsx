@@ -88,7 +88,7 @@ const getButtonContent = (
   if (isLoading)
     return (
       <span className={"flex flex-row"}>
-        <LoadingClock width={20} height={20} />{" "}
+         <LoadingClock className={"w-6 h-6"} />{" "}
         <span className={"ml-1"}>{loadingText}</span>
       </span>
     );
