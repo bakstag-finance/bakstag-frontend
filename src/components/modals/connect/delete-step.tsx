@@ -1,9 +1,8 @@
 import { Dispatch, SetStateAction, useState } from "react";
-import { Copy, Button } from "@/components/ui";
+import { Copy, Button, LoadingClock } from "@/components/ui";
 import {
   Trash,
   ArrowUpRight,
-  Clock10,
   Redo2,
   CircleCheck,
   FileWarning,
@@ -24,11 +23,12 @@ import {
 } from "@wagmi/core";
 import { wagmiConfig } from "@/lib/wagmi/config";
 import { otcMarketAbi, otcMarketAddress } from "@/lib/wagmi/contracts/abi";
-import { useSwitchChain } from "wagmi";
+import { useAccount, useSwitchChain } from "wagmi";
 import axios from "axios";
 import { formatUnits } from "viem";
-import { useRouter } from "next/router";
 import Link from "next/link";
+import { DetailRow } from "@/components/molecules";
+import { formatNumberWithCommas } from "@/lib/helpers/formating";
 
 type Status =
   | "loading"
@@ -45,31 +45,34 @@ interface Props {
   refetch: () => void;
 }
 
-const getButtonVariant = (status: Status) => {
-  switch (status) {
-    case "idle":
-      return "default";
-    case "success":
-      return "default";
-    case "error":
-      return "destructive";
-    case "deleting-error":
-      return "destructive";
-    case "loading":
-    case "deleting":
-      return "secondary";
-    default:
-      return "default";
-  }
+type Variant =
+  | "default"
+  | "destructive"
+  | "secondary"
+  | "link"
+  | "outline"
+  | "ghost"
+  | null
+  | undefined;
+
+const getButtonVariant = (status: Status): Variant => {
+  const statusMapping = {
+    idle: "default",
+    success: "default",
+    error: "destructive",
+    "deleting-error": "destructive",
+    loading: "secondary",
+    deleting: "secondary",
+  };
+  return (statusMapping[status] as Variant) || "default";
 };
 
 export const DeletingStep = ({ order, setStep, refetch }: Props) => {
   const [txHash, setTxHash] = useState<string>("");
   const [status, setStatus] = useState<Status>("idle");
 
-  const walletAddress = "0xd015684B421CBED3bCfA19643d01F51Bc72a4503";
-
   const { switchChainAsync } = useSwitchChain();
+  const { address } = useAccount();
 
   const deleteQuery = async () => {
     try {
@@ -206,53 +209,39 @@ export const DeletingStep = ({ order, setStep, refetch }: Props) => {
     }
   };
 
+  const isPending = ["loading", "deleting"].includes(status);
+  const isError = ["error", "deleting-error"].includes(status);
+
   const buttonHandler = () => {
-    if (status === "idle" || status === "error") {
-      void deleteHandler();
-      return;
-    }
-
-    if (status === "deleting-error") {
-      setStatus("loading");
-      void deleteQuery();
-      return;
-    }
-
-    if (status === "success") {
+    if (isPending) {
+      return null;
+    } else if (["idle", "error", "deleting-error"].includes(status)) {
+      deleteHandler();
+    } else if (status === "success") {
       setStep("main");
-      return;
     }
-
-    return;
   };
-
-  const isPending = status === "loading" || status === "deleting";
-  const isError = status === "error" || status === "deleting-error";
 
   return (
     <div className="w-full flex flex-col justify-start items-center text-sm text-white">
       <ConfirmationSection status={status} />
-      <InfoSection txId={txHash} walletAddress={walletAddress} order={order} />
+      <InfoSection txId={txHash} walletAddress={address || ""} order={order} />
       <Button
         className="w-full mt-5 font-light rounded-xl"
         variant={getButtonVariant(status)}
-        disabled={status === "loading"}
         onClick={buttonHandler}
       >
         {status === "idle" && "Cancel Ad"}
-
         {isPending && (
-          <>
-            <Clock10 className="w-5 h-5 mr-2" /> Processing Transaction
-          </>
+          <div className={"flex flex-row items-center justify-center"}>
+            <LoadingClock className="w-6 h-6 mr-2" /> Processing Transaction
+          </div>
         )}
-
         {isError && (
           <>
             <Redo2 className="w-5 h-5 mr-2" /> Retry
           </>
         )}
-
         {status === "success" && (
           <>
             <CircleCheck className="w-5 h-5 mr-2" /> Done
@@ -290,28 +279,24 @@ const ConfirmationSection = ({ status }: { status: Status }) => {
   );
 };
 
-const InfoSection = ({
-  txId,
-  walletAddress,
-  order,
-}: {
+interface InfoSectionProps {
   txId: string;
   walletAddress: string;
   order: Order;
-}) => {
+}
+
+const InfoSection = ({ txId, walletAddress, order }: InfoSectionProps) => {
   const srcTokenDecimals = getTokenField(
     order.srcTokenTicker,
     order.srcTokenNetwork,
     "decimals",
   );
-
-  const formatedSrcAmount = formatUnits(
-    BigInt(order.srcAmountLD),
-    srcTokenDecimals,
+  const formattedSrcAmount = formatNumberWithCommas(
+    Number(formatUnits(BigInt(order.srcAmountLD), srcTokenDecimals)),
   );
-
-  const exchangeRate = formatUnits(BigInt(order.exchangeRateSD), 6);
-
+  const exchangeRate = formatNumberWithCommas(
+    Number(formatUnits(BigInt(order.exchangeRateSD), 6)),
+  );
   const isMonochain = order.srcTokenNetwork === order.dstTokenNetwork;
 
   const linkToScan = getScanLink({
@@ -322,54 +307,39 @@ const InfoSection = ({
 
   return (
     <div className="w-full flex flex-col justify-center items-center">
-      <InfoRow label="Canellation TX ID">
-        {txId.length > 0 ? (
-          <div className={"flex flex-row"}>
+      <DetailRow label="Cancellation TX ID">
+        {txId ? (
+          <div className="flex flex-row">
             <span>{addressFormat(txId)}</span>
             <Copy textToCopy={txId} />
-            <Link href={linkToScan} target={"_blank"}>
+            <Link href={linkToScan} target="_blank">
               <ArrowUpRight className="w-5 h-5 ml-1 text-gray-700 cursor-pointer hover:text-white" />
             </Link>
           </div>
         ) : (
-          <span className={"text-gray-700"}>N/A</span>
+          <span className="text-gray-700">N/A</span>
         )}
-      </InfoRow>
-      <InfoRow label="Amount to Unlock">
+      </DetailRow>
+      <DetailRow label="Amount to Unlock">
         <span>
-          {formatedSrcAmount + " " + order.srcTokenTicker + " "}
-          <span className={"text-gray-700"}>({order.srcTokenNetwork})</span>
+          {formattedSrcAmount} {order.srcTokenTicker}{" "}
+          <span className="text-gray-700">({order.srcTokenNetwork})</span>
         </span>
-      </InfoRow>
-      <InfoRow label="from Wallet">
-        <div className={"flex flex-row items-center justify-center"}>
-          <span className={"text-gray-700"}>
-            {addressFormat(walletAddress)}
-          </span>
+      </DetailRow>
+      <DetailRow label="From Wallet">
+        <div className="flex flex-row items-center justify-center">
+          <span className="text-gray-700">{addressFormat(walletAddress)}</span>
           <Copy textToCopy={walletAddress} />
         </div>
-      </InfoRow>
-      <InfoRow label="Exchange Rate">
+      </DetailRow>
+      <DetailRow label="Exchange Rate">
         <span>
-          {exchangeRate + " " + order.dstTokenTicker + " "}
-          <span className={"text-gray-700"}>({order.dstTokenNetwork})</span>
+          {exchangeRate} {order.dstTokenTicker}{" "}
+          <span className="text-gray-700">({order.dstTokenNetwork})</span>
         </span>{" "}
         = 1 {order.srcTokenTicker}{" "}
-        <span className={"text-gray-700"}>({order.srcTokenNetwork})</span>
-      </InfoRow>
+        <span className="text-gray-700">({order.srcTokenNetwork})</span>
+      </DetailRow>
     </div>
   );
 };
-
-const InfoRow = ({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) => (
-  <div className="mt-5 w-full flex flex-row justify-between items-center">
-    <span>{label}</span>
-    <span>{children}</span>
-  </div>
-);

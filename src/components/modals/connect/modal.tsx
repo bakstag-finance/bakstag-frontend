@@ -93,13 +93,9 @@ export const ConnectModal = ({ refetch }: Props) => {
   };
 
   const cancelHandler = () => {
-    if (step === "main") {
-      setMainTabsStep("main");
-      setOpenModal(false);
-      setStep("main");
-    } else {
-      setStep("main");
-    }
+    setStep("main");
+    setMainTabsStep("main");
+    setOpenModal(false);
   };
 
   const steps = {
@@ -121,100 +117,18 @@ export const ConnectModal = ({ refetch }: Props) => {
           </TabsList>
           <TabsContent value="wallet" className="w-full">
             <div className="w-full flex flex-col">
-              <div
-                className={`mt-2 border border-gray-800 rounded-xl  px-5  ${isWalletConnected ? "h-22 py-3" : "h-20 flex justify-center items-center"}`}
-              >
-                <div className={"flex w-full justify-between items-center"}>
-                  <div className="flex flex-col">
-                    <span className={"font-semibold text-sm text-white"}>
-                      Ethereum
-                    </span>
-                  </div>
-                  <Button
-                    onClick={() => {
-                      if (isWalletConnected) {
-                        void metamaskWalletHandler();
-                      } else {
-                        setWalletTabStep("ethereum");
-                        setStep("wallet-choose");
-                      }
-                    }}
-                    className={cn(
-                      "group  border border-gray-800 self-start justify-center rounded-xl w-10 h-10",
-                      isWalletConnected ? "bg-transparent mt-3" : "bg-white",
-                    )}
-                  >
-                    {isWalletConnected ? (
-                      <span>
-                        <X
-                          className={"text-gray-700 group-hover:text-white"}
-                          size={20}
-                        />
-                      </span>
-                    ) : (
-                      <span>
-                        <LogIn size={15} className={"group-hover:text-white"} />
-                      </span>
-                    )}
-                  </Button>
-                </div>
-                <span
-                  className={`text-gray-700 ${!isWalletConnected && "hidden"}`}
-                >
-                  {isWalletConnected && addressFormat(account.address!)}
-                </span>
-              </div>
-
-              <div
-                className={`mt-2 border border-gray-800 rounded-xl  px-5 ${isSolanaWalletConnected ? "h-22 py-3" : "h-20 flex justify-center items-center"}`}
-              >
-                <div className={"flex w-full justify-between items-center"}>
-                  <div className="flex flex-col">
-                    <span className={"font-semibold text-sm text-white"}>
-                      Solana
-                    </span>
-                  </div>
-                  <Button
-                    onClick={() => {
-                      if (isSolanaWalletConnected) {
-                        void solanaWalletHandler();
-                      } else {
-                        setWalletTabStep("solana");
-                        setStep("wallet-choose");
-                      }
-                    }}
-                    className={cn(
-                      "group  border border-gray-800 self-start justify-center rounded-xl w-10 h-10",
-                      isSolanaWalletConnected
-                        ? "bg-transparent mt-3"
-                        : "bg-white",
-                    )}
-                  >
-                    {isSolanaWalletConnected ? (
-                      <span>
-                        <X
-                          className={"text-gray-700 group-hover:text-white"}
-                          size={20}
-                        />
-                      </span>
-                    ) : (
-                      <span>
-                        <LogIn size={15} className={"group-hover:text-white"} />
-                      </span>
-                    )}
-                  </Button>
-                </div>
-                <span
-                  className={`text-gray-700 ${!isSolanaWalletConnected && "hidden"}`}
-                >
-                  {isSolanaWalletConnected &&
-                    addressFormat(solanaWallet.publicKey!.toString())}
-                </span>
-              </div>
-
-              <div className="my-2 border border-gray-800 text-gray-800 rounded-xl flex w-full h-10 justify-between items-center px-5">
-                <span>Tron (in development )</span>
-              </div>
+              {renderWalletButton(
+                account.address,
+                isWalletConnected,
+                "Ethereum",
+                metamaskWalletHandler,
+              )}
+              {renderWalletButton(
+                account.address,
+                isSolanaWalletConnected,
+                "Solana",
+                solanaWalletHandler,
+              )}
             </div>
           </TabsContent>
           <TabsContent value="ads" className="w-full">
@@ -309,7 +223,14 @@ export const ConnectModal = ({ refetch }: Props) => {
   };
 
   const walletStepRender = () => {
-    return steps[step];
+    switch (step) {
+      case "wallet-choose":
+        return steps["wallet-choose"];
+      case "delete":
+        return steps["delete"];
+      default:
+        return steps["main"];
+    }
   };
 
   const onOpenChangeHandler = (_open: boolean) => {
@@ -357,5 +278,40 @@ export const ConnectModal = ({ refetch }: Props) => {
         </div>
       </DialogContent>
     </Dialog>
+  );
+};
+
+const renderWalletButton = (
+  address: string | undefined,
+  isConnected: boolean,
+  network: string,
+  onClickHandler: () => void,
+) => {
+  return (
+    <div
+      className={`mt-2 border border-gray-800 rounded-xl px-5 ${isConnected ? "h-22 py-3" : "h-20 flex justify-center items-center"}`}
+    >
+      <div className="flex w-full justify-between items-center">
+        <div className="flex flex-col">
+          <span className="font-semibold text-sm text-white">{network}</span>
+        </div>
+        <Button
+          onClick={onClickHandler}
+          className={cn(
+            "group border border-gray-800 self-start justify-center rounded-xl w-10 h-10",
+            isConnected ? "bg-transparent mt-3" : "bg-white",
+          )}
+        >
+          {isConnected ? (
+            <X className="text-gray-700 group-hover:text-white" size={20} />
+          ) : (
+            <LogIn size={15} className="group-hover:text-white" />
+          )}
+        </Button>
+      </div>
+      {isConnected && (
+        <span className="text-gray-700">{addressFormat(address!)}</span>
+      )}
+    </div>
   );
 };

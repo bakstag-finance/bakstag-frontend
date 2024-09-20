@@ -1,4 +1,4 @@
-import { Clock10, Ghost, Trash } from "lucide-react";
+import { Ghost, Trash } from "lucide-react";
 import { CreateModal } from "@/components/modals/create";
 import {
   Button,
@@ -9,6 +9,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  LoadingClock,
 } from "@/components/ui";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -17,6 +18,7 @@ import { useAccount } from "wagmi";
 import { formatUnits } from "viem";
 import { Order } from "@/types/order";
 import { cn } from "@/lib/utils";
+import { formatNumberWithCommas } from "@/lib/helpers/formating";
 
 type ConnectModalStep = "main" | "wallet-choose" | "delete";
 
@@ -144,8 +146,12 @@ const TableRow = ({
   setOrderData: Dispatch<SetStateAction<Order>>;
   isLast: boolean;
 }) => {
-  const formattedSrcAmount = formatUnits(BigInt(item.srcAmountLD), 18);
-  const formattedDstAmount = formatUnits(BigInt(item.exchangeRateSD), 6);
+  const formattedSrcAmount = formatNumberWithCommas(
+    Number(formatUnits(BigInt(item.srcAmountLD), 18)),
+  );
+  const formattedDstAmount = formatNumberWithCommas(
+    Number(formatUnits(BigInt(item.exchangeRateSD), 6)),
+  );
 
   return (
     <div
@@ -200,8 +206,11 @@ const TableRow = ({
 
 const LoadingState = () => (
   <div className="w-full h-full flex flex-col justify-center items-center text-sm">
-    <Button variant="secondary">
-      <Clock10 className="w-5 h-5 mr-2" /> Fetching Ads
+    <Button
+      variant="secondary"
+      className={"flew flex-row justify-center items-center"}
+    >
+      <LoadingClock className="w-6 h-6 mr-2" /> Fetching Ads
     </Button>
   </div>
 );
