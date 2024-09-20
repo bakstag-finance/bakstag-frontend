@@ -4,11 +4,12 @@ import { Input } from "./input";
 import { isValidCryptoAddress } from "@/lib/helpers";
 
 interface Props {
+  label: string;
   value: string;
   setValue: Dispatch<SetStateAction<string>>;
 }
 
-export const AddressInput = ({ value, setValue }: Props) => {
+export const AddressInput = ({ value, setValue, label }: Props) => {
   const [isChanged, setIsChanged] = useState(false);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -19,18 +20,21 @@ export const AddressInput = ({ value, setValue }: Props) => {
   const isValid = isValidCryptoAddress(value);
 
   return (
-    <Input
-      className={cn(
-        "mt-2 bg-black border rounded-lg",
-        isChanged
-          ? isValid
-            ? "border-gray-800"
-            : "border-red-200 focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1"
-          : "border-gray-800",
-      )}
-      value={value}
-      onChange={handleChange}
-      required
-    />
+    <div className="w-full flex flex-col mt-5">
+      <span className="text-xs text-gray-700 ml-3">{label}</span>
+      <Input
+        className={cn(
+          "mt-2 bg-black border rounded-lg",
+          isChanged
+            ? isValid
+              ? "border-gray-800"
+              : "border-red-200 focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1"
+            : "border-gray-800",
+        )}
+        value={value}
+        onChange={handleChange}
+        required
+      />
+    </div>
   );
 };

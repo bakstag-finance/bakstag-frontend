@@ -2,54 +2,42 @@ import { AddressInput, Button, SelectCoin, TokenInput } from "@/components/ui";
 import { tokensData } from "@/lib/constants";
 import {
   calculateTotalReceiveAmount,
+  isValidCryptoAddress,
   validateTokenAmount,
 } from "@/lib/helpers";
 import { cn } from "@/lib/utils";
-import { Status } from "@/types/contracts";
 import { Dispatch, SetStateAction } from "react";
-import { WalletConnect } from "@/components/modals/wallet-connect";
 import { AddressDetailRow, DetailRow } from "@/components/molecules";
 import { formatNumberWithCommas } from "@/lib/helpers/formating";
+import { useCreateModal } from "@/components/modals/create/context";
+import { useAccount } from "wagmi";
+import { ActionButton } from "@/components/molecules/action-button";
 
 interface FormStepProps {
-  selectedSrcToken: string;
-  setSelectedSrcToken: Dispatch<SetStateAction<string>>;
-  selectedDstToken: string;
-  setSelectedDstToken: Dispatch<SetStateAction<string>>;
-  srcTokenAmount: string;
-  setSrcTokenAmount: Dispatch<SetStateAction<string>>;
-  dstTokenAmount: string;
-  setDstTokenAmount: Dispatch<SetStateAction<string>>;
-  destinationWallet: string;
-  setDestinationWallet: Dispatch<SetStateAction<string>>;
-  srcAddress: `0x${string}` | undefined;
-  isWalletConnected: boolean;
-  approvingStatus: Status;
-  approvingErrorMessage: string;
-  isValidDestinationWallet: boolean;
   handleCreateSwap: () => void;
   handleClose: () => void;
 }
 
-export const FormStep = ({
-  selectedSrcToken,
-  setSelectedSrcToken,
-  srcTokenAmount,
-  setSrcTokenAmount,
-  selectedDstToken,
-  setSelectedDstToken,
-  dstTokenAmount,
-  setDstTokenAmount,
-  destinationWallet,
-  setDestinationWallet,
-  srcAddress,
-  isWalletConnected,
-  isValidDestinationWallet,
-  handleCreateSwap,
-  handleClose,
-  approvingStatus,
-  approvingErrorMessage,
-}: FormStepProps) => {
+export const FormStep = ({ handleCreateSwap, handleClose }: FormStepProps) => {
+  const {
+    srcTokenAmount,
+    dstTokenAmount,
+    setDstTokenAmount,
+    setSrcTokenAmount,
+    destinationWallet,
+    setDestinationWallet,
+    selectedSrcToken,
+    setSelectedSrcToken,
+    selectedDstToken,
+    setSelectedDstToken,
+    approvingStatus,
+    approvingErrorMsg,
+  } = useCreateModal();
+
+  const { address } = useAccount();
+  const isWalletConnected = !!address;
+  const isValidDestinationWallet = isValidCryptoAddress(destinationWallet);
+
   const totalReceiveAmount = calculateTotalReceiveAmount(
     srcTokenAmount,
     dstTokenAmount,
@@ -57,14 +45,6 @@ export const FormStep = ({
 
   const isCorrectSrcTokenAmount = validateTokenAmount(srcTokenAmount);
   const isCorrectExchangeRate = validateTokenAmount(dstTokenAmount);
-
-  const buttonDisabled = checkButtonDisabled(
-    isWalletConnected,
-    isValidDestinationWallet,
-    isCorrectExchangeRate,
-    isCorrectSrcTokenAmount,
-    approvingStatus,
-  );
 
   return (
     <div className="max-w-[320px] w-full flex flex-col text-white">
@@ -87,7 +67,7 @@ export const FormStep = ({
         className={"mt-5"}
         isExchangeRate={true}
       />
-      <WalletAddressInput
+      <AddressInput
         label="Destination Wallet Address"
         value={destinationWallet}
         setValue={setDestinationWallet}
@@ -98,16 +78,22 @@ export const FormStep = ({
         selectedDstToken={selectedDstToken}
         exchangeRate={dstTokenAmount.toString()}
         destinationWallet={destinationWallet}
-        srcAddress={srcAddress}
+        srcAddress={address}
         totalReceiveAmount={totalReceiveAmount}
       />
       <ActionButton
-        buttonDisabled={buttonDisabled}
         approvingStatus={approvingStatus}
-        approvingErrorMessage={approvingErrorMessage}
-        handleCreateSwap={handleCreateSwap}
+        approvingErrorMsg={approvingErrorMsg}
         handleClose={handleClose}
-        isWalletConnected={isWalletConnected}
+        handleClick={handleCreateSwap}
+        btnDisabled={
+          !isValidDestinationWallet ||
+          !isCorrectExchangeRate ||
+          !isCorrectSrcTokenAmount
+        }
+        defaultText={"Publish Ad"}
+        isValidDestinationWallet={isValidDestinationWallet}
+        isValidTokensInput={isCorrectSrcTokenAmount && isCorrectExchangeRate}
       />
     </div>
   );
@@ -161,21 +147,6 @@ const TokenAmountInput = ({
     </div>
   );
 };
-
-const WalletAddressInput = ({
-  label,
-  value,
-  setValue,
-}: {
-  label: string;
-  value: string;
-  setValue: Dispatch<SetStateAction<string>>;
-}) => (
-  <div className="w-full flex flex-col mt-5">
-    <span className="text-xs text-gray-700 ml-3">{label}</span>
-    <AddressInput value={value} setValue={setValue} />
-  </div>
-);
 
 const Summary = ({
   selectedSrcToken,
@@ -255,73 +226,5 @@ const Summary = ({
         )}
       </DetailRow>
     </div>
-  );
-};
-
-const ActionButton = ({
-  buttonDisabled,
-  approvingStatus,
-  approvingErrorMessage,
-  handleCreateSwap,
-  handleClose,
-  isWalletConnected,
-}: {
-  buttonDisabled: boolean;
-  approvingStatus: Status;
-  approvingErrorMessage: string;
-  handleCreateSwap: () => void;
-  handleClose: () => void;
-  isWalletConnected: boolean;
-}) => {
-  if (!isWalletConnected) {
-    return <WalletConnect />;
-  }
-
-  return (
-    <>
-      <Button
-        className="w-full mt-5 rounded-xl"
-        disabled={buttonDisabled}
-        onClick={handleCreateSwap}
-        variant={
-          (approvingStatus === "pending" && "secondary") ||
-          (approvingStatus === "error" && "destructive") ||
-          "default"
-        }
-      >
-        {getButtonText(approvingStatus, approvingErrorMessage)}
-      </Button>
-      <Button
-        className="w-full mt-5 bg-black text-gray-700 border border-white border-opacity-50 hover:bg-gray-800 rounded-xl"
-        onClick={handleClose}
-      >
-        Cancel
-      </Button>
-    </>
-  );
-};
-
-const getButtonText = (
-  approvingStatus: Status,
-  approvingErrorMessage: string,
-) => {
-  if (approvingStatus === "pending") return "Pending Confirmation";
-  if (approvingStatus === "error") return approvingErrorMessage;
-  return "Publish Ad";
-};
-
-const checkButtonDisabled = (
-  isWalletConnected: boolean,
-  isValidDestinationWallet: boolean,
-  isCorrectExchangeRate: boolean,
-  isCorrectSrcTokenAmount: boolean,
-  approvingStatus: Status,
-) => {
-  return (
-    !isWalletConnected ||
-    !isValidDestinationWallet ||
-    !isCorrectExchangeRate ||
-    !isCorrectSrcTokenAmount ||
-    approvingStatus === "pending"
   );
 };

@@ -72,10 +72,10 @@ export const FormStep = ({
         isCorrectAmount={isCorrectExchangeRate}
         handleInputChange={(e) => handleInputChange(e, "dst")}
       />
-      <WalletAddressInput
+      <AddressInput
         label={`Destination Wallet Address | (${dstToken.network})`}
-        walletAddress={destinationWallet}
-        setWalletAddress={setDestinationWallet}
+        value={destinationWallet}
+        setValue={setDestinationWallet}
       />
       <Summary
         srcToken={srcToken}
@@ -149,21 +149,6 @@ const TokenInput = ({
         onChange={handleInputChange}
       />
     </div>
-  </div>
-);
-
-const WalletAddressInput = ({
-  label,
-  walletAddress,
-  setWalletAddress,
-}: {
-  label: string;
-  walletAddress: string;
-  setWalletAddress: Dispatch<SetStateAction<string>>;
-}) => (
-  <div className="w-full flex flex-col mt-3">
-    <span className="text-xs text-gray-700">{label}</span>
-    <AddressInput value={walletAddress} setValue={setWalletAddress} />
   </div>
 );
 

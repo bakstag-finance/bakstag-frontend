@@ -1,13 +1,13 @@
 "use client";
 
-import { Button, Copy, StatusHeader } from "@/components/ui";
+import { Copy, StatusHeader } from "@/components/ui";
 import {
   addressFormat,
   calculateTotalReceiveAmount,
   getScanLink,
 } from "@/lib/helpers";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowUpRight, CircleCheck, Clock10, Redo2 } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import axios from "axios";
 import { tokensData } from "@/lib/constants";
 import { getTransactionReceipt, waitForTransactionReceipt } from "@wagmi/core";
@@ -17,32 +17,27 @@ import { Dispatch, SetStateAction } from "react";
 import { ChainIds, Status } from "@/types/contracts";
 import { DetailRow } from "@/components/molecules";
 import { formatNumberWithCommas } from "@/lib/helpers/formating";
+import { useCreateModal } from "@/components/modals/create/context";
+import { useAccount } from "wagmi";
+import { ActionButton } from "@/components/molecules/action-button";
 
 interface TransactionData {
   txHash: string;
   srcEid: number;
-  srcChainId: ChainIds;
+  srcChainId: undefined | ChainIds;
   offerId: string;
   dstEid: number;
   srcSellerAddress: string;
+  dstSellerAddress: string;
   srcTokenAddress: string;
   dstTokenAddress: string;
-  dstSellerAddress: string;
   srcAmountLD: bigint;
   exchangeRateSD: bigint;
 }
 
 interface Props {
-  destinationWallet: string;
-  srcAddress: `0x${string}` | undefined;
-  dstTokenAmount: string;
-  srcTokenAmount: string;
-  selectedSrcToken: string;
-  selectedDstToken: string;
-  transactionData: TransactionData;
   handleClose: () => void;
   handleRetry: () => void;
-  setTransactionStatus: Dispatch<SetStateAction<Status>>;
   refetch: () => void;
 }
 
@@ -94,49 +89,18 @@ const handleTransaction = async (
   return null;
 };
 
-const ButtonContent = ({
-  isError,
-  isLoading,
-  isSuccess,
-}: {
-  isError: boolean;
-  isLoading: boolean;
-  isSuccess: boolean;
-}) => {
-  if (isError)
-    return (
-      <>
-        <Redo2 className="w-5 h-5 mr-2" /> Retry
-      </>
-    );
-  if (isLoading)
-    return (
-      <>
-        <Clock10 className="w-5 h-5 mr-2" /> Preparing Your Ad
-      </>
-    );
-  if (isSuccess)
-    return (
-      <>
-        <CircleCheck className="w-5 h-5 mr-2" /> Done
-      </>
-    );
-  return null;
-};
-
 export const TransactionStep = ({
-  destinationWallet,
-  srcAddress,
-  dstTokenAmount,
-  srcTokenAmount,
-  selectedDstToken,
-  selectedSrcToken,
-  transactionData,
   handleClose,
   handleRetry,
-  setTransactionStatus,
   refetch,
 }: Props) => {
+  const {
+    selectedSrcToken,
+    selectedDstToken,
+    transactionData,
+    setTransactionStatus,
+  } = useCreateModal();
+
   const srcNetwork = tokensData[selectedSrcToken].network;
   const dstNetwork = tokensData[selectedDstToken].network;
   const isMonochain = srcNetwork === dstNetwork;
@@ -154,7 +118,17 @@ export const TransactionStep = ({
       ),
   });
 
-  const buttonHandler = () => (isError ? handleRetry() : handleClose());
+  const buttonHandler = () => {
+    if (isLoading) {
+      return null;
+    }
+
+    if (isError) {
+      handleRetry();
+    } else {
+      handleClose();
+    }
+  };
 
   return (
     <div className="w-full flex flex-col items-center">
@@ -176,56 +150,39 @@ export const TransactionStep = ({
         }}
       />
 
-      <TransactionDetails
-        transactionData={transactionData}
-        destinationWallet={destinationWallet}
-        srcAddress={srcAddress}
-        srcTokenAmount={srcTokenAmount}
-        selectedSrcToken={selectedSrcToken}
-        selectedDstToken={selectedDstToken}
-        dstTokenAmount={dstTokenAmount}
-        handleClose={handleClose}
-        handleRetry={handleRetry}
-        setTransactionStatus={setTransactionStatus}
-        refetch={refetch}
-        isMonochain={isMonochain}
-        srcNetwork={srcNetwork}
-      />
+      <TransactionDetails isMonochain={isMonochain} srcNetwork={srcNetwork} />
 
-      <Button
-        className="w-full mt-5 rounded-xl"
-        onClick={buttonHandler}
-        variant={
-          (isError && "destructive") || (isLoading && "secondary") || "default"
-        }
-        disabled={isLoading}
-      >
-        <ButtonContent
-          isError={isError}
-          isLoading={isLoading}
-          isSuccess={isSuccess}
-        />
-      </Button>
+      <ActionButton
+        handleClick={buttonHandler}
+        isError={isError}
+        isLoading={isLoading}
+        isSuccess={isSuccess}
+        loadingText={"Preparing Your Ad"}
+      />
     </div>
   );
 };
 
-interface TransactionDetailsProps extends Props {
+interface TransactionDetailsProps {
   isMonochain: boolean;
   srcNetwork: string;
 }
 
 const TransactionDetails = ({
-  transactionData,
-  destinationWallet,
-  srcAddress,
-  srcTokenAmount,
-  selectedSrcToken,
-  selectedDstToken,
-  dstTokenAmount,
   isMonochain,
   srcNetwork,
 }: TransactionDetailsProps) => {
+  const {
+    transactionData,
+    destinationWallet,
+    selectedSrcToken,
+    selectedDstToken,
+    srcTokenAmount,
+    dstTokenAmount,
+  } = useCreateModal();
+
+  const { address: srcAddress } = useAccount();
+
   const link = getScanLink({
     isMonochain,
     srcNetwork,

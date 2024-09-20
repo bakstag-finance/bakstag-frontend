@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import {
   Button,
   Dialog,
@@ -11,7 +10,7 @@ import {
   DialogTrigger,
   VisuallyHidden,
 } from "@/components/ui";
-import { isValidCryptoAddress, hexZeroPadTo32, toSD } from "@/lib/helpers";
+import { hexZeroPadTo32, toSD } from "@/lib/helpers";
 import { useAccount, useSwitchChain } from "wagmi";
 import { tokensData } from "@/lib/constants";
 import { wagmiConfig } from "@/lib/wagmi/config";
@@ -26,56 +25,42 @@ import { ethers } from "ethers";
 import { erc20Abi } from "viem";
 import { TransactionStep } from "./transaction-step";
 import { FormStep } from "./form-step";
-import { Status, LzFee, ChainIds } from "@/types/contracts";
-
-type CreateModalStep = "main" | "transaction";
+import { LzFee, ChainIds } from "@/types/contracts";
+import CreateModalProvider, { useCreateModal } from "./context";
 
 interface Props {
   buttonText: string;
   refetch: () => void;
 }
 
-export const CreateModal = ({ buttonText, refetch }: Props) => {
-  const [openModal, setOpenModal] = useState(false);
-  const [currentStep, setCurrentStep] = useState<CreateModalStep>("main");
+const Modal = ({ buttonText, refetch }: Props) => {
+  const {
+    openModal,
+    setOpenModal,
+    currentStep,
+    setCurrentStep,
+    selectedSrcToken,
+    setSelectedSrcToken,
+    selectedDstToken,
+    setSelectedDstToken,
+    srcTokenAmount,
+    setSrcTokenAmount,
+    dstTokenAmount,
+    setDstTokenAmount,
+    destinationWallet,
+    setDestinationWallet,
+    approvingStatus,
+    setApprovingStatus,
+    setApprovingErrorMsg,
+    transactionStatus,
+    setTransactionStatus,
+    setTransactionData,
+  } = useCreateModal();
 
-  // State of form
-  const [selectedDstToken, setSelectedDstToken] = useState("");
-  const [dstTokenAmount, setDstTokenAmount] = useState("0");
-
-  const [selectedSrcToken, setSelectedSrcToken] = useState("");
-  const [srcTokenAmount, setSrcTokenAmount] = useState("0");
-
-  const [destinationWallet, setDestinationWallet] = useState("");
-
-  // State for transaction step
-  const [infoForTransactionStep, setInfoForTransactionStep] = useState({
-    txHash: "",
-    srcEid: 0,
-    srcChainId: undefined as ChainIds,
-    offerId: "",
-    dstEid: 0,
-    srcSellerAddress: "",
-    dstSellerAddress: "",
-    srcTokenAddress: "",
-    dstTokenAddress: "",
-    srcAmountLD: BigInt(0),
-    exchangeRateSD: BigInt(0),
-  });
-
-  // State of Wallet
   const { address } = useAccount();
   const isWalletConnected = !!address;
+
   const { switchChainAsync } = useSwitchChain();
-
-  // State of approval
-  const [approvingStatus, setApprovingStatus] = useState<Status>("idle");
-  const [approvingErrorMessage, setApprovingErrorMessage] = useState("");
-
-  // State of transaction process
-  const [transactionStatus, setTransactionStatus] = useState<Status>("idle");
-
-  const isValidDestinationWallet = isValidCryptoAddress(destinationWallet);
 
   const handleClose = () => {
     setOpenModal(false);
@@ -218,7 +203,7 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
           });
         }
 
-        setInfoForTransactionStep((prevState) => {
+        setTransactionData((prevState) => {
           return {
             ...prevState,
             offerId: offerId,
@@ -251,7 +236,7 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
         });
 
         if (txHash) {
-          setInfoForTransactionStep((prevState) => {
+          setTransactionData((prevState) => {
             return {
               ...prevState,
               txHash,
@@ -273,51 +258,28 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
         }
       }
     } catch (e: any) {
-      setApprovingErrorMessage(e.message);
+      setApprovingErrorMsg(e.message);
       setApprovingStatus("error");
     }
   };
 
-  const stepsContent = {
-    main: (
-      <FormStep
-        srcAddress={address}
-        destinationWallet={destinationWallet}
-        setDestinationWallet={setDestinationWallet}
-        srcTokenAmount={srcTokenAmount}
-        setSrcTokenAmount={setSrcTokenAmount}
-        dstTokenAmount={dstTokenAmount}
-        setDstTokenAmount={setDstTokenAmount}
-        handleClose={handleClose}
-        handleCreateSwap={handleCreateSwap}
-        selectedDstToken={selectedDstToken}
-        selectedSrcToken={selectedSrcToken}
-        setSelectedSrcToken={setSelectedSrcToken}
-        setSelectedDstToken={setSelectedDstToken}
-        isWalletConnected={isWalletConnected}
-        isValidDestinationWallet={isValidDestinationWallet}
-        approvingStatus={approvingStatus}
-        approvingErrorMessage={approvingErrorMessage}
-      />
-    ),
-    transaction: (
-      <TransactionStep
-        destinationWallet={destinationWallet}
-        srcAddress={address}
-        transactionData={infoForTransactionStep}
-        dstTokenAmount={dstTokenAmount}
-        handleRetry={handleRetry}
-        srcTokenAmount={srcTokenAmount}
-        selectedSrcToken={selectedSrcToken}
-        selectedDstToken={selectedDstToken}
-        handleClose={handleClose}
-        setTransactionStatus={setTransactionStatus}
-        refetch={refetch}
-      />
-    ),
-  };
-
   const renderStepContent = () => {
+    const stepsContent = {
+      main: (
+        <FormStep
+          handleClose={handleClose}
+          handleCreateSwap={handleCreateSwap}
+        />
+      ),
+      transaction: (
+        <TransactionStep
+          handleRetry={handleRetry}
+          handleClose={handleClose}
+          refetch={refetch}
+        />
+      ),
+    };
+
     return stepsContent[currentStep];
   };
 
@@ -365,5 +327,13 @@ export const CreateModal = ({ buttonText, refetch }: Props) => {
         </DialogContent>
       </DialogOverlay>
     </Dialog>
+  );
+};
+
+export const CreateModal = ({ buttonText, refetch }: Props) => {
+  return (
+    <CreateModalProvider>
+      <Modal buttonText={buttonText} refetch={refetch} />
+    </CreateModalProvider>
   );
 };
