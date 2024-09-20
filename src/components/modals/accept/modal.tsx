@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 import {
   Button,
   Dialog,
@@ -14,7 +14,6 @@ import {
   getTokenField,
   hexStripsAddr,
   hexZeroPadTo32,
-  isValidCryptoAddress,
   isValidTokenAmount,
 } from "@/lib/helpers";
 import { useAccount, useSwitchChain } from "wagmi";
@@ -31,62 +30,37 @@ import {
 } from "@wagmi/core";
 import { wagmiConfig } from "@/lib/wagmi/config";
 import { ethers } from "ethers";
+import AcceptModalProvider, { useAcceptModal } from "./context";
 
-type ConnectModalStep = "main" | "transaction";
-
-interface Props {
-  order: OrderProps;
-  refetch: () => void;
-}
-
-export const AcceptModal = ({ order, refetch }: Props) => {
-  const [openModal, setOpenModal] = useState(false);
-  const [step, setStep] = useState<ConnectModalStep>("main");
-
-  const [srcTokenAmount, setSrcTokenAmount] = useState("0");
-  const [dstTokenAmount, setDstTokenAmount] = useState("0");
-
-  const [destinationWallet, setDestinationWallet] = useState("");
-
-  const isValidDestinationWallet = isValidCryptoAddress(destinationWallet);
+const Modal = () => {
+  const {
+    order,
+    openModal,
+    setOpenModal,
+    step,
+    setStep,
+    srcTokenAmount,
+    setSrcTokenAmount,
+    dstTokenAmount,
+    setDstTokenAmount,
+    setDestinationWallet,
+    approvingStatus,
+    setApprovingStatus,
+    setApprovingErrorMsg,
+    transactionStatus,
+    setTransactionStatus,
+    setInfoForTransactionStep,
+  } = useAcceptModal();
 
   const { address } = useAccount();
   const { switchChainAsync } = useSwitchChain();
   const isWalletConnected = !!address;
 
-  // State of approval
-  const [approvingStatus, setApprovingStatus] = useState<Status>("idle");
-  const [approvingErrorMessage, setApprovingErrorMessage] = useState("");
-
-  // State of transaction proccess
-  const [transactionStatus, setTransactionStatus] = useState<Status>("idle");
-
-  // State for transaction step
-  const [infoForTransactionStep, setInfoForTransactionStep] = useState({
-    txHash: "",
-    offerId: "",
-    srcChainId: undefined,
-    srcEid: "",
-    srcTokenAddress: "",
-    dstTokenAddress: "",
-    srcTokenAmount: "",
-    exchangeRate: "",
-    srcAmountLD: "",
-    srcToken: {
-      ticker: "",
-      network: "",
-    },
-    dstToken: {
-      ticker: "",
-      network: "",
-    },
-  });
-
   const closeModalHandler = () => {
     setOpenModal(false);
     setStep("main");
-    setSrcTokenAmount("0.000001");
-    setDstTokenAmount("0.000001");
+    setSrcTokenAmount("0");
+    setDstTokenAmount("0");
     setApprovingStatus("idle");
   };
 
@@ -170,7 +144,6 @@ export const AcceptModal = ({ order, refetch }: Props) => {
         _srcAmountSD,
         _dstTokenChainId,
         _dstEid,
-        _srcTokenDecimals,
         _dstTokenDecimals,
       } = prepareDataForContracts();
 
@@ -204,6 +177,8 @@ export const AcceptModal = ({ order, refetch }: Props) => {
           console.log("Error", e);
           throw new Error(error.name);
         });
+
+        setInterval(() => {}, 1000);
 
         const hexAddressZero = hexZeroPadTo32(ethers.constants.AddressZero);
 
@@ -277,7 +252,7 @@ export const AcceptModal = ({ order, refetch }: Props) => {
       }
     } catch (e: any) {
       setApprovingStatus("error");
-      setApprovingErrorMessage(e.message);
+      setApprovingErrorMsg(e.message);
     }
   };
 
@@ -312,13 +287,14 @@ export const AcceptModal = ({ order, refetch }: Props) => {
   };
 
   const handleInputChange = async (
-    e: ChangeEvent<HTMLInputElement>,
+    inputValue: string,
     inputField: "src" | "dst",
   ) => {
     try {
-      const inputValue = e.target.value;
-
       if (!isValidTokenAmount(inputValue)) {
+        inputField === "src"
+          ? setSrcTokenAmount(inputValue)
+          : setDstTokenAmount(inputValue);
         return;
       }
       setApprovingStatus("idle");
@@ -353,7 +329,7 @@ export const AcceptModal = ({ order, refetch }: Props) => {
           inputValue,
           order.srcAmountLD,
           setApprovingStatus,
-          setApprovingErrorMessage,
+          setApprovingErrorMsg,
         );
       } else {
         const newSrcTokenAmount = (
@@ -365,7 +341,7 @@ export const AcceptModal = ({ order, refetch }: Props) => {
           newSrcTokenAmount,
           order.srcAmountLD,
           setApprovingStatus,
-          setApprovingErrorMessage,
+          setApprovingErrorMsg,
         );
       }
     } catch (e) {
@@ -380,33 +356,13 @@ export const AcceptModal = ({ order, refetch }: Props) => {
     const steps = {
       main: (
         <FormStep
-          isWalletConnected={isWalletConnected}
-          srcTokenAmount={srcTokenAmount}
-          setSrcTokenAmount={setSrcTokenAmount}
-          dstTokenAmount={dstTokenAmount}
-          setDstTokenAmount={setDstTokenAmount}
           closeModalHandler={closeModalHandler}
-          srcWalletAddress={address as any}
-          isValidDestinationWallet={isValidDestinationWallet}
           submitHandler={submitHandler}
-          destinationWallet={destinationWallet}
-          setDestinationWallet={setDestinationWallet}
-          approvingStatus={approvingStatus}
-          approvingErrorMessage={approvingErrorMessage}
-          order={order}
           handleInputChange={handleInputChange}
         />
       ),
       transaction: (
-        <TransactionStep
-          srcWalletAddress={address as any}
-          destinationWallet={destinationWallet}
-          handleRetry={handleRetry}
-          handleClose={handleClose}
-          setTransactionStatus={setTransactionStatus}
-          transactionData={infoForTransactionStep}
-          refetch={refetch}
-        />
+        <TransactionStep handleRetry={handleRetry} handleClose={handleClose} />
       ),
     };
 
@@ -455,3 +411,14 @@ export const AcceptModal = ({ order, refetch }: Props) => {
     </Dialog>
   );
 };
+
+interface Props {
+  order: OrderProps;
+  refetch: () => void;
+}
+
+export const AcceptModal = ({ order, refetch }: Props) => (
+  <AcceptModalProvider order={order} refetch={refetch}>
+    <Modal />
+  </AcceptModalProvider>
+);

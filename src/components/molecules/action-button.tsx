@@ -87,8 +87,8 @@ const getButtonContent = (
 ) => {
   if (isLoading)
     return (
-      <span className={"flex flex-row"}>
-         <LoadingClock className={"w-6 h-6"} />{" "}
+      <span className={"flex flex-row items-center justify-center"}>
+        <LoadingClock className={"w-6 h-6"} />{" "}
         <span className={"ml-1"}>{loadingText}</span>
       </span>
     );
@@ -104,10 +104,10 @@ const getButtonContent = (
         <CircleCheck className="w-5 h-5 mr-2" /> Done
       </>
     );
+  if (approvingStatus === "error") return approvingErrorMsg;
   if (!isValidDestinationWallet) return "Add Destination Wallet Address";
   if (!isValidTokensInput) return "Invalid Tokens Amount";
   if (approvingStatus === "pending") return "Pending Confirmation";
-  if (approvingStatus === "error") return approvingErrorMsg;
   return defaultText;
 };
 

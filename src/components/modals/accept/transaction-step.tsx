@@ -1,42 +1,22 @@
-import { Button, Copy } from "@/components/ui";
+import { Copy, StatusHeader } from "@/components/ui";
 import { addressFormat } from "@/lib/helpers";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Dispatch, SetStateAction } from "react";
 import Link from "next/link";
-import {
-  ArrowUpRight,
-  CircleCheck,
-  Clock10,
-  Clock11,
-  FileWarning,
-  Redo2,
-} from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { ChainIds, Status } from "@/types/contracts";
 import { LAYER_ZERO_SCAN } from "@/lib/constants";
 import { getTransactionReceipt } from "@wagmi/core";
 import { wagmiConfig } from "@/lib/wagmi/config";
+import { useAcceptModal } from "@/components/modals/accept/context";
+import { useAccount } from "wagmi";
+import { formatNumberWithCommas } from "@/lib/helpers/formating";
+import { DetailRow, ActionButton } from "@/components/molecules";
 
 interface Props {
-  srcWalletAddress: string;
-  destinationWallet: string;
-  transactionData: {
-    txHash: string;
-    offerId: string;
-    srcChainId: ChainIds;
-    srcEid: string;
-    srcTokenAddress: string;
-    dstTokenAddress: string;
-    srcTokenAmount: string;
-    exchangeRate: string;
-    srcAmountLD: string;
-    srcToken: { network: string; ticker: string };
-    dstToken: { network: string; ticker: string };
-  };
   handleClose: () => void;
   handleRetry: () => void;
-  setTransactionStatus: Dispatch<SetStateAction<Status>>;
-  refetch: () => void;
 }
 
 const handleTransaction = async (
@@ -71,15 +51,13 @@ const handleTransaction = async (
   return null;
 };
 
-export const TransactionStep = ({
-  srcWalletAddress,
-  destinationWallet,
-  transactionData,
-  handleRetry,
-  handleClose,
-  setTransactionStatus,
-  refetch,
-}: Props) => {
+export const TransactionStep = ({ handleRetry, handleClose }: Props) => {
+  const {
+    destinationWallet,
+    refetch,
+    setTransactionStatus,
+    infoForTransactionStep,
+  } = useAcceptModal();
   const {
     srcToken,
     dstToken,
@@ -88,7 +66,9 @@ export const TransactionStep = ({
     txHash,
     srcChainId,
     offerId,
-  } = transactionData;
+  } = infoForTransactionStep;
+
+  const { address } = useAccount();
 
   const isMonochain = srcToken.network === dstToken.network;
 
@@ -111,206 +91,100 @@ export const TransactionStep = ({
 
   return (
     <div className="w-full flex flex-col items-center">
-      <StatusDisplay
-        isLoading={isLoading}
+      <StatusHeader
         isError={isError}
+        isLoading={isLoading}
         isSuccess={isSuccess}
+        errorMessage={{
+          title: "Ad Acceptance Failed",
+          subtitle: "Please Retry",
+        }}
+        loadingMessage={{
+          title: "Ad Acceptance in progress",
+          subtitle: "You can already view the transaction in the explorer",
+        }}
+        successMessage={{
+          title: "Success",
+          subtitle: "",
+        }}
       />
       <TransactionDetails
-        transactionData={transactionData}
-        srcWalletAddress={srcWalletAddress}
+        srcWalletAddress={address || ""}
         destinationWallet={destinationWallet}
       />
       <ActionButton
         isLoading={isLoading}
         isError={isError}
         isSuccess={isSuccess}
-        buttonHandler={buttonHandler}
+        handleClick={buttonHandler}
+        loadingText={"Processing Transaction"}
       />
     </div>
   );
 };
 
-const StatusDisplay = ({
-  isLoading,
-  isError,
-  isSuccess,
-}: {
-  isLoading: boolean;
-  isError: boolean;
-  isSuccess: boolean;
-}) => {
-  const renderStatusIcon = () => {
-    if (isError) return <FileWarning className="size-16 stroke-[0.5]" />;
-    if (isLoading)
-      return <Clock11 className="size-16 text-white stroke-[0.5]" />;
-    if (isSuccess) return <CircleCheck className="size-16 stroke-[0.5]" />;
-    return null;
-  };
-
-  const renderStatusMessage = () => {
-    if (isError) {
-      return (
-        <>
-          <span className="mt-5">Ad Acceptance Failed</span>
-          <span className="text-gray-700 mt-2">Please Retry</span>
-        </>
-      );
-    }
-    if (isLoading) {
-      return (
-        <>
-          <span className="mt-5">Ad Acceptance in progress</span>
-          <span className="text-gray-700 mt-2">
-            You can already view the transaction in the explorer
-          </span>
-        </>
-      );
-    }
-    if (isSuccess) {
-      return <span className="mt-5">Success</span>;
-    }
-    return null;
-  };
-
-  return (
-    <div className="w-full h-44 flex flex-col justify-center items-center mt-2 text-xs text-white">
-      {renderStatusIcon()}
-      {renderStatusMessage()}
-    </div>
-  );
-};
-
 const TransactionDetails = ({
-  transactionData,
   srcWalletAddress,
   destinationWallet,
 }: {
-  transactionData: Props["transactionData"];
   srcWalletAddress: string;
   destinationWallet: string;
-}) => (
-  <div className={"w-full flex flex-col text-xs mt-5 text-white"}>
-    <DetailRow label="TX ID">
-      <div className={"flex flex-row items-center justify-center"}>
-        {addressFormat(transactionData.txHash)}
-        <Copy textToCopy={transactionData.txHash} />
-        <Link href={LAYER_ZERO_SCAN + transactionData.txHash} target="_blank">
-          <ArrowUpRight className="w-5 h-5 ml-1 text-gray-700 cursor-pointer hover:text-white" />
-        </Link>
-      </div>
-    </DetailRow>
-    <DetailRow label="Amount to pay">
-      <span>
-        {transactionData.srcTokenAmount} {transactionData.dstToken.ticker}{" "}
-        <span className={"text-gray-700"}>
-          ({transactionData.dstToken.network})
-        </span>
-      </span>
-    </DetailRow>
-    <DetailRow label="to Wallet">
-      <div className={"flex flex-row items-center justify-center"}>
-        {addressFormat(destinationWallet)}
-        <Copy textToCopy={destinationWallet} />
-      </div>
-    </DetailRow>
-    <DetailRow label="from Wallet">
-      <div className={"flex flex-row items-center justify-center"}>
-        {addressFormat(srcWalletAddress)}
-        <Copy textToCopy={srcWalletAddress} />
-      </div>
-    </DetailRow>
-    <DetailRow label="Amount to receive">
-      <span>
-        {transactionData.exchangeRate} {transactionData.srcToken.ticker}{" "}
-        <span className={"text-gray-700"}>
-          ({transactionData.srcToken.network})
-        </span>
-      </span>
-    </DetailRow>
-    <DetailRow label="Exchange Rate">
-      <span>
-        {transactionData.exchangeRate} {transactionData.dstToken.ticker}{" "}
-        <span className={"text-gray-700"}>
-          ({transactionData.dstToken.network})
-        </span>{" "}
-        = 1 {transactionData.srcToken.ticker}{" "}
-        <span className={"text-gray-700"}>
-          ({transactionData.srcToken.network})
-        </span>
-      </span>
-    </DetailRow>
-  </div>
-);
-
-const DetailRow = ({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) => (
-  <div className="w-full flex flex-row justify-between items-center my-2">
-    <span>{label}</span>
-    <span>{children}</span>
-    {/*{isLink || isCopy ? (*/}
-    {/*  <div className="flex flex-row items-center justify-center text-gray-800">*/}
-    {/*    {addressFormat(value)}*/}
-    {/*    <Copy textToCopy={value} />*/}
-    {/*    {isLink && (*/}
-    {/*      <Link href={LAYER_ZERO_SCAN + value} target="_blank">*/}
-    {/*        <ArrowUpRight className="w-5 h-5 ml-1 text-gray-700 cursor-pointer hover:text-white" />*/}
-    {/*      </Link>*/}
-    {/*    )}*/}
-    {/*  </div>*/}
-    {/*) : (*/}
-    {/*  <span>{value}</span>*/}
-    {/*)}*/}
-  </div>
-);
-
-const ActionButton = ({
-  isLoading,
-  isError,
-  isSuccess,
-  buttonHandler,
-}: {
-  isLoading: boolean;
-  isError: boolean;
-  isSuccess: boolean;
-  buttonHandler: () => void;
 }) => {
-  const renderButtonContent = () => {
-    if (isError)
-      return (
-        <>
-          <Redo2 className="w-5 h-5 mr-2" /> Retry
-        </>
-      );
-    if (isLoading)
-      return (
-        <>
-          <Clock10 className="w-5 h-5 mr-2" /> Processing Transaction
-        </>
-      );
-    if (isSuccess)
-      return (
-        <>
-          <CircleCheck className="w-5 h-5 mr-2" /> Done
-        </>
-      );
-    return null;
-  };
-
+  const { infoForTransactionStep: transactionData } = useAcceptModal();
   return (
-    <Button
-      className="w-full mt-5 rounded-xl"
-      onClick={buttonHandler}
-      variant={
-        (isError && "destructive") || (isLoading && "secondary") || "default"
-      }
-    >
-      {renderButtonContent()}
-    </Button>
+    <div className={"w-full flex flex-col text-xs mt-5 text-white"}>
+      <DetailRow label="TX ID">
+        <div className={"flex flex-row items-center justify-center"}>
+          {addressFormat(transactionData.txHash)}
+          <Copy textToCopy={transactionData.txHash} />
+          <Link href={LAYER_ZERO_SCAN + transactionData.txHash} target="_blank">
+            <ArrowUpRight className="w-5 h-5 ml-1 text-gray-700 cursor-pointer hover:text-white" />
+          </Link>
+        </div>
+      </DetailRow>
+      <DetailRow label="Amount to pay">
+        <span>
+          {formatNumberWithCommas(transactionData.srcTokenAmount)}{" "}
+          {transactionData.dstToken.ticker}{" "}
+          <span className={"text-gray-700"}>
+            ({transactionData.dstToken.network})
+          </span>
+        </span>
+      </DetailRow>
+      <DetailRow label="to Wallet">
+        <div className={"flex flex-row items-center justify-center"}>
+          {addressFormat(destinationWallet)}
+          <Copy textToCopy={destinationWallet} />
+        </div>
+      </DetailRow>
+      <DetailRow label="from Wallet">
+        <div className={"flex flex-row items-center justify-center"}>
+          {addressFormat(srcWalletAddress)}
+          <Copy textToCopy={srcWalletAddress} />
+        </div>
+      </DetailRow>
+      <DetailRow label="Amount to receive">
+        <span>
+          {formatNumberWithCommas(transactionData.exchangeRate)}{" "}
+          {transactionData.srcToken.ticker}{" "}
+          <span className={"text-gray-700"}>
+            ({transactionData.srcToken.network})
+          </span>
+        </span>
+      </DetailRow>
+      <DetailRow label="Exchange Rate">
+        <span>
+          {formatNumberWithCommas(transactionData.exchangeRate)}{" "}
+          {transactionData.dstToken.ticker}{" "}
+          <span className={"text-gray-700"}>
+            ({transactionData.dstToken.network})
+          </span>{" "}
+          = 1 {transactionData.srcToken.ticker}{" "}
+          <span className={"text-gray-700"}>
+            ({transactionData.srcToken.network})
+          </span>
+        </span>
+      </DetailRow>
+    </div>
   );
 };

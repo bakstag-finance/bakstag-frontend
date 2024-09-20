@@ -1,7 +1,7 @@
 "use client";
 
 import { ChangeEvent, useState } from "react";
-import {Button, Input, LoadingClock, SelectCoin} from "@/components/ui";
+import { Button, Input, LoadingClock, SelectCoin } from "@/components/ui";
 import { ConnectModal, CreateModal } from "@/components/modals";
 import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
@@ -9,7 +9,7 @@ import { isValidTokenAmount } from "@/lib/helpers";
 import axios from "axios";
 import { Order } from "@/types/order";
 import { TableItem } from "@/components/molecules";
-import {Clock10} from "lucide-react";
+import { Clock10 } from "lucide-react";
 
 export default function Home() {
   const [tokenToBuy, setTokenToBuy] = useState("eth-opt");

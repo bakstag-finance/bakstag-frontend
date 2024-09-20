@@ -3,6 +3,7 @@ import { AcceptModal } from "../modals";
 import { addressFormat, getTokenField } from "@/lib/helpers";
 import { formatUnits } from "viem";
 import { OrderProps } from "@/types/order";
+import { formatNumberWithCommas } from "@/lib/helpers/formating";
 
 interface Props {
   order: OrderProps;
@@ -20,8 +21,12 @@ export const TableItem = ({ order, refetch, isLast }: Props) => {
     "decimals",
   );
 
-  const formatedSrcAmount = formatUnits(BigInt(srcAmountLD), srcTokenDecimals);
-  const formatedDstAmount = formatUnits(BigInt(exchangeRateSD), 6);
+  const formatedSrcAmount = formatNumberWithCommas(
+    Number(formatUnits(BigInt(srcAmountLD), srcTokenDecimals)),
+  );
+  const formatedDstAmount = formatNumberWithCommas(
+    Number(formatUnits(BigInt(exchangeRateSD), 6)),
+  );
 
   return (
     <>
