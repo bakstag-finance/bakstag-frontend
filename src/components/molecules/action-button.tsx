@@ -1,7 +1,7 @@
 import { FC } from "react";
 import { useAccount } from "wagmi";
-import { Button } from "@/components/ui";
-import { CircleCheck, Clock10, Redo2 } from "lucide-react";
+import { Button, LoadingClock } from "@/components/ui";
+import { CircleCheck, Redo2 } from "lucide-react";
 import { WalletConnect } from "@/components/modals/wallet-connect";
 import { Status } from "@/types/contracts";
 
@@ -87,9 +87,10 @@ const getButtonContent = (
 ) => {
   if (isLoading)
     return (
-      <>
-        <Clock10 className="w-5 h-5 mr-2" /> {loadingText}
-      </>
+      <span className={"flex flex-row"}>
+        <LoadingClock width={20} height={20} />{" "}
+        <span className={"ml-1"}>{loadingText}</span>
+      </span>
     );
   if (isError)
     return (

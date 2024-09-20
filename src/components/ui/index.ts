@@ -44,6 +44,7 @@ import {
   TableCell,
   TableCaption,
 } from "./table";
+import { LoadingClock } from "./loading-clock";
 
 export {
   Button,
@@ -89,4 +90,5 @@ export {
   AddressInput,
   StatusHeader,
   TokenInput,
+  LoadingClock,
 };

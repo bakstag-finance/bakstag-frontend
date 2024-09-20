@@ -51,11 +51,11 @@ export default function Home() {
                 You Receive
               </label>
               <SelectCoin
-                  placeholder="Token to Buy"
-                  value={tokenToBuy}
-                  setValue={(s) => {
-                    setTokenToBuy(s);
-                  }}
+                placeholder="Token to Buy"
+                value={tokenToBuy}
+                setValue={(s) => {
+                  setTokenToBuy(s);
+                }}
               />
             </div>
             <div className="flex flex-col w-full lg:pl-4">
@@ -63,16 +63,16 @@ export default function Home() {
                 Amount to Receive
               </label>
               <Input
-                  className={cn(
-                      "bg-black border rounded-lg ",
-                      isValidTokenAmount(amountToBuy)
-                          ? "border-gray-800"
-                          : "border-red-200  focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1",
-                  )}
-                  value={amountToBuy}
-                  onChange={inputChangeHandler}
-                  placeholder="0.0"
-                  required
+                className={cn(
+                  "bg-black border rounded-lg ",
+                  isValidTokenAmount(amountToBuy)
+                    ? "border-gray-800"
+                    : "border-red-200  focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1",
+                )}
+                value={amountToBuy}
+                onChange={inputChangeHandler}
+                placeholder="0.0"
+                required
               />
             </div>
           </div>
@@ -80,27 +80,25 @@ export default function Home() {
             <div className="flex flex-col w-full lg:pl-4 mt-5 lg:mt-0">
               <label className="text-xs mb-2 ml-2 text-gray-700">You pay</label>
               <SelectCoin
-                  placeholder="Token to Sell"
-                  value={tokenToSell}
-                  setValue={(s) => {
-                    setTokenToSell(s);
-                  }}
+                placeholder="Token to Sell"
+                value={tokenToSell}
+                setValue={(s) => {
+                  setTokenToSell(s);
+                }}
               />
             </div>
             <div className="px-0 mt-6 flex justify-center items-center h-full w-full lg:pl-4">
-              <ConnectModal refetch={refetch}/>
+              <ConnectModal refetch={refetch} />
             </div>
           </div>
         </div>
         <div
-            className={cn(
-                "mt-5 lg:mt-2 w-full border overflow-y-auto scroll-smooth border-gray-800 rounded-xl flex flex-col justify-start items-center",
-                heightOfTable,
-            )}
+          className={cn(
+            "mt-5 lg:mt-2 w-full border overflow-y-auto scroll-smooth border-gray-800 rounded-xl flex flex-col justify-start items-center",
+            heightOfTable,
+          )}
         >
-          <div
-              className="hidden lg:sticky lg:top-0 lg:bg-blur lg:border-b lg:border-gray-800 w-full lg:flex justify-center items-center text-sm z-10"
-          >
+          <div className="hidden lg:sticky lg:top-0 lg:bg-blur lg:border-b lg:border-gray-800 w-full lg:flex justify-center items-center text-sm z-10">
             <div className="py-2 px-5 w-[95%] flex justify-around items-center h-10 text-gray-700">
               <span className="w-[240px]">Advertiser</span>
               <span className="w-full text-center ml-5">Exchange Rate</span>
@@ -109,40 +107,39 @@ export default function Home() {
             </div>
           </div>
 
-          {isLoading && <LoadingComponent/>}
+          {isLoading && <LoadingComponent />}
 
-          {isError && <ErrorComponent refetch={refetch}/>}
+          {isError && <ErrorComponent refetch={refetch} />}
 
-          {isEmptyAdsList && <EmptyComponent refetch={refetch}/>}
+          {isEmptyAdsList && <EmptyComponent refetch={refetch} />}
 
           {tableData &&
-              tableData?.map((item: any, i: number) => (
-                  <>
-                    <TableItem
-                        refetch={refetch}
-                        order={{
-                          srcAmountLD: item.srcAmountLD,
-                          srcToken: {
-                            ticker: item.srcTokenTicker,
-                            network: item.srcTokenNetwork,
-                          },
-                          dstToken: {
-                            ticker: item.dstTokenTicker,
-                            network: item.dstTokenNetwork,
-                          },
-                          offerId: item.offerId,
-                          srcTokenAddress: item.srcTokenAddress,
-                          dstTokenAddress: item.dstTokenAddress,
-                          exchangeRateSD: item.exchangeRateSD,
-                          dstSellerAddress: item.dstSellerAddress,
-                        }}
-                        key={`order-id-${i}`}
-                        isLast={i === tableData.length - 1}
-                    />
-                  </>
-              ))}
+            tableData?.map((item: any, i: number) => (
+              <>
+                <TableItem
+                  refetch={refetch}
+                  order={{
+                    srcAmountLD: item.srcAmountLD,
+                    srcToken: {
+                      ticker: item.srcTokenTicker,
+                      network: item.srcTokenNetwork,
+                    },
+                    dstToken: {
+                      ticker: item.dstTokenTicker,
+                      network: item.dstTokenNetwork,
+                    },
+                    offerId: item.offerId,
+                    srcTokenAddress: item.srcTokenAddress,
+                    dstTokenAddress: item.dstTokenAddress,
+                    exchangeRateSD: item.exchangeRateSD,
+                    dstSellerAddress: item.dstSellerAddress,
+                  }}
+                  key={`order-id-${i}`}
+                  isLast={i === tableData.length - 1}
+                />
+              </>
+            ))}
         </div>
-
       </div>
     </main>
   );
@@ -150,28 +147,28 @@ export default function Home() {
 
 const LoadingComponent = () => {
   return (
-      <div className="flex justify-center items-center h-full my-full">
-        <Button variant="secondary" className={"rounded-xl"}>
-          <Clock10 className="w-5 h-5 mr-2"/> Fetching Ads
-        </Button>
-      </div>
+    <div className="flex justify-center items-center h-full my-full">
+      <Button variant="secondary" className={"rounded-xl"}>
+        <Clock10 className="w-5 h-5 mr-2" /> Fetching Ads
+      </Button>
+    </div>
   );
 };
 
-const ErrorComponent = ({refetch}: { refetch: () => void }) => {
+const ErrorComponent = ({ refetch }: { refetch: () => void }) => {
   return (
-      <div className="flex justify-center items-center h-full my-full">
-        <Button variant="destructive" onClick={refetch} className={"rounded-xl"}>
-          Fetching Failed (Retry)
-        </Button>
-      </div>
+    <div className="flex justify-center items-center h-full my-full">
+      <Button variant="destructive" onClick={refetch} className={"rounded-xl"}>
+        Fetching Failed (Retry)
+      </Button>
+    </div>
   );
 };
 
-const EmptyComponent = ({refetch}: { refetch: () => void }) => {
+const EmptyComponent = ({ refetch }: { refetch: () => void }) => {
   return (
-      <div className="flex justify-center items-center h-full my-full">
-        <CreateModal buttonText={"Create Ad"} refetch={refetch}/>
-      </div>
+    <div className="flex justify-center items-center h-full my-full">
+      <CreateModal buttonText={"Create Ad"} refetch={refetch} />
+    </div>
   );
 };
