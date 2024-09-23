@@ -49,6 +49,8 @@ export const ConnectModal = ({ refetch }: Props) => {
     srcSellerAddress: "",
     srcAmountLD: BigInt(0),
     exchangeRateSD: BigInt(0),
+    createdAt: new Date(),
+    updatedAt: new Date()
   });
   const solanaWallet = useWallet();
 

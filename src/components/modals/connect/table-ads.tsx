@@ -28,9 +28,11 @@ interface Props {
   setOrderData: Dispatch<SetStateAction<Offer>>;
 }
 
+type FilterType = "new" | "old";
 export const TableComponent = ({ setStep, setOrderData }: Props) => {
   const { address } = useAccount();
   const [tokenToBuy, setTokenToBuy] = useState("");
+  const [timeFilter, setTimeFilter] = useState<FilterType>("new");
 
   const isWalletConntected = !!address;
   const {
@@ -39,19 +41,38 @@ export const TableComponent = ({ setStep, setOrderData }: Props) => {
     isError,
     refetch,
   } = useQuery<Offer[]>({
-    queryKey: ["table-ads", tokenToBuy, address],
+    queryKey: ["table-ads", tokenToBuy, address, timeFilter],
     queryFn: async () => {
       const result = await axios.get(
         `/api/offer/get_all?tokenToBuy=${tokenToBuy}&address=${address}&amountToBuy=0&showEmpty=true`,
       );
-      return result.data.orders;
+      let orders = result.data.orders;
+
+      if (timeFilter === "new") {
+        orders = orders.sort(
+          (a: Offer, b: Offer) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        );
+      } else if (timeFilter === "old") {
+        orders = orders.sort(
+          (a: Offer, b: Offer) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+        );
+      }
+
+      return orders;
     },
   });
 
   return (
     <div className="w-full flex flex-col">
       {isWalletConntected && tableData && tableData.length >= 2 && (
-        <FilterSection tokenToBuy={tokenToBuy} setTokenToBuy={setTokenToBuy} />
+        <FilterSection
+          tokenToBuy={tokenToBuy}
+          setTokenToBuy={setTokenToBuy}
+          timeFilter={timeFilter}
+          setTimeFilter={setTimeFilter}
+        />
       )}
       <TableContent
         tableData={tableData || []}
@@ -71,9 +92,13 @@ export const TableComponent = ({ setStep, setOrderData }: Props) => {
 const FilterSection = ({
   tokenToBuy,
   setTokenToBuy,
+  timeFilter,
+  setTimeFilter,
 }: {
   tokenToBuy: string;
   setTokenToBuy: Dispatch<SetStateAction<string>>;
+  timeFilter: string;
+  setTimeFilter: Dispatch<SetStateAction<FilterType>>;
 }) => (
   <div className="w-full flex flex-row justify-between mt-2">
     <SelectCoin
@@ -81,7 +106,10 @@ const FilterSection = ({
       value={tokenToBuy}
       setValue={setTokenToBuy}
     />
-    <Select>
+    <Select
+      value={timeFilter}
+      onValueChange={(value) => setTimeFilter(value as FilterType)}
+    >
       <SelectTrigger
         className="w-full ml-2 border rounded-md"
         showChevronUpDown
@@ -90,10 +118,9 @@ const FilterSection = ({
       </SelectTrigger>
       <SelectContent
         className="bg-black text-white p-2 hover:border-gray-800 focus:border-gray-800"
-        defaultValue="most"
+        defaultValue="New"
       >
         <SelectGroup>
-          <SelectItem value="most">Most Recent</SelectItem>
           <SelectItem value="new">Newest</SelectItem>
           <SelectItem value="old">Oldest</SelectItem>
         </SelectGroup>

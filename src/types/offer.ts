@@ -11,6 +11,8 @@ export interface Offer {
   dstTokenNetwork: string;
   srcAmountLD: bigint;
   exchangeRateSD: bigint;
+  createdAt: Date;
+  updatedAt: Date;
 }
 export interface OfferProps {
   srcToken: {

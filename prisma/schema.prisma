@@ -8,8 +8,8 @@ datasource db {
 }
 
 model Order {
-  id               Int     @id @default(autoincrement())
-  offerId          String  @unique
+  id               Int      @id @default(autoincrement())
+  offerId          String   @unique
   srcSellerAddress String?
   dstSellerAddress String
   dstEid           Int
@@ -21,4 +21,6 @@ model Order {
   dstTokenNetwork  String
   srcAmountLD      String
   exchangeRateSD   String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
