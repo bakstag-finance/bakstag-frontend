@@ -7,7 +7,7 @@ import {
   ReactNode,
 } from "react";
 import { Status } from "@/types/contracts";
-import { OrderProps } from "@/types/order";
+import { OfferProps } from "@/types/offer";
 
 type ConnectModalStep = "main" | "transaction";
 
@@ -32,7 +32,7 @@ interface AcceptModalContextProps {
   setInfoForTransactionStep: Dispatch<SetStateAction<any>>;
   handleClose: () => void;
   handleResetState: () => void;
-  order: OrderProps;
+  order: OfferProps;
   refetch: () => void;
 }
 
@@ -50,7 +50,7 @@ export const useAcceptModal = () => {
 
 interface AcceptModalProviderProps {
   children: ReactNode;
-  order: OrderProps;
+  order: OfferProps;
   refetch: () => void;
 }
 

@@ -8,7 +8,7 @@ import {
   FileWarning,
 } from "lucide-react";
 import { Options } from "@layerzerolabs/lz-v2-utilities";
-import { Order } from "@/types/order";
+import { Offer } from "@/types/offer";
 import {
   addressFormat,
   getScanLink,
@@ -40,7 +40,7 @@ type Status =
 type ConnectModalStep = "main" | "wallet-choose" | "delete";
 
 interface Props {
-  order: Order;
+  order: Offer;
   setStep: Dispatch<SetStateAction<ConnectModalStep>>;
   refetch: () => void;
 }
@@ -282,7 +282,7 @@ const ConfirmationSection = ({ status }: { status: Status }) => {
 interface InfoSectionProps {
   txId: string;
   walletAddress: string;
-  order: Order;
+  order: Offer;
 }
 
 const InfoSection = ({ txId, walletAddress, order }: InfoSectionProps) => {

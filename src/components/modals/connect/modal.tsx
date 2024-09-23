@@ -21,7 +21,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { PhantomWalletName } from "@solana/wallet-adapter-wallets";
 import { DeletingStep } from "./delete-step";
 import { TableComponent } from "./table-ads";
-import { Order } from "@/types/order";
+import { Offer } from "@/types/offer";
 import { cn } from "@/lib/utils";
 
 type ConnectModalStep = "main" | "wallet-choose" | "delete";
@@ -36,7 +36,7 @@ export const ConnectModal = ({ refetch }: Props) => {
   const [mainTabsStep, setMainTabsStep] = useState("wallet");
   const [walletTabStep, setWalletTabStep] = useState("ethereum");
 
-  const [orderData, setOrderData] = useState<Order>({
+  const [orderData, setOrderData] = useState<Offer>({
     offerId: "",
     dstSellerAddress: "",
     dstEid: 0,

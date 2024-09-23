@@ -1,4 +1,4 @@
-export interface Order {
+export interface Offer {
   offerId: string;
   dstSellerAddress: string;
   dstEid: number;
@@ -12,7 +12,7 @@ export interface Order {
   srcAmountLD: bigint;
   exchangeRateSD: bigint;
 }
-export interface OrderProps {
+export interface OfferProps {
   srcToken: {
     ticker: string;
     network: string;
@@ -31,5 +31,5 @@ export interface OrderProps {
 
 export interface APIOrder {
   status: 200;
-  objects: Order[];
+  objects: Offer[];
 }

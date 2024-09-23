@@ -1,7 +1,6 @@
-import { Ghost, Trash } from "lucide-react";
+import { Trash } from "lucide-react";
 import { CreateModal } from "@/components/modals/create";
 import {
-  Button,
   SelectCoin,
   Select,
   SelectContent,
@@ -9,14 +8,16 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  LoadingClock,
+  LoadingComponent,
+  ErrorComponent,
+  EmptyComponent,
 } from "@/components/ui";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useAccount } from "wagmi";
 import { formatUnits } from "viem";
-import { Order } from "@/types/order";
+import { Offer } from "@/types/offer";
 import { cn } from "@/lib/utils";
 import { formatNumberWithCommas } from "@/lib/helpers/formating";
 
@@ -24,7 +25,7 @@ type ConnectModalStep = "main" | "wallet-choose" | "delete";
 
 interface Props {
   setStep: Dispatch<SetStateAction<ConnectModalStep>>;
-  setOrderData: Dispatch<SetStateAction<Order>>;
+  setOrderData: Dispatch<SetStateAction<Offer>>;
 }
 
 export const TableComponent = ({ setStep, setOrderData }: Props) => {
@@ -37,7 +38,7 @@ export const TableComponent = ({ setStep, setOrderData }: Props) => {
     isLoading,
     isError,
     refetch,
-  } = useQuery<Order[]>({
+  } = useQuery<Offer[]>({
     queryKey: ["table-ads", tokenToBuy, address],
     queryFn: async () => {
       const result = await axios.get(
@@ -109,17 +110,25 @@ const TableContent = ({
   setStep,
   setOrderData,
 }: {
-  tableData: Order[];
+  tableData: Offer[];
   isLoading: boolean;
   isError: boolean;
   refetch: () => void;
   setStep: Dispatch<SetStateAction<ConnectModalStep>>;
-  setOrderData: Dispatch<SetStateAction<Order>>;
+  setOrderData: Dispatch<SetStateAction<Offer>>;
 }) => (
   <div className="mt-5 w-full flex flex-col h-64 overflow-y-scroll no-scrollbar rounded-xl border border-gray-800 p-2">
-    {isLoading && <LoadingState />}
-    {isError && <ErrorState refetch={refetch} />}
-    {tableData && !isLoading && tableData.length === 0 && <EmptyState />}
+    {isLoading && <LoadingComponent />}
+    {isError && <ErrorComponent refetch={refetch} />}
+    {tableData && !isLoading && tableData.length === 0 && (
+      <EmptyComponent
+        refetch={refetch}
+        error={{
+          title: "No Ads Yet",
+          subtitle: "Create your first ad",
+        }}
+      />
+    )}
     {tableData && tableData.length > 0 && (
       <>
         {tableData.map((item, i) => (
@@ -142,9 +151,9 @@ const TableRow = ({
   setOrderData,
   isLast,
 }: {
-  item: Order;
+  item: Offer;
   setStep: Dispatch<SetStateAction<ConnectModalStep>>;
-  setOrderData: Dispatch<SetStateAction<Order>>;
+  setOrderData: Dispatch<SetStateAction<Offer>>;
   isLast: boolean;
 }) => {
   const formattedSrcAmount = formatNumberWithCommas(
@@ -204,30 +213,3 @@ const TableRow = ({
     </div>
   );
 };
-
-const LoadingState = () => (
-  <div className="w-full h-full flex flex-col justify-center items-center text-sm">
-    <Button
-      variant="secondary"
-      className={"flew flex-row justify-center items-center"}
-    >
-      <LoadingClock className="w-6 h-6 mr-2" /> Fetching Ads
-    </Button>
-  </div>
-);
-
-const ErrorState = ({ refetch }: { refetch: () => void }) => (
-  <div className="w-full h-full flex flex-col justify-center items-center text-sm">
-    <Button variant="destructive" onClick={refetch}>
-      Fetching Failed (Retry)
-    </Button>
-  </div>
-);
-
-const EmptyState = () => (
-  <div className="w-full h-full flex flex-col justify-center items-center text-sm">
-    <Ghost className="w-20 h-28 stroke-[0.25]" />
-    <span>No Ads Yet</span>
-    <span className="text-gray-700 text-xs">Create your first ad</span>
-  </div>
-);

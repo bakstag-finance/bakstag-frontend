@@ -20,7 +20,7 @@ import { useAccount, useSwitchChain } from "wagmi";
 import { FormStep } from "./form-step";
 import { TransactionStep } from "./transaction-step";
 import { Status } from "@/types/contracts";
-import { OrderProps } from "@/types/order";
+import { OfferProps } from "@/types/offer";
 import { erc20Abi, formatUnits, parseUnits } from "viem";
 import {
   readContract,
@@ -413,7 +413,7 @@ const Modal = () => {
 };
 
 interface Props {
-  order: OrderProps;
+  order: OfferProps;
   refetch: () => void;
 }
 

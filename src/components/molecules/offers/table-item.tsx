@@ -1,12 +1,12 @@
 import { cn } from "@/lib/utils";
-import { AcceptModal } from "../modals";
+import { AcceptModal } from "../../modals";
 import { addressFormat, getTokenField } from "@/lib/helpers";
 import { formatUnits } from "viem";
-import { OrderProps } from "@/types/order";
+import { OfferProps } from "@/types/offer";
 import { formatNumberWithCommas } from "@/lib/helpers/formating";
 
 interface Props {
-  order: OrderProps;
+  order: OfferProps;
   refetch: () => void;
   isLast: boolean;
 }
@@ -74,7 +74,7 @@ export const TableItem = ({ order, refetch, isLast }: Props) => {
             )}
           >
             <span className="">{formatedAddress}</span>
-            <span className="w-full text-center ml-10">
+            <span className="w-full text-center ml-7">
               {formatedDstAmount}{" "}
               <span className="text-gray-700">
                 {dstToken.ticker} ({dstToken.network})

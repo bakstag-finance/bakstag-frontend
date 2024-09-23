@@ -14,7 +14,7 @@ interface Props extends InputHTMLAttributes<HTMLInputElement> {
   setValue: Dispatch<SetStateAction<string>>;
 }
 
-export const TokenInput = ({ value, setValue, ...props }: Props) => {
+export const TokenInput = ({ value, setValue, className, ...props }: Props) => {
   const [isChanged, setIsChanged] = useState(false);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -28,6 +28,7 @@ export const TokenInput = ({ value, setValue, ...props }: Props) => {
     <Input
       className={cn(
         "mt-2 bg-black border rounded-lg",
+        className,
         isChanged
           ? isValid
             ? "border-gray-800"
