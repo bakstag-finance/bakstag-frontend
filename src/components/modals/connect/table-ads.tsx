@@ -31,6 +31,7 @@ export const TableComponent = ({ setStep, setOrderData }: Props) => {
   const { address } = useAccount();
   const [tokenToBuy, setTokenToBuy] = useState("");
 
+  const isWalletConntected = !!address;
   const {
     data: tableData,
     isLoading,
@@ -48,7 +49,7 @@ export const TableComponent = ({ setStep, setOrderData }: Props) => {
 
   return (
     <div className="w-full flex flex-col">
-      {tableData && tableData.length > 0 && (
+      {isWalletConntected && tableData && tableData.length >= 2 && (
         <FilterSection tokenToBuy={tokenToBuy} setTokenToBuy={setTokenToBuy} />
       )}
       <TableContent

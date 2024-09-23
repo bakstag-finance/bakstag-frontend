@@ -180,7 +180,7 @@ const Modal = ({ buttonText, refetch }: Props) => {
         ).catch((e) => {
           const error = e as ReadContractErrorType;
           console.log(error);
-          throw new Error(error.name);
+          throw new Error(error.shortMessage);
         });
 
         _lzFee = lzFee;

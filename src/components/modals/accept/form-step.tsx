@@ -56,7 +56,7 @@ export const FormStep = ({
         handleInputChange={(e) => handleInputChange(e, "dst")}
       />
       <AddressInput
-        label={`Destination Wallet Address | (${dstToken.network})`}
+        label={`Destination Wallet Address | ${srcToken.ticker} (${srcToken.network})`}
         value={destinationWallet}
         setValue={setDestinationWallet}
       />

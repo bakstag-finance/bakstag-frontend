@@ -245,7 +245,7 @@ const TransactionDetails = ({
         {totatReceiveAmount}
         <span>
           {" "}
-          {tokensData[selectedDstToken]?.network}{" "}
+          {tokensData[selectedDstToken]?.token}{" "}
           <span className={"text-gray-700"}>
             ({tokensData[selectedDstToken]?.network})
           </span>

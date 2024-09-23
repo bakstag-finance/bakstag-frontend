@@ -124,7 +124,7 @@ export const ConnectModal = ({ refetch }: Props) => {
                 metamaskWalletHandler,
               )}
               {renderWalletButton(
-                account.address,
+                solanaWallet.publicKey?.toString(),
                 isSolanaWalletConnected,
                 "Solana",
                 solanaWalletHandler,
@@ -282,7 +282,7 @@ export const ConnectModal = ({ refetch }: Props) => {
 };
 
 const renderWalletButton = (
-  address: string | undefined,
+  address: string | undefined | null,
   isConnected: boolean,
   network: string,
   onClickHandler: () => void,
@@ -298,15 +298,17 @@ const renderWalletButton = (
         <Button
           onClick={onClickHandler}
           className={cn(
-            "group border border-gray-800 self-start justify-center rounded-xl w-10 h-10",
+            "group border border-gray-800 flex self-start justify-center rounded-xl w-10 h-10",
             isConnected ? "bg-transparent mt-3" : "bg-white",
           )}
         >
-          {isConnected ? (
-            <X className="text-gray-700 group-hover:text-white" size={20} />
-          ) : (
-            <LogIn size={15} className="group-hover:text-white" />
-          )}
+          <div>
+            {isConnected ? (
+              <X className="text-gray-700 group-hover:text-white" size={20} />
+            ) : (
+              <LogIn size={15} className="group-hover:text-white" />
+            )}
+          </div>
         </Button>
       </div>
       {isConnected && (
