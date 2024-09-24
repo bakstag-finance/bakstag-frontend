@@ -1876,7 +1876,7 @@
   dependencies:
     "@radix-ui/react-primitive" "2.0.0"
 
-"@radix-ui/react-slot@1.1.0", "@radix-ui/react-slot@^1.1.0":
+"@radix-ui/react-slot@1.1.0", "@radix-ui/react-slot@^1.0.2", "@radix-ui/react-slot@^1.1.0":
   version "1.1.0"
   resolved "https://registry.npmjs.org/@radix-ui/react-slot/-/react-slot-1.1.0.tgz"
   integrity sha512-FUCf5XMfmW4dtYl69pdS4DbxKy8nj4M7SafBgPllysxmdachynNflAdp/gCsnYWNDnge6tI9onzMp5ARYc1KNw==
@@ -2520,6 +2520,14 @@
     bs58 "^5.0.0"
     eventemitter3 "^5.0.1"
     uuid "^9.0.0"
+
+"@squircle-js/react@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@squircle-js/react/-/react-1.2.0.tgz#92dc4eb83b26cb5b7c803dcca60c6cfe7f61ee6c"
+  integrity sha512-Nmayv8/5CrDCa2a6jAozwHzZ005BNvI0oM9Om+zrLZzQqPtxMW/GEMMQvxKsSJh2PQaOHe4zfpCKtCzkKg0HDw==
+  dependencies:
+    "@radix-ui/react-slot" "^1.0.2"
+    figma-squircle "^0.3.0"
 
 "@stablelib/aead@^1.0.1":
   version "1.0.1"
@@ -5597,6 +5605,11 @@ fdir@^6.1.1:
   version "6.2.0"
   resolved "https://registry.npmjs.org/fdir/-/fdir-6.2.0.tgz"
   integrity sha512-9XaWcDl0riOX5j2kYfy0kKdg7skw3IY6kA4LFT8Tk2yF9UdrADUy8D6AJuBLtf7ISm/MksumwAHE3WVbMRyCLw==
+
+figma-squircle@^0.3.0:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/figma-squircle/-/figma-squircle-0.3.1.tgz#ff38020c31e9085bce8a9d68b1e0be9628c2fab9"
+  integrity sha512-cyb7fbNaJgM3XrMXRq/B4NPUILfbrSRHjqt+0/3OGBOejJKNLnFKTXSMSAjdqbw2bSo2Y2eCnYXvaRgshBnWQw==
 
 file-entry-cache@^6.0.1:
   version "6.0.1"

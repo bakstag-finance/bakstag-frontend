@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { LoadingClock } from "@/components/ui/loading-clock";
 import { CreateModal } from "@/components/modals";
 import { Ghost } from "lucide-react";
+import { Squircle } from "@squircle-js/react";
 
 interface Props {
   refetch: () => void;
@@ -14,9 +15,11 @@ interface Props {
 export const LoadingComponent = () => {
   return (
     <div className="flex justify-center items-center h-full my-full">
-      <Button variant="secondary" className={"rounded-xl"}>
-        <LoadingClock className={"w-6 h-6 mr-1"} /> Fetching Ads
-      </Button>
+      <Squircle asChild cornerRadius={12} cornerSmoothing={1}>
+        <Button variant="secondary" className={"rounded-xl"}>
+          <LoadingClock className={"w-6 h-6 mr-1"} /> Fetching Ads
+        </Button>
+      </Squircle>
     </div>
   );
 };
@@ -24,16 +27,22 @@ export const LoadingComponent = () => {
 export const ErrorComponent = ({ refetch }: Props) => {
   return (
     <div className="flex justify-center items-center h-full my-full">
-      <Button variant="destructive" onClick={refetch} className={"rounded-xl"}>
-        Fetching Failed (Retry)
-      </Button>
+      <Squircle asChild cornerRadius={12} cornerSmoothing={1}>
+        <Button
+          variant="destructive"
+          onClick={refetch}
+          className={"rounded-xl"}
+        >
+          Fetching Failed (Retry)
+        </Button>
+      </Squircle>
     </div>
   );
 };
 
 export const EmptyComponent = ({ refetch, error }: Props) => {
   return (
-    <div className="flex justify-center items-center h-full my-full">
+    <div className="flex flex-col justify-center items-center h-full my-full">
       {error ? (
         <>
           <Ghost className="w-20 h-28 stroke-[0.25]" />

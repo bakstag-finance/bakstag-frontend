@@ -19,7 +19,7 @@ import { DetailRow } from "@/components/molecules";
 import { formatNumberWithCommas } from "@/lib/helpers/formating";
 import { useCreateModal } from "@/components/modals/create/context";
 import { useAccount } from "wagmi";
-import { ActionButton } from "@/components/molecules/action-button";
+import { ActionButton } from "@/components/ui/";
 
 interface TransactionData {
   txHash: string;

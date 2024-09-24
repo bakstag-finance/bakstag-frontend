@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from "./select";
 import { cn } from "@/lib/utils";
+import { Squircle } from "@squircle-js/react";
 
 interface Props {
   placeholder: string;
@@ -26,12 +27,22 @@ export const SelectCoin = ({
 }: Props) => {
   return (
     <Select value={value} onValueChange={setValue}>
-      <SelectTrigger className={cn("w-full", className)}>
-        <SelectValue placeholder={placeholder} className="border border-red" />
-      </SelectTrigger>
+      <Squircle
+        asChild
+        cornerRadius={12}
+        cornerSmoothing={1}
+        className="bg-black text-white border border-gray-800 rounded-xl"
+      >
+        <SelectTrigger className={cn("w-full", className)}>
+          <SelectValue
+            placeholder={placeholder}
+            className="border border-red"
+          />
+        </SelectTrigger>
+      </Squircle>
       <SelectContent
         className={
-          "bg-black text-white p-2 hover:border-gray-800 focus:border-gray-800"
+          "bg-black text-white hover:border-gray-800 focus:border-gray-800 rounded-xl"
         }
       >
         <SelectGroup>

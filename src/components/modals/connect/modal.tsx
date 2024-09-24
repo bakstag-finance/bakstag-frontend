@@ -23,6 +23,7 @@ import { DeletingStep } from "./delete-step";
 import { TableComponent } from "./table-ads";
 import { Offer } from "@/types/offer";
 import { cn } from "@/lib/utils";
+import { Squircle } from "@squircle-js/react";
 
 type ConnectModalStep = "main" | "wallet-choose" | "delete";
 
@@ -50,7 +51,7 @@ export const ConnectModal = ({ refetch }: Props) => {
     srcAmountLD: BigInt(0),
     exchangeRateSD: BigInt(0),
     createdAt: new Date(),
-    updatedAt: new Date()
+    updatedAt: new Date(),
   });
   const solanaWallet = useWallet();
 
@@ -110,12 +111,16 @@ export const ConnectModal = ({ refetch }: Props) => {
           className="w-full flex flex-col items-center text-white"
         >
           <TabsList className={"w-full rounded-xl"}>
-            <TabsTrigger value="wallet" className={"w-full rounded-lg"}>
-              Wallet
-            </TabsTrigger>
-            <TabsTrigger value="ads" className={"w-full rounded-lg"}>
-              Ads
-            </TabsTrigger>
+            <Squircle asChild cornerRadius={8} cornerSmoothing={1}>
+              <TabsTrigger value="wallet" className={"w-full"}>
+                Wallet
+              </TabsTrigger>
+            </Squircle>
+            <Squircle asChild cornerRadius={8} cornerSmoothing={1}>
+              <TabsTrigger value="ads" className={"w-full"}>
+                Ads
+              </TabsTrigger>
+            </Squircle>
           </TabsList>
           <TabsContent value="wallet" className="w-full">
             <div className="w-full flex flex-col">
@@ -246,13 +251,13 @@ export const ConnectModal = ({ refetch }: Props) => {
   return (
     <Dialog open={openModal} onOpenChange={onOpenChangeHandler}>
       <DialogTrigger asChild>
-        <Button
-          className={"bg-white text-black w-full rounded-xl font-extralight"}
-        >
-          {isWalletConnected || isSolanaWalletConnected
-            ? "Profile"
-            : "+ Connect"}
-        </Button>
+        <Squircle asChild cornerRadius={12} cornerSmoothing={1}>
+          <Button className={"bg-white text-black w-full font-extralight"}>
+            {isWalletConnected || isSolanaWalletConnected
+              ? "Profile"
+              : "+ Connect"}
+          </Button>
+        </Squircle>
       </DialogTrigger>
       <DialogContent className="no-scrollbar w-full max-w-[380px] bg-black transition-all duration-1000 ease-linear">
         <VisuallyHidden>
@@ -264,13 +269,15 @@ export const ConnectModal = ({ refetch }: Props) => {
         <div className={"w-full flex justify-center items-center flex-col"}>
           {walletStepRender()}
 
-          <Button
-            className="w-full mt-5 bg-black text-gray-700 border border-white border-opacity-50 hover:bg-gray-800 rounded-xl"
-            onClick={cancelHandler}
-            disabled={status === "pending"}
-          >
-            {step === "main" ? "Cancel" : "Back"}
-          </Button>
+          <Squircle asChild cornerRadius={12} cornerSmoothing={1}>
+            <Button
+              className="w-full mt-5 bg-black text-gray-700 border border-white border-opacity-50 hover:bg-gray-800 rounded-xl"
+              onClick={cancelHandler}
+              disabled={status === "pending"}
+            >
+              {step === "main" ? "Cancel" : "Back"}
+            </Button>
+          </Squircle>
           {step === "delete" ? (
             <span className="text-xs text-gray-700 mt-5">
               After the Ad is canceled, the remaining assets will be
@@ -297,21 +304,23 @@ const renderWalletButton = (
         <div className="flex flex-col">
           <span className="font-semibold text-sm text-white">{network}</span>
         </div>
-        <Button
-          onClick={onClickHandler}
-          className={cn(
-            "group border border-gray-800 flex self-start justify-center rounded-xl w-10 h-10",
-            isConnected ? "bg-transparent mt-3" : "bg-white",
-          )}
-        >
-          <div>
-            {isConnected ? (
-              <X className="text-gray-700 group-hover:text-white" size={20} />
-            ) : (
-              <LogIn size={15} className="group-hover:text-white" />
+        <Squircle asChild cornerRadius={12} cornerSmoothing={1}>
+          <Button
+            onClick={onClickHandler}
+            className={cn(
+              "group border border-gray-800 flex self-start justify-center rounded-xl w-10 h-10",
+              isConnected ? "bg-transparent mt-3" : "bg-white",
             )}
-          </div>
-        </Button>
+          >
+            <div>
+              {isConnected ? (
+                <X className="text-gray-700 group-hover:text-white" size={20} />
+              ) : (
+                <LogIn size={15} className="group-hover:text-white" />
+              )}
+            </div>
+          </Button>
+        </Squircle>
       </div>
       {isConnected && (
         <span className="text-gray-700">{addressFormat(address!)}</span>

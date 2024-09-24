@@ -27,6 +27,7 @@ import { TransactionStep } from "./transaction-step";
 import { FormStep } from "./form-step";
 import { LzFee, ChainIds } from "@/types/contracts";
 import CreateModalProvider, { useCreateModal } from "./context";
+import { Squircle } from "@squircle-js/react";
 
 interface Props {
   buttonText: string;
@@ -297,11 +298,13 @@ const Modal = ({ buttonText, refetch }: Props) => {
   return (
     <Dialog open={openModal} onOpenChange={onOpenChangeHandler}>
       <DialogTrigger asChild>
-        <Button
-          className={"bg-white text-black w-full rounded-xl font-extralight"}
-        >
-          {buttonText}
-        </Button>
+        <Squircle asChild cornerRadius={12} cornerSmoothing={1}>
+          <Button
+            className={"bg-white text-black w-full rounded-xl font-extralight"}
+          >
+            {buttonText}
+          </Button>
+        </Squircle>
       </DialogTrigger>
       <DialogOverlay>
         <DialogContent

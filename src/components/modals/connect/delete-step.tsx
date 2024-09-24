@@ -119,12 +119,14 @@ export const DeletingStep = ({ order, setStep, refetch }: Props) => {
         chainId: dstChainId,
       }).catch((e) => {
         const error = e as ReadContractErrorType;
+        console.log(error);
         console.log("Error", error);
       });
 
       const _srcAddress = hexZeroPadTo32(
         order.srcSellerAddress as `0x${string}`,
       );
+
       const _options = Options.newOptions().addExecutorLzReceiveOption(
         quoteCancelOffer!.lzTokenFee,
         quoteCancelOffer!.nativeFee,
@@ -143,6 +145,7 @@ export const DeletingStep = ({ order, setStep, refetch }: Props) => {
         chainId: srcChainId,
       }).catch((e) => {
         const error = e as ReadContractErrorType;
+        console.log(error.cause as ReadContractErrorType);
         console.log("Error", error);
       });
 

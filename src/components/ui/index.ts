@@ -47,6 +47,8 @@ import {
 import { LoadingClock } from "./loading-clock";
 import { LoadingComponent, ErrorComponent, EmptyComponent } from "./statuses";
 
+import { ActionButton } from "./action-button";
+
 export {
   Button,
   buttonVariants,
@@ -95,4 +97,5 @@ export {
   LoadingComponent,
   ErrorComponent,
   EmptyComponent,
+  ActionButton,
 };

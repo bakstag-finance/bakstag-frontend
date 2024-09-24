@@ -1,9 +1,10 @@
 import { FC } from "react";
 import { useAccount } from "wagmi";
-import { Button, LoadingClock } from "@/components/ui";
+import { Button, LoadingClock } from "@/components/ui/index";
 import { CircleCheck, Redo2 } from "lucide-react";
 import { WalletConnect } from "@/components/modals/wallet-connect";
 import { Status } from "@/types/contracts";
+import { Squircle } from "@squircle-js/react";
 
 interface ActionButtonProps {
   approvingStatus?: Status;
@@ -42,33 +43,37 @@ export const ActionButton: FC<ActionButtonProps> = ({
       {!isWalletConnected ? (
         <WalletConnect />
       ) : (
-        <Button
-          className="w-full mt-5 rounded-xl"
-          variant={getButtonVariant(approvingStatus, isLoading, isError)}
-          onClick={handleClick}
-          disabled={btnDisabled}
-        >
-          {getButtonContent(
-            isLoading,
-            loadingText,
-            isError,
-            isSuccess,
-            defaultText,
-            approvingStatus,
-            approvingErrorMsg,
-            isValidDestinationWallet,
-            isValidTokensInput,
-          )}
-        </Button>
+        <Squircle asChild cornerRadius={12} cornerSmoothing={1}>
+          <Button
+            className="w-full mt-5 rounded-xl"
+            variant={getButtonVariant(approvingStatus, isLoading, isError)}
+            onClick={handleClick}
+            disabled={btnDisabled}
+          >
+            {getButtonContent(
+              isLoading,
+              loadingText,
+              isError,
+              isSuccess,
+              defaultText,
+              approvingStatus,
+              approvingErrorMsg,
+              isValidDestinationWallet,
+              isValidTokensInput,
+            )}
+          </Button>
+        </Squircle>
       )}
 
       {handleClose && (
-        <Button
-          className="w-full mt-5 bg-black text-gray-700 border border-white border-opacity-50 hover:bg-gray-800 rounded-xl"
-          onClick={handleClose}
-        >
-          Cancel
-        </Button>
+        <Squircle asChild cornerRadius={12} cornerSmoothing={1}>
+          <Button
+            className="w-full mt-5 bg-black text-gray-700 border border-white border-opacity-50 hover:bg-gray-800 rounded-xl"
+            onClick={handleClose}
+          >
+            Cancel
+          </Button>
+        </Squircle>
       )}
     </>
   );

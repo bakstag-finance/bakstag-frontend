@@ -4,7 +4,7 @@ import { formatUnits } from "viem";
 import { useAcceptModal } from "./context";
 import { useAccount } from "wagmi";
 import { AddressDetailRow, DetailRow } from "@/components/molecules";
-import { ActionButton } from "@/components/molecules/action-button";
+import { ActionButton } from "@/components/ui/";
 import { formatNumberWithCommas } from "@/lib/helpers/formating";
 
 interface Props {

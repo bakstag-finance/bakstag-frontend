@@ -20,6 +20,7 @@ import { formatUnits } from "viem";
 import { Offer } from "@/types/offer";
 import { cn } from "@/lib/utils";
 import { formatNumberWithCommas } from "@/lib/helpers/formating";
+import { Squircle } from "@squircle-js/react";
 
 type ConnectModalStep = "main" | "wallet-choose" | "delete";
 
@@ -110,12 +111,14 @@ const FilterSection = ({
       value={timeFilter}
       onValueChange={(value) => setTimeFilter(value as FilterType)}
     >
-      <SelectTrigger
-        className="w-full ml-2 border rounded-md"
-        showChevronUpDown
-      >
-        <SelectValue placeholder="Most Recent" />
-      </SelectTrigger>
+      <Squircle asChild cornerRadius={12} cornerSmoothing={1}>
+        <SelectTrigger
+          className="w-full ml-2 border rounded-md"
+          showChevronUpDown
+        >
+          <SelectValue placeholder="Most Recent" />
+        </SelectTrigger>
+      </Squircle>
       <SelectContent
         className="bg-black text-white p-2 hover:border-gray-800 focus:border-gray-800"
         defaultValue="New"
