@@ -12,6 +12,7 @@ import {
 } from "@/components/ui";
 import {
   getTokenField,
+  handleContractError,
   hexStripsAddr,
   hexZeroPadTo32,
   isValidTokenAmount,
@@ -31,6 +32,7 @@ import {
 import { wagmiConfig } from "@/lib/wagmi/config";
 import { ethers } from "ethers";
 import AcceptModalProvider, { useAcceptModal } from "./context";
+import { otcMarketAbi } from "@/lib/wagmi/contracts/abi";
 
 const Modal = () => {
   const {
@@ -173,9 +175,11 @@ const Modal = () => {
             chainId: _dstTokenChainId,
           },
         ).catch((e) => {
-          const error = e as ReadContractErrorType;
-          console.log("Error", e);
-          throw new Error(error.name);
+          const errorMsg = handleContractError(
+            e as ReadContractErrorType,
+            otcMarketAbi,
+          );
+          throw new Error(errorMsg);
         });
 
         setInterval(() => {}, 1000);
@@ -195,9 +199,11 @@ const Modal = () => {
             args: [_abiConfig!.address, dstAmountLD],
             chainId: _dstTokenChainId,
           }).catch((e) => {
-            const error = e as WriteContractErrorType;
-            console.log("Error", e);
-            throw new Error(error.name);
+            const errorMsg = handleContractError(
+              e as WriteContractErrorType,
+              otcMarketAbi,
+            );
+            throw new Error(errorMsg);
           });
         }
 
@@ -216,9 +222,11 @@ const Modal = () => {
           value: _value,
           chainId: _dstTokenChainId,
         }).catch((e) => {
-          const error = e as WriteContractErrorType;
-          console.log("Error", e);
-          throw new Error(error.name);
+          const errorMsg = handleContractError(
+            e as WriteContractErrorType,
+            otcMarketAbi,
+          );
+          throw new Error(errorMsg);
         });
 
         if (txHash) {

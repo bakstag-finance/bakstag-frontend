@@ -26,12 +26,12 @@ export const AddressInput = ({ value, setValue, label }: Props) => {
       <Squircle asChild cornerRadius={12} cornerSmoothing={1}>
         <Input
           className={cn(
-            "mt-2 bg-black border rounded-lg",
+            "mt-2 bg-black border rounded-lg border-gray-800",
             isChanged
               ? isValid
-                ? "border-gray-800"
-                : "border-red-200 focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1"
-              : "border-gray-800",
+                ? "text-white"
+                : "text-red-200"
+              : "text-white",
           )}
           value={value}
           onChange={handleChange}

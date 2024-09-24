@@ -13,6 +13,7 @@ import {
   addressFormat,
   getScanLink,
   getTokenField,
+  handleContractError,
   hexZeroPadTo32,
 } from "@/lib/helpers";
 import {
@@ -20,6 +21,7 @@ import {
   readContract,
   ReadContractErrorType,
   writeContract,
+  WriteContractErrorType,
 } from "@wagmi/core";
 import { wagmiConfig } from "@/lib/wagmi/config";
 import { otcMarketAbi, otcMarketAddress } from "@/lib/wagmi/contracts/abi";
@@ -118,9 +120,11 @@ export const DeletingStep = ({ order, setStep, refetch }: Props) => {
         args: [order.offerId as `0x${string}`],
         chainId: dstChainId,
       }).catch((e) => {
-        const error = e as ReadContractErrorType;
-        console.log(error);
-        console.log("Error", error);
+        const errorMsg = handleContractError(
+          e as ReadContractErrorType,
+          otcMarketAbi,
+        );
+        throw new Error(errorMsg);
       });
 
       const _srcAddress = hexZeroPadTo32(
@@ -144,9 +148,11 @@ export const DeletingStep = ({ order, setStep, refetch }: Props) => {
         ],
         chainId: srcChainId,
       }).catch((e) => {
-        const error = e as ReadContractErrorType;
-        console.log(error.cause as ReadContractErrorType);
-        console.log("Error", error);
+        const errorMsg = handleContractError(
+          e as ReadContractErrorType,
+          otcMarketAbi,
+        );
+        throw new Error(errorMsg);
       });
 
       await switchChainAsync({
@@ -166,6 +172,12 @@ export const DeletingStep = ({ order, setStep, refetch }: Props) => {
         ],
         value: fee,
         chainId: srcChainId,
+      }).catch((e) => {
+        const errorMsg = handleContractError(
+          e as WriteContractErrorType,
+          otcMarketAbi,
+        );
+        throw new Error(errorMsg);
       });
 
       if (_txHash) {
@@ -190,7 +202,12 @@ export const DeletingStep = ({ order, setStep, refetch }: Props) => {
             .get(`/api/offer/info?txHash=${_txHash}&srcEid=${order.dstEid}`)
             .catch((e) => {
               setStatus("error");
-              console.log(e);
+
+              const errorMsg = handleContractError(
+                e as ReadContractErrorType,
+                otcMarketAbi,
+              );
+              console.log("ErrorMsg", errorMsg);
             });
 
           queryResult = receipt;
@@ -219,7 +236,7 @@ export const DeletingStep = ({ order, setStep, refetch }: Props) => {
     if (isPending) {
       return null;
     } else if (["idle", "error", "deleting-error"].includes(status)) {
-      deleteHandler();
+      void deleteHandler();
     } else if (status === "success") {
       setStep("main");
     }

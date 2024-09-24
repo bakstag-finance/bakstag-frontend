@@ -1,47 +1,86 @@
-import { decodeErrorResult, isHex } from "viem";
-import { otcMarketAbi } from "@/lib/wagmi/contracts/abi";
+import {
+  ContractFunctionExecutionError,
+  ContractFunctionExecutionErrorType,
+  ContractFunctionRevertedError,
+  decodeErrorResult,
+} from "viem";
+import { Abi } from "abitype";
+import {
+  SimulateContractErrorType,
+  WriteContractErrorType,
+  WaitForTransactionReceiptErrorType,
+  ReadContractErrorType,
+} from "@wagmi/core";
+import { BaseError } from "wagmi";
+import { splitCamelCase } from "@/lib/helpers/formating";
 
-const abis = [otcMarketAbi];
+interface ParseEvmTransactionLogArgs<TAbi extends Abi | readonly unknown[]> {
+  abi: TAbi;
+  error:
+    | ContractFunctionExecutionErrorType
+    | SimulateContractErrorType
+    | WriteContractErrorType
+    | WaitForTransactionReceiptErrorType
+    | ReadContractErrorType
+    | null;
+}
 
-const getContractErrorHashFromError = (error: any): string | undefined => {
-  if (error?.version && /viem/.test(error.version)) {
-    const code = error?.code;
+export const decodeEvmTransactionErrorResult = <
+  TAbi extends Abi | readonly unknown[],
+>({
+  error,
+  abi,
+}: ParseEvmTransactionLogArgs<TAbi>) => {
+  try {
+    if (
+      error instanceof BaseError ||
+      error instanceof ContractFunctionExecutionError
+    ) {
+      const revertError = error.walk(
+        (err) => err instanceof ContractFunctionRevertedError,
+      );
+      if (revertError instanceof ContractFunctionRevertedError) {
+        const errorName = revertError.data?.errorName ?? "";
 
-    if (!isHex(code) && error?.cause) {
-      return getContractErrorHashFromError(error.cause);
+        if (errorName) {
+          // This error is already decoded
+          const decodedError = revertError.data;
+          return { error, decodedError };
+        }
+      }
     }
 
-    return code;
+    if (
+      error?.cause instanceof ContractFunctionRevertedError &&
+      error?.cause?.signature
+    ) {
+      const decodedError = decodeErrorResult({
+        abi,
+        data: error?.cause?.signature,
+      });
+
+      return { decodedError, error };
+    }
+    return { error, decodedError: undefined };
+  } catch (_) {
+    return { error, decodedError: undefined };
   }
 };
 
-export default function getContractErrorInfo(error: any) {
-  const hex = getContractErrorHashFromError(error);
-
-  if (!isHex(hex)) {
-    return {
-      hex: null,
-      name: "Something Went Wrong",
-    };
-  }
-
-  let foundErrorName: any = null;
-
-  abis.some((abi) => {
-    try {
-      const { errorName } = decodeErrorResult({
-        abi,
-        data: hex,
-      });
-
-      foundErrorName = errorName;
-    } catch {}
-
-    return foundErrorName;
+export function handleContractError<T>(error: T, abi: Abi): string {
+  const res = decodeEvmTransactionErrorResult({
+    abi: abi,
+    error: error as WriteContractErrorType | ReadContractErrorType | null,
   });
 
-  return {
-    hex,
-    name: foundErrorName,
-  };
+  console.log("Result", res);
+
+  if (!res.decodedError) {
+    if (res.error?.cause === "createOffer") {
+      return splitCamelCase(res.error.name);
+    }
+    return (res.error as any).shortMessage;
+  }
+
+  return splitCamelCase(res.decodedError?.errorName || "");
 }

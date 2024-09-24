@@ -22,3 +22,7 @@ export const calculateSrcAmountPerOneDst = (
 ) => {
   return Number(srcAmount) / Number(dstAmount);
 };
+
+export const splitCamelCase = (value: string): string => {
+  return value.replace(/([a-z])([A-Z])/g, "$1 $2");
+};

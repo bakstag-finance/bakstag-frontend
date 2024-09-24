@@ -10,7 +10,7 @@ import {
   DialogTrigger,
   VisuallyHidden,
 } from "@/components/ui";
-import { hexZeroPadTo32, toSD } from "@/lib/helpers";
+import { handleContractError, hexZeroPadTo32, toSD } from "@/lib/helpers";
 import { useAccount, useSwitchChain } from "wagmi";
 import { tokensData } from "@/lib/constants";
 import { wagmiConfig } from "@/lib/wagmi/config";
@@ -28,6 +28,8 @@ import { FormStep } from "./form-step";
 import { LzFee, ChainIds } from "@/types/contracts";
 import CreateModalProvider, { useCreateModal } from "./context";
 import { Squircle } from "@squircle-js/react";
+import { decodeEvmTransactionErrorResult } from "@/lib/helpers";
+import { otcMarketAbi } from "@/lib/wagmi/contracts/abi";
 
 interface Props {
   buttonText: string;
@@ -119,6 +121,7 @@ const Modal = ({ buttonText, refetch }: Props) => {
     if (!isWalletConnected || approvingStatus === "success") {
       return null;
     }
+
     try {
       const {
         abiConfig,
@@ -179,11 +182,12 @@ const Modal = ({ buttonText, refetch }: Props) => {
             chainId: srcToken.chainId as any,
           },
         ).catch((e) => {
-          const error = e as ReadContractErrorType;
-          console.log(error);
-          throw new Error(error.shortMessage);
+          const errorMsg = handleContractError(
+            e as ReadContractErrorType,
+            otcMarketAbi,
+          );
+          throw new Error(errorMsg);
         });
-
         _lzFee = lzFee;
         _value =
           srcToken.tokenAddress == ethers.constants.AddressZero
@@ -198,9 +202,11 @@ const Modal = ({ buttonText, refetch }: Props) => {
             args: [abiConfig.address, srcAmountLD],
             chainId: srcToken.chainId,
           }).catch((e) => {
-            const error = e as WriteContractErrorType;
-            console.log(error);
-            throw new Error(error.name);
+            const errorMsg = handleContractError(
+              e as WriteContractErrorType,
+              otcMarketAbi,
+            );
+            throw new Error(errorMsg);
           });
         }
 
@@ -231,9 +237,11 @@ const Modal = ({ buttonText, refetch }: Props) => {
           value: _value,
           chainId: srcToken.chainId,
         }).catch((e) => {
-          const error = e as WriteContractErrorType;
-          console.log(error);
-          throw new Error(error.name);
+          const errorMsg = handleContractError(
+            e as WriteContractErrorType,
+            otcMarketAbi,
+          );
+          throw new Error(errorMsg);
         });
 
         if (txHash) {

@@ -9,7 +9,6 @@ import { cn } from "@/lib/utils";
 import { Input } from "./input";
 import { validateTokenAmount } from "@/lib/helpers";
 import { Squircle } from "@squircle-js/react";
-import { Button } from "@/components/ui/button";
 
 interface Props extends InputHTMLAttributes<HTMLInputElement> {
   value: string;
@@ -35,13 +34,9 @@ export const TokenInput = ({ value, setValue, className, ...props }: Props) => {
     >
       <Input
         className={cn(
-          "mt-2 bg-black border rounded-lg",
+          "mt-2 bg-black border rounded-lg border-gray-800",
           className,
-          isChanged
-            ? isValid
-              ? "border-gray-800"
-              : "border-red-200 focus-visible:ring-red-200 focus-visible:ring-offset-0 focus-visible:ring-1"
-            : "border-gray-800",
+          isChanged ? (isValid ? "text-white" : "text-red-200") : "text-white",
         )}
         placeholder={"0"}
         value={value}

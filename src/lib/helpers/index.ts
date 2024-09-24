@@ -1,7 +1,7 @@
 import {
   addressFormat,
   calculateSrcAmountPerOneDst,
-  formatNumberWithCommas,
+  splitCamelCase,
 } from "./formating";
 import {
   isEthAddress,
@@ -26,6 +26,11 @@ import { getScanLink } from "./get-scan-link";
 
 import { calculateTotalReceiveAmount } from "./calculation";
 
+import {
+  decodeEvmTransactionErrorResult,
+  handleContractError,
+} from "./decode-error";
+
 export {
   toSD,
   addressFormat,
@@ -44,4 +49,7 @@ export {
   calculateSrcAmountPerOneDst,
   calculateTotalReceiveAmount,
   validateTokenAmount,
+  splitCamelCase,
+  handleContractError,
+  decodeEvmTransactionErrorResult,
 };
