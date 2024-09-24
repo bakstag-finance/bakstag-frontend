@@ -79,6 +79,7 @@ export function handleContractError<T>(error: T, abi: Abi): string {
     if (res.error?.cause === "createOffer") {
       return splitCamelCase(res.error.name);
     }
+
     return (res.error as any).shortMessage;
   }
 

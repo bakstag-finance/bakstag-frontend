@@ -7,7 +7,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { ChainIds, Status } from "@/types/contracts";
 import { LAYER_ZERO_SCAN } from "@/lib/constants";
-import { getTransactionReceipt } from "@wagmi/core";
+import { waitForTransaction } from "@wagmi/core";
 import { wagmiConfig } from "@/lib/wagmi/config";
 import { useAcceptModal } from "@/components/modals/accept/context";
 import { useAccount } from "wagmi";
@@ -30,7 +30,7 @@ const handleTransaction = async (
   refetch: () => void,
 ) => {
   if (isMonochain) {
-    const receipt = await getTransactionReceipt(wagmiConfig, {
+    const receipt = await waitForTransaction(wagmiConfig, {
       hash: txHash as `0x${string}`,
       chainId: srcChainId as any,
     });
@@ -47,7 +47,7 @@ const handleTransaction = async (
     srcAmountLD: srcAmountLD,
   });
   setTransactionStatus("success");
-  await refetch();
+  void refetch();
   return null;
 };
 

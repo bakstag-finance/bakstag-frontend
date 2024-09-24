@@ -10,7 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowUpRight } from "lucide-react";
 import axios from "axios";
 import { tokensData } from "@/lib/constants";
-import { getTransactionReceipt, waitForTransactionReceipt } from "@wagmi/core";
+import { waitForTransaction } from "@wagmi/core";
 import { wagmiConfig } from "@/lib/wagmi/config";
 import Link from "next/link";
 import { Dispatch, SetStateAction } from "react";
@@ -50,7 +50,7 @@ const handleTransaction = async (
   refetch: () => void,
 ) => {
   if (isMonochain) {
-    const receipt = await getTransactionReceipt(wagmiConfig, {
+    const receipt = await waitForTransaction(wagmiConfig, {
       hash: transactionData.txHash as `0x${string}`,
       chainId: transactionData.srcChainId,
     });
@@ -63,11 +63,6 @@ const handleTransaction = async (
       `/api/offer/info?txHash=${transactionData.txHash}&srcEid=${transactionData.srcEid}`,
     );
   }
-
-  await waitForTransactionReceipt(wagmiConfig, {
-    chainId: transactionData.srcChainId,
-    hash: transactionData.txHash as `0x${string}`,
-  });
 
   await axios.post("/api/offer/add", {
     offerId: transactionData.offerId,

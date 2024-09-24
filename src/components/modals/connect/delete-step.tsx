@@ -20,6 +20,7 @@ import {
   getTransactionReceipt,
   readContract,
   ReadContractErrorType,
+  waitForTransaction,
   writeContract,
   WriteContractErrorType,
 } from "@wagmi/core";
@@ -31,6 +32,7 @@ import { formatUnits } from "viem";
 import Link from "next/link";
 import { DetailRow } from "@/components/molecules";
 import { formatNumberWithCommas } from "@/lib/helpers/formating";
+import { ChainIds } from "@/types/contracts";
 
 type Status =
   | "loading"
@@ -78,30 +80,143 @@ export const DeletingStep = ({ order, setStep, refetch }: Props) => {
 
   const deleteQuery = async () => {
     try {
-      const deleteQuery = await axios.post(`/api/offer/delete`, {
+      const response = await axios.post(`/api/offer/delete`, {
         offerId: order.offerId,
       });
 
-      if (deleteQuery.status === 200) {
+      if (response.status === 200) {
         setStatus("success");
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
       setStatus("deleting-error");
+    }
+  };
+
+  const executeTransaction = async (args: any, chainId: ChainIds) => {
+    try {
+      const _txHash = await writeContract(wagmiConfig, {
+        abi: otcMarketAbi,
+        address: otcMarketAddress,
+        functionName: "cancelOffer",
+        args,
+        value: args[1].nativeFee || BigInt(0),
+        chainId,
+      }).catch(e => {
+        const errorMsg = handleContractError(e as WriteContractErrorType, otcMarketAbi);
+        throw new Error(errorMsg);
+      });
+
+      setTxHash(_txHash);
+      setStatus("loading");
+
+      const data = await waitForTransaction(wagmiConfig, { hash: _txHash });
+
+      if (data.status === "reverted") throw new Error("Reverted transaction");
+
+      const txReceipt = await getTransactionReceipt(wagmiConfig, {
+        hash: _txHash,
+        chainId,
+      });
+
+      if (txReceipt.status === "reverted")
+        throw new Error("Reverted Transaction");
+
+      return _txHash;
+    } catch (e) {
+      console.error(e);
+      setStatus("error");
+      throw e;
+    }
+  };
+
+  const processMonochain = async (srcChainId: ChainIds) => {
+    const args = [
+      order.offerId as `0x${string}`,
+      { nativeFee: BigInt(0), lzTokenFee: BigInt(0) },
+      "" as `0x${string}`,
+    ];
+
+    const _txHash = await executeTransaction(args, srcChainId);
+
+    if (_txHash) {
+      setStatus("deleting");
+      await deleteQuery();
+      refetch();
+      setStatus("success");
+    }
+  };
+
+  const processCrossChain = async (
+    srcChainId: ChainIds,
+    dstChainId: ChainIds,
+  ) => {
+    const quoteCancelOffer = await readContract(wagmiConfig, {
+      abi: otcMarketAbi,
+      address: otcMarketAddress,
+      functionName: "quoteCancelOffer",
+      args: [order.offerId as `0x${string}`],
+      chainId: dstChainId,
+    }).catch(e => {
+      const errorMsg = handleContractError(e as ReadContractErrorType, otcMarketAbi);
+      throw new Error(errorMsg);
+    });
+
+    const _srcAddress = hexZeroPadTo32(order.srcSellerAddress as `0x${string}`);
+    const _options = Options.newOptions().addExecutorLzReceiveOption(
+      quoteCancelOffer!.lzTokenFee,
+      quoteCancelOffer!.nativeFee,
+    );
+
+    const quoteCancelOfferFee = await readContract(wagmiConfig, {
+      abi: otcMarketAbi,
+      address: otcMarketAddress,
+      functionName: "quoteCancelOfferOrder",
+      args: [
+        _srcAddress,
+        order.offerId as `0x${string}`,
+        _options.toHex() as `0x${string}`,
+        false,
+      ],
+      chainId: srcChainId,
+    }).catch(e => {
+      const errorMsg = handleContractError(e as ReadContractErrorType, otcMarketAbi);
+      throw new Error(errorMsg);
+    });
+
+    await switchChainAsync({ chainId: srcChainId! });
+
+    const args = [
+      order.offerId as `0x${string}`,
+      quoteCancelOfferFee!,
+      _options.toHex() as `0x${string}`,
+    ];
+
+    const _txHash = await executeTransaction(args, srcChainId);
+
+    if (_txHash) {
+      const receipt = await axios.get(
+        `/api/offer/info?txHash=${_txHash}&srcEid=${order.dstEid}`,
+      );
+      if (receipt) {
+        setStatus("deleting");
+        await deleteQuery();
+        refetch();
+        setStatus("success");
+      }
     }
   };
 
   const deleteHandler = async () => {
     try {
-      if (order.offerId.length === 0) {
+      if (!order.offerId) {
         console.log("No order details");
-        return null;
+        return;
       }
 
       setStatus("loading");
 
       const isMonochain = order.dstTokenNetwork === order.srcTokenNetwork;
-
       const dstChainId = getTokenField(
         order.dstTokenTicker,
         order.dstTokenNetwork,
@@ -113,119 +228,14 @@ export const DeletingStep = ({ order, setStep, refetch }: Props) => {
         "chainId",
       );
 
-      const quoteCancelOffer = await readContract(wagmiConfig, {
-        abi: otcMarketAbi,
-        address: otcMarketAddress,
-        functionName: "quoteCancelOffer",
-        args: [order.offerId as `0x${string}`],
-        chainId: dstChainId,
-      }).catch((e) => {
-        const errorMsg = handleContractError(
-          e as ReadContractErrorType,
-          otcMarketAbi,
-        );
-        throw new Error(errorMsg);
-      });
-
-      const _srcAddress = hexZeroPadTo32(
-        order.srcSellerAddress as `0x${string}`,
-      );
-
-      const _options = Options.newOptions().addExecutorLzReceiveOption(
-        quoteCancelOffer!.lzTokenFee,
-        quoteCancelOffer!.nativeFee,
-      );
-
-      const qureCancelOfferFee = await readContract(wagmiConfig, {
-        abi: otcMarketAbi,
-        address: otcMarketAddress,
-        functionName: "quoteCancelOfferOrder",
-        args: [
-          _srcAddress,
-          order.offerId as `0x${string}`,
-          _options.toHex() as `0x${string}`,
-          false,
-        ],
-        chainId: srcChainId,
-      }).catch((e) => {
-        const errorMsg = handleContractError(
-          e as ReadContractErrorType,
-          otcMarketAbi,
-        );
-        throw new Error(errorMsg);
-      });
-
-      await switchChainAsync({
-        chainId: srcChainId!,
-      });
-
-      const fee = qureCancelOfferFee!.nativeFee;
-
-      const _txHash = await writeContract(wagmiConfig, {
-        abi: otcMarketAbi,
-        address: otcMarketAddress,
-        functionName: "cancelOffer",
-        args: [
-          order.offerId as `0x${string}`,
-          qureCancelOfferFee!,
-          _options.toHex() as `0x${string}`,
-        ],
-        value: fee,
-        chainId: srcChainId,
-      }).catch((e) => {
-        const errorMsg = handleContractError(
-          e as WriteContractErrorType,
-          otcMarketAbi,
-        );
-        throw new Error(errorMsg);
-      });
-
-      if (_txHash) {
-        setTxHash(_txHash);
-        setStatus("loading");
-
-        let queryResult;
-
-        if (isMonochain) {
-          const receipt = await getTransactionReceipt(wagmiConfig, {
-            hash: txHash as `0x${string}`,
-            chainId: srcChainId as any,
-          });
-
-          if (receipt.status == "reverted") {
-            throw new Error("Reverted Transaction");
-          }
-
-          queryResult = receipt;
-        } else {
-          const receipt = await axios
-            .get(`/api/offer/info?txHash=${_txHash}&srcEid=${order.dstEid}`)
-            .catch((e) => {
-              setStatus("error");
-
-              const errorMsg = handleContractError(
-                e as ReadContractErrorType,
-                otcMarketAbi,
-              );
-              console.log("ErrorMsg", errorMsg);
-            });
-
-          queryResult = receipt;
-        }
-
-        if (queryResult) {
-          setStatus("deleting");
-
-          void deleteQuery();
-          void refetch();
-          setStatus("success");
-        }
+      if (isMonochain) {
+        await processMonochain(srcChainId);
       } else {
-        throw new Error("No txHash");
+        await processCrossChain(srcChainId, dstChainId);
       }
     } catch (e) {
+      console.error(e);
       setStatus("error");
-      console.log(e);
     }
   };
 

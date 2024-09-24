@@ -28,7 +28,6 @@ import { FormStep } from "./form-step";
 import { LzFee, ChainIds } from "@/types/contracts";
 import CreateModalProvider, { useCreateModal } from "./context";
 import { Squircle } from "@squircle-js/react";
-import { decodeEvmTransactionErrorResult } from "@/lib/helpers";
 import { otcMarketAbi } from "@/lib/wagmi/contracts/abi";
 
 interface Props {
