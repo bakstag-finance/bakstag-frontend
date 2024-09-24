@@ -102,8 +102,11 @@ export const DeletingStep = ({ order, setStep, refetch }: Props) => {
         args,
         value: args[1].nativeFee || BigInt(0),
         chainId,
-      }).catch(e => {
-        const errorMsg = handleContractError(e as WriteContractErrorType, otcMarketAbi);
+      }).catch((e) => {
+        const errorMsg = handleContractError(
+          e as WriteContractErrorType,
+          otcMarketAbi,
+        );
         throw new Error(errorMsg);
       });
 
@@ -157,8 +160,11 @@ export const DeletingStep = ({ order, setStep, refetch }: Props) => {
       functionName: "quoteCancelOffer",
       args: [order.offerId as `0x${string}`],
       chainId: dstChainId,
-    }).catch(e => {
-      const errorMsg = handleContractError(e as ReadContractErrorType, otcMarketAbi);
+    }).catch((e) => {
+      const errorMsg = handleContractError(
+        e as ReadContractErrorType,
+        otcMarketAbi,
+      );
       throw new Error(errorMsg);
     });
 
@@ -179,8 +185,11 @@ export const DeletingStep = ({ order, setStep, refetch }: Props) => {
         false,
       ],
       chainId: srcChainId,
-    }).catch(e => {
-      const errorMsg = handleContractError(e as ReadContractErrorType, otcMarketAbi);
+    }).catch((e) => {
+      const errorMsg = handleContractError(
+        e as ReadContractErrorType,
+        otcMarketAbi,
+      );
       throw new Error(errorMsg);
     });
 

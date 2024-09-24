@@ -44,6 +44,6 @@ export const TokenInput = ({ value, setValue, className, ...props }: Props) => {
         required
         {...props}
       />
-    </Squircle>
+   </Squircle>
   );
 };

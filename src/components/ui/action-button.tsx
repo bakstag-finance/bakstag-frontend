@@ -45,7 +45,7 @@ export const ActionButton: FC<ActionButtonProps> = ({
       ) : (
         <Squircle asChild cornerRadius={12} cornerSmoothing={1}>
           <Button
-            className="w-full mt-5 rounded-xl"
+            className="w-full mt-4 rounded-xl font-light"
             variant={getButtonVariant(approvingStatus, isLoading, isError)}
             onClick={handleClick}
             disabled={btnDisabled}
@@ -68,7 +68,7 @@ export const ActionButton: FC<ActionButtonProps> = ({
       {handleClose && (
         <Squircle asChild cornerRadius={12} cornerSmoothing={1}>
           <Button
-            className="w-full mt-5 bg-black text-gray-700 border border-white border-opacity-50 hover:bg-gray-800 rounded-xl"
+            className="w-full mt-4 bg-black text-gray-700 border border-white border-opacity-50 hover:bg-gray-800 rounded-xl font-light"
             onClick={handleClose}
           >
             Cancel

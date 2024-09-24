@@ -1,4 +1,4 @@
-import { AddressInput, Button, SelectCoin, TokenInput } from "@/components/ui";
+import {AddressInput, Button, SelectCoin, Skeleton, TokenInput} from "@/components/ui";
 import { tokensData } from "@/lib/constants";
 import {
   calculateTotalReceiveAmount,
@@ -12,6 +12,7 @@ import { formatNumberWithCommas } from "@/lib/helpers/formating";
 import { useCreateModal } from "@/components/modals/create/context";
 import { useAccount } from "wagmi";
 import { ActionButton } from "@/components/ui";
+import {Squircle} from "@squircle-js/react";
 
 interface FormStepProps {
   handleCreateSwap: () => void;
@@ -35,7 +36,7 @@ export const FormStep = ({ handleCreateSwap, handleClose }: FormStepProps) => {
   } = useCreateModal();
 
   const { address } = useAccount();
-  const isWalletConnected = !!address;
+
   const isValidDestinationWallet = isValidCryptoAddress(destinationWallet);
 
   const totalReceiveAmount = calculateTotalReceiveAmount(
@@ -64,8 +65,10 @@ export const FormStep = ({ handleCreateSwap, handleClose }: FormStepProps) => {
         tokenAmount={dstTokenAmount}
         setTokenAmount={setDstTokenAmount}
         placeholder="0"
-        className={"mt-5"}
         isExchangeRate={true}
+        selectedDstToken={selectedDstToken}
+        selectedSrcToken={selectedSrcToken}
+        className={"mt-5"}
       />
       <AddressInput
         label="Destination Wallet Address"
@@ -108,6 +111,8 @@ const TokenAmountInput = ({
   placeholder,
   className,
   isExchangeRate = false,
+    selectedDstToken,
+    selectedSrcToken
 }: {
   label: string;
   selectedToken: string;
@@ -117,11 +122,13 @@ const TokenAmountInput = ({
   placeholder: string;
   className?: string;
   isExchangeRate: boolean;
+  selectedSrcToken?: string;
+  selectedDstToken?: string;
 }) => {
   return (
     <div
       className={cn(
-        "flex flex-row justify-between items-center text-xs",
+        "w-full flex flex-col justify-between items-center text-xs",
         className,
       )}
     >
@@ -134,39 +141,59 @@ const TokenAmountInput = ({
           setValue={setSelectedToken}
         />
       </div>
-      <div className="ml-2 w-full flex flex-col justify-between items-start">
-        <span className="text-gray-700 ml-3">
-          {isExchangeRate ? "Set Exchange Rate" : "Amount to sell"}
+      <div className="mt-5 w-full flex flex-col justify-between items-start">
+        <span className={"text-gray-700 ml-3"}>
+          {isExchangeRate ? "Exchange Rate" : "Amount to sell"}
         </span>
-        <TokenInput
-          value={tokenAmount}
-          setValue={setTokenAmount}
-          placeholder={placeholder}
-        />
+          <div className={cn("flex justify-center items-center w-full")}>
+              <TokenInput
+                  value={tokenAmount}
+                  setValue={setTokenAmount}
+                  placeholder={placeholder}
+                  className={isExchangeRate ? "w-1/2 float-right" : ""}
+              />
+              {
+                  isExchangeRate ? selectedSrcToken && selectedDstToken ? (
+                      <span className={"w-full h-full ml-3 mt-2 text-white flex flex-row justify-start items-center"}>
+                          <span className={"text-[14px] font-light"}>
+                  {tokensData[selectedDstToken].token +
+                  " "}
+                              <span className={"text-gray-700"}>
+                ({tokensData[selectedDstToken].network}){" "}
+              </span> = 1 <span>{tokensData[selectedSrcToken].token}</span>{" "}
+                                            <span className={"text-gray-700"}>
+                                                {" "}({tokensData[selectedSrcToken].network})</span>
+            </span>
+                      </span>
+                  ) : (
+                          <Skeleton className={"ml-3 h-10 w-full mt-2 rounded-xl"}/>
+                  ) : null
+              }
+          </div>
       </div>
     </div>
   );
 };
 
 const Summary = ({
-  selectedSrcToken,
-  srcTokenAmount,
-  selectedDstToken,
-  exchangeRate,
-  destinationWallet,
-  srcAddress,
-  totalReceiveAmount,
-}: {
-  selectedSrcToken: string;
-  srcTokenAmount: string;
-  selectedDstToken: string;
-  exchangeRate: string;
-  destinationWallet: string;
-  srcAddress: `0x${string}` | undefined;
-  totalReceiveAmount: number;
+                     selectedSrcToken,
+                     srcTokenAmount,
+                     selectedDstToken,
+                     exchangeRate,
+                     destinationWallet,
+                     srcAddress,
+                     totalReceiveAmount,
+                 }: {
+    selectedSrcToken: string;
+    srcTokenAmount: string;
+    selectedDstToken: string;
+    exchangeRate: string;
+    destinationWallet: string;
+    srcAddress: `0x${string}` | undefined;
+    totalReceiveAmount: number;
 }) => {
-  const isShowExchangeRate =
-    selectedDstToken && selectedSrcToken && exchangeRate && srcTokenAmount;
+    const isShowExchangeRate =
+        selectedDstToken && selectedSrcToken && exchangeRate && srcTokenAmount;
 
   const isShowTotalReceiveAmount = exchangeRate && selectedDstToken;
 

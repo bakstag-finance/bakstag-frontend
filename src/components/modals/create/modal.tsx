@@ -316,7 +316,7 @@ const Modal = ({ buttonText, refetch }: Props) => {
       <DialogOverlay>
         <DialogContent
           className={
-            "no-scrollbar w-full h-[90%] md:h-auto overflow-y-scroll max-w-[380px] bg-black"
+            "no-scrollbar w-full h-full max-h-[90%] md:h-auto overflow-y-scroll max-w-[380px] bg-black-800"
           }
         >
           <VisuallyHidden>
@@ -327,7 +327,7 @@ const Modal = ({ buttonText, refetch }: Props) => {
           </VisuallyHidden>
           <div className={"w-full flex justify-center items-center flex-col"}>
             {renderStepContent()}
-            <span className={"text-gray-700 text-xs mt-3 text-justify"}>
+            <span className={"text-gray-700 text-xs mt-3 text-left px-2"}>
               Assets will be locked. Once the ad is accepted by the buyer, the
               assets will be automatically sent to the destination wallet
               address you provided. Please verify all details before confirming.

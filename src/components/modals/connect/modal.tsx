@@ -259,7 +259,7 @@ export const ConnectModal = ({ refetch }: Props) => {
           </Button>
         </Squircle>
       </DialogTrigger>
-      <DialogContent className="no-scrollbar w-full max-w-[380px] bg-black transition-all duration-1000 ease-linear">
+      <DialogContent className="no-scrollbar w-full max-w-[380px] bg-black-800 transition-all duration-1000 ease-linear">
         <VisuallyHidden>
           <DialogTitle></DialogTitle>
         </VisuallyHidden>
