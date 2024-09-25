@@ -128,13 +128,19 @@ export const ConnectModal = ({ refetch }: Props) => {
                 account.address,
                 isWalletConnected,
                 "Ethereum",
-                metamaskWalletHandler,
+                () => {
+                  setStep("wallet-choose");
+                  setWalletTabStep("ethereum");
+                },
               )}
               {renderWalletButton(
                 solanaWallet.publicKey?.toString(),
                 isSolanaWalletConnected,
                 "Solana",
-                solanaWalletHandler,
+                () => {
+                  setStep("wallet-choose");
+                  setWalletTabStep("solana");
+                },
               )}
             </div>
           </TabsContent>
