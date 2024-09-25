@@ -147,9 +147,7 @@ export const OffersTable = () => {
               onClick={handleSortByRate}
             >
               Exchange Rate
-              {sortByRate !== null && (
-                <ArrowDownUp className="ml-2 stroke-white" size={13} />
-              )}
+              {renderIcon(sortByRate)}
             </span>
             <span
               className={cn(
@@ -159,12 +157,7 @@ export const OffersTable = () => {
               onClick={handleSortByAmount}
             >
               Max Amount
-              {sortByAmount === "asc" && (
-                <ArrowUp className="ml-2 stroke-white" size={13} />
-              )}
-              {sortByAmount === "desc" && (
-                <ArrowDown className="ml-2 stroke-white" size={13} />
-              )}
+              {renderIcon(sortByAmount)}
             </span>
             <span className="text-end pr-5 w-[160px]">Trade</span>
           </div>
@@ -203,4 +196,14 @@ export const OffersTable = () => {
       </div>
     </>
   );
+};
+
+const renderIcon = (sortStatus: "asc" | "desc" | null) => {
+  if (sortStatus === "asc") {
+    return <ArrowUp className="ml-2 stroke-white" size={13} />;
+  }
+  if (sortStatus === "desc") {
+    return <ArrowDown className="ml-2 stroke-white" size={13} />;
+  }
+  return <ArrowDownUp className="ml-2 stroke-gray-700" size={13} />;
 };
