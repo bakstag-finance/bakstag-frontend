@@ -54,7 +54,7 @@ const config = {
         },
         black: {
           DEFAULT: "#000000",
-          800: "#09090B"
+          800: "#09090B",
         },
         gray: {
           100: "#FAFAFA",
