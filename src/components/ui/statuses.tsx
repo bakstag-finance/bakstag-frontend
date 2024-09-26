@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { LoadingClock } from "@/components/ui/loading-clock";
 import { CreateModal } from "@/components/modals";
-import { Ghost } from "lucide-react";
+import { Clock, Ghost } from "lucide-react";
 import { Squircle } from "@squircle-js/react";
+import { Suspense } from "react";
 
 interface Props {
   refetch: () => void;
@@ -15,11 +16,22 @@ interface Props {
 export const LoadingComponent = () => {
   return (
     <div className="flex justify-center items-center h-full my-full">
-      <Squircle asChild cornerRadius={12} cornerSmoothing={1}>
-        <Button variant="secondary" className={"rounded-xl"}>
-          <LoadingClock className={"w-6 h-6 mr-1"} /> Fetching Ads
-        </Button>
-      </Squircle>
+      <Suspense
+        fallback={
+          <Button variant="secondary" className={"rounded-xl"}>
+            <Clock className={"w-6 h-6 mr-1"} />
+          </Button>
+        }
+      >
+        <Squircle asChild cornerRadius={12} cornerSmoothing={1}>
+          <Button variant="secondary" className={"rounded-xl"}>
+            <Suspense fallback={<Clock className={"w-6 h-6 mr-1"} />}>
+              <LoadingClock className={"w-6 h-6 mr-1"} />
+            </Suspense>{" "}
+            Fetching Ads
+          </Button>
+        </Squircle>
+      </Suspense>
     </div>
   );
 };

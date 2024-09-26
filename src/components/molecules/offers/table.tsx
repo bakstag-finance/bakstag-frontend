@@ -10,8 +10,8 @@ import {
 import { cn } from "@/lib/utils";
 import { ConnectModal } from "@/components/modals";
 import { TableItem } from "@/components/molecules";
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect, useRef } from "react";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { Offer } from "@/types/offer";
 import axios from "axios";
 import { ArrowDown, ArrowDownUp, ArrowUp } from "lucide-react";
@@ -24,20 +24,29 @@ export const OffersTable = () => {
   const [sortByAmount, setSortByAmount] = useState<"asc" | "desc" | null>(null);
   const [sortByRate, setSortByRate] = useState<"asc" | "desc" | null>(null);
 
-  const {
-    data: tableData,
-    isError,
-    isLoading,
-    refetch,
-  } = useQuery<Offer[]>({
-    queryKey: ["home-page-ads", tokenToBuy, tokenToSell, amountToBuy],
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [allOffers, setAllOffers] = useState<Offer[]>([]);
+
+  const { data, isError, isLoading, isFetching, refetch } = useQuery<Offer[]>({
+    queryKey: ["home-page-ads", tokenToBuy, tokenToSell, amountToBuy, page],
     queryFn: async () => {
       const result = await axios.get(
-        `/api/offer/get_all?tokenToBuy=${tokenToBuy}&tokenToSell=${tokenToSell}&amountToBuy=${amountToBuy}&showEmpty=${false}`,
+        `/api/offer/get_all?tokenToBuy=${tokenToBuy}&tokenToSell=${tokenToSell}&amountToBuy=${amountToBuy}&page=${page}&limit=15&showEmpty=${false}`,
       );
-      return result.data.orders || [];
+      void sideQueryPagination(result.data.offers || []);
+      return result.data.offers || [];
     },
+    placeholderData: keepPreviousData,
   });
+
+  const sideQueryPagination = (newData: Offer[]) => {
+    if (newData.length === 0) {
+      setHasMore(false);
+    } else {
+      setAllOffers((prev) => [...prev, ...newData]);
+    }
+  };
 
   const sortTableData = (data: Offer[]) => {
     let sortedData = [...data];
@@ -59,7 +68,7 @@ export const OffersTable = () => {
     return sortedData;
   };
 
-  const sortedTableData = tableData ? sortTableData(tableData) : [];
+  const sortedTableData = sortTableData(allOffers);
 
   const handleSortByAmount = () => {
     if (sortByAmount === "asc") {
@@ -86,6 +95,31 @@ export const OffersTable = () => {
   const isEmptyAdsList = sortedTableData && sortedTableData.length === 0;
   const heightOfTable =
     isEmptyAdsList || isLoading || isError ? "h-[425px]" : "flex-grow";
+
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastOfferElementRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (isFetching || !hasMore) return;
+
+    const callback = (entries: IntersectionObserverEntry[]) => {
+      const [entry] = entries;
+      if (entry.isIntersecting) {
+        setPage((prevPage) => prevPage + 1);
+      }
+    };
+
+    observer.current = new IntersectionObserver(callback);
+    if (lastOfferElementRef.current) {
+      observer.current.observe(lastOfferElementRef.current);
+    }
+
+    return () => {
+      if (observer.current) {
+        observer.current.disconnect();
+      }
+    };
+  }, [isFetching, hasMore]);
 
   return (
     <>
@@ -130,6 +164,7 @@ export const OffersTable = () => {
           </div>
         </div>
       </div>
+
       <div
         className={cn(
           "mt-5 lg:mt-2 w-full border overflow-y-auto scroll-smooth border-gray-800 rounded-xl flex flex-col justify-start items-center",
@@ -156,54 +191,64 @@ export const OffersTable = () => {
               )}
               onClick={handleSortByAmount}
             >
-              Max Amount
+              Amount
               {renderIcon(sortByAmount)}
             </span>
-            <span className="text-end pr-5 w-[160px]">Trade</span>
           </div>
         </div>
 
         {isLoading && <LoadingComponent />}
-
         {isError && <ErrorComponent refetch={refetch} />}
 
-        {isEmptyAdsList && <EmptyComponent refetch={refetch} />}
+        {!isLoading && !isError && isEmptyAdsList && (
+          <EmptyComponent refetch={refetch} />
+        )}
 
-        {sortedTableData &&
-          sortedTableData.map((item: any, i: number) => (
-            <TableItem
-              refetch={refetch}
-              order={{
-                srcAmountLD: item.srcAmountLD,
-                srcToken: {
-                  ticker: item.srcTokenTicker,
-                  network: item.srcTokenNetwork,
-                },
-                dstToken: {
-                  ticker: item.dstTokenTicker,
-                  network: item.dstTokenNetwork,
-                },
-                offerId: item.offerId,
-                srcTokenAddress: item.srcTokenAddress,
-                dstTokenAddress: item.dstTokenAddress,
-                exchangeRateSD: item.exchangeRateSD,
-                dstSellerAddress: item.dstSellerAddress,
-              }}
-              key={`order-id-${i}`}
-              isLast={i === sortedTableData.length - 1}
-            />
-          ))}
+        {!isLoading && !isError && !isEmptyAdsList && (
+          <div className="w-full flex-grow flex flex-col items-center justify-start">
+            {sortedTableData.map((offer, idx) => (
+              <TableItem
+                key={`offer-${offer?.offerId}`}
+                offer={{
+                  srcAmountLD: offer.srcAmountLD.toString(),
+                  srcToken: {
+                    ticker: offer.srcTokenTicker,
+                    network: offer.srcTokenNetwork,
+                  },
+                  dstToken: {
+                    ticker: offer.dstTokenTicker,
+                    network: offer.dstTokenNetwork,
+                  },
+                  offerId: offer.offerId,
+                  srcTokenAddress: offer.srcTokenAddress,
+                  dstTokenAddress: offer.dstTokenAddress,
+                  exchangeRateSD: offer.exchangeRateSD.toString(),
+                  dstSellerAddress: offer.dstSellerAddress,
+                }}
+                refetch={refetch}
+                isLast={idx === sortedTableData.length - 1}
+                ref={
+                  idx === sortedTableData.length - 1
+                    ? lastOfferElementRef
+                    : null
+                }
+              />
+            ))}
+          </div>
+        )}
+
+        {isFetching && hasMore && !isLoading && (
+          <div className="py-5 flex justify-center w-full">
+            <LoadingComponent />
+          </div>
+        )}
       </div>
     </>
   );
 };
 
-const renderIcon = (sortStatus: "asc" | "desc" | null) => {
-  if (sortStatus === "asc") {
-    return <ArrowUp className="ml-2 stroke-white" size={13} />;
-  }
-  if (sortStatus === "desc") {
-    return <ArrowDown className="ml-2 stroke-white" size={13} />;
-  }
-  return <ArrowDownUp className="ml-2 stroke-gray-700" size={13} />;
+const renderIcon = (sortState: "asc" | "desc" | null) => {
+  if (sortState === "asc") return <ArrowUp size={16} />;
+  if (sortState === "desc") return <ArrowDown size={16} />;
+  return <ArrowDownUp size={16} />;
 };

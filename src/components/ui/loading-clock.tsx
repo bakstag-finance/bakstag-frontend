@@ -28,7 +28,7 @@ function Lotie({ src, loop, renderer, className }: Props): React.ReactNode {
 
       return () => animation.destroy();
     }
-  }, [lottie]);
+  }, [loop, lottie, renderer, src]);
 
   return <div ref={ref} className={className}></div>;
 }

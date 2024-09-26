@@ -1,5 +1,16 @@
-import { Trash } from "lucide-react";
+import {
+  Dispatch,
+  SetStateAction,
+  forwardRef,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import axios from "axios";
+
+import { useQuery } from "@tanstack/react-query";
 import { CreateModal } from "@/components/modals/create";
+
 import {
   SelectCoin,
   Select,
@@ -12,15 +23,16 @@ import {
   ErrorComponent,
   EmptyComponent,
 } from "@/components/ui";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Squircle } from "@squircle-js/react";
+
 import { useAccount } from "wagmi";
 import { formatUnits } from "viem";
+
 import { Offer } from "@/types/offer";
 import { cn } from "@/lib/utils";
 import { formatNumberWithCommas } from "@/lib/helpers/formating";
-import { Squircle } from "@squircle-js/react";
+
+import { Trash } from "lucide-react";
 
 type ConnectModalStep = "main" | "wallet-choose" | "delete";
 
@@ -35,39 +47,87 @@ export const TableComponent = ({ setStep, setOrderData }: Props) => {
   const [tokenToBuy, setTokenToBuy] = useState("");
   const [timeFilter, setTimeFilter] = useState<FilterType>("new");
 
-  const isWalletConntected = !!address;
+  const isWalletConnected = !!address;
+
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [allOffers, setAllOffers] = useState<Offer[]>([]);
+
   const {
     data: tableData,
     isLoading,
     isError,
+    isFetching,
     refetch,
   } = useQuery<Offer[]>({
-    queryKey: ["table-ads", tokenToBuy, address, timeFilter],
+    queryKey: ["table-ads", tokenToBuy, address, timeFilter, page],
     queryFn: async () => {
       const result = await axios.get(
         `/api/offer/get_all?tokenToBuy=${tokenToBuy}&address=${address}&amountToBuy=0&showEmpty=true`,
       );
-      let orders = result.data.orders;
+      let offers = result.data.offers || [];
 
-      if (timeFilter === "new") {
-        orders = orders.sort(
-          (a: Offer, b: Offer) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-        );
-      } else if (timeFilter === "old") {
-        orders = orders.sort(
-          (a: Offer, b: Offer) =>
-            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-        );
-      }
-
-      return orders;
+      void sideQueryPagination(offers);
+      return offers;
     },
   });
 
+  const sortByTime = (data: Offer[]) => {
+    let offers;
+
+    if (timeFilter === "new") {
+      offers = data.sort(
+        (a: Offer, b: Offer) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      );
+    } else if (timeFilter === "old") {
+      offers = data.sort(
+        (a: Offer, b: Offer) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      );
+    }
+
+    return offers;
+  };
+
+  const sortedTableData = sortByTime(allOffers);
+
+  const sideQueryPagination = (newData: Offer[]) => {
+    if (newData.length === 0) {
+      setHasMore(false);
+    } else {
+      setAllOffers((prev) => [...prev, ...newData]);
+    }
+  };
+
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastOfferElementRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (isFetching || !hasMore) return;
+
+    const callback = (entries: IntersectionObserverEntry[]) => {
+      const [entry] = entries;
+      if (entry.isIntersecting) {
+        setPage((prevPage) => prevPage + 1);
+      }
+    };
+
+    observer.current = new IntersectionObserver(callback);
+    if (lastOfferElementRef.current) {
+      observer.current.observe(lastOfferElementRef.current);
+    }
+
+    return () => {
+      if (observer.current) {
+        observer.current.disconnect();
+      }
+    };
+  }, [isFetching, hasMore]);
+
   return (
     <div className="w-full flex flex-col">
-      {isWalletConntected && tableData && tableData.length >= 2 && (
+      {isWalletConnected && sortedTableData && sortedTableData.length >= 2 && (
         <FilterSection
           tokenToBuy={tokenToBuy}
           setTokenToBuy={setTokenToBuy}
@@ -76,12 +136,15 @@ export const TableComponent = ({ setStep, setOrderData }: Props) => {
         />
       )}
       <TableContent
-        tableData={tableData || []}
+        tableData={sortedTableData || []}
         isLoading={isLoading}
+        isFetching={isFetching}
         isError={isError}
         refetch={refetch}
         setStep={setStep}
+        hasMore={hasMore}
         setOrderData={setOrderData}
+        lastOfferElementRef={lastOfferElementRef}
       />
       <div className="mt-5">
         <CreateModal buttonText={"Create Ad"} refetch={refetch} />
@@ -136,16 +199,22 @@ const TableContent = ({
   tableData,
   isLoading,
   isError,
+  isFetching,
   refetch,
   setStep,
   setOrderData,
+  hasMore,
+  lastOfferElementRef,
 }: {
   tableData: Offer[];
   isLoading: boolean;
   isError: boolean;
+  isFetching: boolean;
+  hasMore: boolean;
   refetch: () => void;
   setStep: Dispatch<SetStateAction<ConnectModalStep>>;
   setOrderData: Dispatch<SetStateAction<Offer>>;
+  lastOfferElementRef: React.Ref<HTMLDivElement>;
 }) => (
   <div className="mt-5 w-full flex flex-col h-64 overflow-y-scroll no-scrollbar rounded-xl border border-gray-800 p-2">
     {isLoading && <LoadingComponent />}
@@ -168,24 +237,29 @@ const TableContent = ({
             setStep={setStep}
             setOrderData={setOrderData}
             isLast={i === tableData.length - 1}
+            ref={i === tableData.length - 1 ? lastOfferElementRef : null}
           />
         ))}
       </>
     )}
+
+    {isFetching && hasMore && !isLoading && (
+      <div className="py-5 flex justify-center w-full">
+        <LoadingComponent />
+      </div>
+    )}
   </div>
 );
 
-const TableRow = ({
-  item,
-  setStep,
-  setOrderData,
-  isLast,
-}: {
-  item: Offer;
-  setStep: Dispatch<SetStateAction<ConnectModalStep>>;
-  setOrderData: Dispatch<SetStateAction<Offer>>;
-  isLast: boolean;
-}) => {
+const TableRow = forwardRef<
+  HTMLDivElement,
+  {
+    item: Offer;
+    setStep: Dispatch<SetStateAction<ConnectModalStep>>;
+    setOrderData: Dispatch<SetStateAction<Offer>>;
+    isLast: boolean;
+  }
+>(({ item, setStep, setOrderData, isLast }, ref) => {
   const formattedSrcAmount = formatNumberWithCommas(
     Number(formatUnits(BigInt(item.srcAmountLD), 18)),
   );
@@ -195,6 +269,7 @@ const TableRow = ({
 
   return (
     <div
+      ref={ref}
       className={cn(
         "w-full flex flex-row h-28 px-2 py-2",
         isLast ? "" : " border-b border-gray-800",
@@ -242,4 +317,6 @@ const TableRow = ({
       </div>
     </div>
   );
-};
+});
+
+TableRow.displayName = "TableRow";

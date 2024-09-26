@@ -47,10 +47,10 @@ export async function GET(req: Request) {
       where: whereCondition,
     });
 
-    const filteredOrders = result.filter((order) => {
-      const isOrderEmpty = BigInt(order.srcAmountLD) === BigInt(0);
+    const filteredOffers = result.filter((offer) => {
+      const isOrderEmpty = BigInt(offer.srcAmountLD) === BigInt(0);
       const isValidAmount =
-        BigInt(order.srcAmountLD) >= amountToBuyInSmallestUnit;
+        BigInt(offer.srcAmountLD) >= amountToBuyInSmallestUnit;
 
       if (showEmpty === "true") {
         return isValidAmount;
@@ -59,15 +59,15 @@ export async function GET(req: Request) {
       }
     });
 
-    const orders = filteredOrders.map((order) => ({
-      ...order,
-      srcAmountLD: order.srcAmountLD.toString(),
-      exchangeRateSD: order.exchangeRateSD.toString(),
+    const offers = filteredOffers.map((offer) => ({
+      ...offer,
+      srcAmountLD: offer.srcAmountLD.toString(),
+      exchangeRateSD: offer.exchangeRateSD.toString(),
     }));
 
     return NextResponse.json({
       status: 200,
-      orders,
+      offers,
     });
   } catch (e: any) {
     console.log(e);
