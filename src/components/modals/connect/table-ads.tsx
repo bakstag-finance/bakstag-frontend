@@ -8,7 +8,7 @@ import {
 } from "react";
 import axios from "axios";
 
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { CreateModal } from "@/components/modals/create";
 
 import {
@@ -63,14 +63,21 @@ export const TableComponent = ({ setStep, setOrderData }: Props) => {
     queryKey: ["table-ads", tokenToBuy, address, timeFilter, page],
     queryFn: async () => {
       const result = await axios.get(
-        `/api/offer/get_all?tokenToBuy=${tokenToBuy}&address=${address}&page=${page}&limit=15&amountToBuy=0&showEmpty=true`,
+        `/api/offer/get_all?tokenToBuy=${tokenToBuy}&address=${address}&page=${page}&limit=5&amountToBuy=0&showEmpty=true`,
       );
       let offers = result.data.offers || [];
 
       void sideQueryPagination(offers);
       return offers;
     },
+    placeholderData: keepPreviousData,
   });
+
+  useEffect(() => {
+    setPage(1);
+    setAllOffers([]);
+    void refetch();
+  }, [tokenToBuy, address, timeFilter]);
 
   const sortByTime = (data: Offer[]) => {
     let offers;
@@ -160,7 +167,7 @@ const FilterSection = ({
   setTimeFilter,
 }: {
   tokenToBuy: string;
-  setTokenToBuy: Dispatch<SetStateAction<string>>;
+  setTokenToBuy: (value: string) => void;
   timeFilter: string;
   setTimeFilter: Dispatch<SetStateAction<FilterType>>;
 }) => (

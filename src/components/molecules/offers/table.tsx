@@ -21,8 +21,8 @@ import axios from "axios";
 import { ArrowDown, ArrowDownUp, ArrowUp } from "lucide-react";
 
 export const OffersTable = () => {
-  const [tokenToBuy, setTokenToBuy] = useState("");
-  const [tokenToSell, setTokenToSell] = useState("");
+  const [tokenToBuy, setTokenToBuy] = useState("eth-opt");
+  const [tokenToSell, setTokenToSell] = useState("eth-base");
   const [amountToBuy, setAmountToBuy] = useState("0");
 
   const [sortByAmount, setSortByAmount] = useState<"asc" | "desc" | null>(null);
@@ -42,7 +42,7 @@ export const OffersTable = () => {
       void sideQueryPagination(result.data);
       return result.data.offers || [];
     },
-    // placeholderData: keepPreviousData,
+    placeholderData: keepPreviousData,
   });
 
   const sideQueryPagination = (newData: any) => {
