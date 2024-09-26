@@ -63,7 +63,7 @@ export const TableComponent = ({ setStep, setOrderData }: Props) => {
     queryKey: ["table-ads", tokenToBuy, address, timeFilter, page],
     queryFn: async () => {
       const result = await axios.get(
-        `/api/offer/get_all?tokenToBuy=${tokenToBuy}&address=${address}&amountToBuy=0&showEmpty=true`,
+        `/api/offer/get_all?tokenToBuy=${tokenToBuy}&address=${address}&page=${page}&limit=15&amountToBuy=0&showEmpty=true`,
       );
       let offers = result.data.offers || [];
 

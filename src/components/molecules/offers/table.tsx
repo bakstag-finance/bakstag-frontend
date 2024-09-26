@@ -11,14 +11,18 @@ import { cn } from "@/lib/utils";
 import { ConnectModal } from "@/components/modals";
 import { TableItem } from "@/components/molecules";
 import { useState, useEffect, useRef } from "react";
-import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import {
+  useQuery,
+  keepPreviousData,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { Offer } from "@/types/offer";
 import axios from "axios";
 import { ArrowDown, ArrowDownUp, ArrowUp } from "lucide-react";
 
 export const OffersTable = () => {
-  const [tokenToBuy, setTokenToBuy] = useState("eth-opt");
-  const [tokenToSell, setTokenToSell] = useState("eth-base");
+  const [tokenToBuy, setTokenToBuy] = useState("");
+  const [tokenToSell, setTokenToSell] = useState("");
   const [amountToBuy, setAmountToBuy] = useState("0");
 
   const [sortByAmount, setSortByAmount] = useState<"asc" | "desc" | null>(null);
@@ -28,24 +32,25 @@ export const OffersTable = () => {
   const [hasMore, setHasMore] = useState(true);
   const [allOffers, setAllOffers] = useState<Offer[]>([]);
 
+  const { invalidateQueries } = useQueryClient();
   const { data, isError, isLoading, isFetching, refetch } = useQuery<Offer[]>({
     queryKey: ["home-page-ads", tokenToBuy, tokenToSell, amountToBuy, page],
     queryFn: async () => {
       const result = await axios.get(
         `/api/offer/get_all?tokenToBuy=${tokenToBuy}&tokenToSell=${tokenToSell}&amountToBuy=${amountToBuy}&page=${page}&limit=15&showEmpty=${false}`,
       );
-      void sideQueryPagination(result.data.offers || []);
+      void sideQueryPagination(result.data);
       return result.data.offers || [];
     },
-    placeholderData: keepPreviousData,
+    // placeholderData: keepPreviousData,
   });
 
-  const sideQueryPagination = (newData: Offer[]) => {
-    if (newData.length === 0) {
-      setHasMore(false);
-    } else {
-      setAllOffers((prev) => [...prev, ...newData]);
-    }
+  const sideQueryPagination = (newData: any) => {
+    setAllOffers((prev) => {
+      if (page === 1) return newData.offers;
+      return [...prev, ...newData.offers];
+    });
+    setHasMore(newData.hasMore);
   };
 
   const sortTableData = (data: Offer[]) => {
@@ -71,6 +76,7 @@ export const OffersTable = () => {
   const sortedTableData = sortTableData(allOffers);
 
   const handleSortByAmount = () => {
+    handleFilterChange();
     if (sortByAmount === "asc") {
       setSortByAmount("desc");
     } else if (sortByAmount === "desc") {
@@ -82,6 +88,7 @@ export const OffersTable = () => {
   };
 
   const handleSortByRate = () => {
+    handleFilterChange();
     if (sortByRate === "asc") {
       setSortByRate("desc");
     } else if (sortByRate === "desc") {
@@ -90,6 +97,13 @@ export const OffersTable = () => {
       setSortByRate("asc");
     }
     setSortByAmount(null);
+  };
+
+  const handleFilterChange = () => {
+    setPage(1);
+    void invalidateQueries({
+      queryKey: ["home-page-ads"],
+    });
   };
 
   const isEmptyAdsList = sortedTableData && sortedTableData.length === 0;
@@ -167,7 +181,7 @@ export const OffersTable = () => {
 
       <div
         className={cn(
-          "mt-5 lg:mt-2 w-full border overflow-y-auto scroll-smooth border-gray-800 rounded-xl flex flex-col justify-start items-center",
+          "mt-5 lg:mt-2 w-full border overflow-y-auto scroll-smooth border-gray-800 rounded-xl flex flex-col justify-start items-center transition-all",
           heightOfTable,
         )}
       >
@@ -194,6 +208,7 @@ export const OffersTable = () => {
               Amount
               {renderIcon(sortByAmount)}
             </span>
+            <span className="text-end pr-5 w-[160px]">Trade</span>
           </div>
         </div>
 
@@ -248,7 +263,7 @@ export const OffersTable = () => {
 };
 
 const renderIcon = (sortState: "asc" | "desc" | null) => {
-  if (sortState === "asc") return <ArrowUp size={16} />;
-  if (sortState === "desc") return <ArrowDown size={16} />;
-  return <ArrowDownUp size={16} />;
+  if (sortState === "asc") return <ArrowUp size={16} className={"ml-1"} />;
+  if (sortState === "desc") return <ArrowDown size={16} className={"ml-1"} />;
+  return <ArrowDownUp size={16} className={"ml-1"} />;
 };

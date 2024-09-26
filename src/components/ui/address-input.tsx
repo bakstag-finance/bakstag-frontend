@@ -8,9 +8,10 @@ interface Props {
   label: string;
   value: string;
   setValue: Dispatch<SetStateAction<string>>;
+  className?: string;
 }
 
-export const AddressInput = ({ value, setValue, label }: Props) => {
+export const AddressInput = ({ value, setValue, label, className }: Props) => {
   const [isChanged, setIsChanged] = useState(false);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -21,7 +22,7 @@ export const AddressInput = ({ value, setValue, label }: Props) => {
   const isValid = isValidCryptoAddress(value);
 
   return (
-    <div className="w-full flex flex-col mt-5">
+    <div className={cn("w-full flex flex-col mt-5", className)}>
       <span className="text-xs text-gray-700 ml-3">{label}</span>
       <Squircle asChild cornerRadius={12} cornerSmoothing={1}>
         <Input

@@ -6,8 +6,6 @@ import { parseUnits } from "viem";
 
 export const dynamic = "force-dynamic";
 
-export async function POST() {}
-
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
@@ -16,20 +14,16 @@ export async function GET(req: Request) {
     const amountToBuy = searchParams.get("amountToBuy") || "";
     const tokenToSell = searchParams.get("tokenToSell") || "";
     const srcAddress = searchParams.get("address") || "";
-    const showEmpty = searchParams.get("showEmpty") || "";
+    const showEmpty = searchParams.get("showEmpty") || "false";
+
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const limit = parseInt(searchParams.get("limit") || "15", 10);
 
     const amountToBuyInSmallestUnit = parseUnits(amountToBuy, 18);
 
     const whereCondition: any = {};
 
     if (srcAddress && srcAddress.length > 0) {
-      if (srcAddress === "undefined") {
-        return NextResponse.json({
-          status: 200,
-          orders: [],
-        });
-      }
-
       whereCondition.srcSellerAddress = hexZeroPadTo32(srcAddress as any);
     }
 
@@ -45,6 +39,8 @@ export async function GET(req: Request) {
 
     const result = await prisma.order.findMany({
       where: whereCondition,
+      skip: (page - 1) * limit,
+      take: limit,
     });
 
     const filteredOffers = result.filter((offer) => {

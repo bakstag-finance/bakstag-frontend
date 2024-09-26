@@ -1,6 +1,5 @@
 import {
   AddressInput,
-  Button,
   SelectCoin,
   Skeleton,
   TokenInput,
@@ -13,12 +12,10 @@ import {
 } from "@/lib/helpers";
 import { cn } from "@/lib/utils";
 import { Dispatch, SetStateAction } from "react";
-import { AddressDetailRow, DetailRow } from "@/components/molecules";
+import { DetailRow } from "@/components/molecules";
 import { formatNumberWithCommas } from "@/lib/helpers/formating";
 import { useCreateModal } from "@/components/modals/create/context";
-import { useAccount } from "wagmi";
 import { ActionButton } from "@/components/ui";
-import { Squircle } from "@squircle-js/react";
 
 interface FormStepProps {
   handleCreateSwap: () => void;
@@ -40,8 +37,6 @@ export const FormStep = ({ handleCreateSwap, handleClose }: FormStepProps) => {
     approvingStatus,
     approvingErrorMsg,
   } = useCreateModal();
-
-  const { address } = useAccount();
 
   const isValidDestinationWallet = isValidCryptoAddress(destinationWallet);
 
@@ -74,20 +69,17 @@ export const FormStep = ({ handleCreateSwap, handleClose }: FormStepProps) => {
         isExchangeRate={true}
         selectedDstToken={selectedDstToken}
         selectedSrcToken={selectedSrcToken}
-        className={"mt-5"}
+        className={"mt-3"}
       />
       <AddressInput
         label="Destination Wallet Address"
         value={destinationWallet}
         setValue={setDestinationWallet}
+        className={"mt-3"}
       />
       <Summary
-        selectedSrcToken={selectedSrcToken}
-        srcTokenAmount={srcTokenAmount}
         selectedDstToken={selectedDstToken}
         exchangeRate={dstTokenAmount.toString()}
-        destinationWallet={destinationWallet}
-        srcAddress={address}
         totalReceiveAmount={totalReceiveAmount}
       />
       <ActionButton
@@ -142,12 +134,12 @@ const TokenAmountInput = ({
         <span className="text-gray-700 ml-3">{label}</span>
         <SelectCoin
           placeholder={label}
-          className="mt-2"
+          className="mt-3"
           value={selectedToken}
           setValue={setSelectedToken}
         />
       </div>
-      <div className="mt-5 w-full flex flex-col justify-between items-start">
+      <div className="mt-3 w-full flex flex-col justify-between items-start">
         <span className={"text-gray-700 ml-3"}>
           {isExchangeRate ? "Exchange Rate" : "Amount to sell"}
         </span>
@@ -188,64 +180,18 @@ const TokenAmountInput = ({
 };
 
 const Summary = ({
-  selectedSrcToken,
-  srcTokenAmount,
   selectedDstToken,
   exchangeRate,
-  destinationWallet,
-  srcAddress,
   totalReceiveAmount,
 }: {
-  selectedSrcToken: string;
-  srcTokenAmount: string;
   selectedDstToken: string;
   exchangeRate: string;
-  destinationWallet: string;
-  srcAddress: `0x${string}` | undefined;
   totalReceiveAmount: number;
 }) => {
-  const isShowExchangeRate =
-    selectedDstToken && selectedSrcToken && exchangeRate && srcTokenAmount;
-
   const isShowTotalReceiveAmount = exchangeRate && selectedDstToken;
 
   return (
-    <div className="w-full flex flex-col text-xs mt-5">
-      <DetailRow label="Locked Amount">
-        {exchangeRate.length > 0 && selectedSrcToken ? (
-          <span>
-            {srcTokenAmount + " " + tokensData[selectedSrcToken]?.token}{" "}
-            <span className={"text-gray-700"}>
-              ({tokensData[selectedSrcToken].network})
-            </span>
-          </span>
-        ) : (
-          <span className={"text-gray-700"}>N/A</span>
-        )}
-      </DetailRow>
-      <AddressDetailRow label="to Wallet" value={destinationWallet} />
-      <AddressDetailRow label="from Wallet" value={srcAddress || ""} />
-      <DetailRow label="Exchange Rate">
-        {isShowExchangeRate && selectedSrcToken && selectedDstToken ? (
-          <>
-            <span>
-              {formatNumberWithCommas(Number(exchangeRate)) +
-                " " +
-                tokensData[selectedDstToken].token +
-                " "}
-              <span className={"text-gray-700"}>
-                ({tokensData[selectedDstToken].network})
-              </span>
-            </span>{" "}
-            = 1 <span>{tokensData[selectedSrcToken].token}</span>{" "}
-            <span className={"text-gray-700"}>
-              ({tokensData[selectedSrcToken].network})
-            </span>
-          </>
-        ) : (
-          <span className={"text-gray-700"}>Set Exchange Rate</span>
-        )}
-      </DetailRow>
+    <div className="w-full flex flex-col text-xs mt-3">
       <DetailRow label="Protocol Fee">
         <span>1%</span>
       </DetailRow>

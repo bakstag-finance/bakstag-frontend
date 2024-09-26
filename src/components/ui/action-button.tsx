@@ -68,7 +68,7 @@ export const ActionButton: FC<ActionButtonProps> = ({
       {handleClose && (
         <Squircle asChild cornerRadius={12} cornerSmoothing={1}>
           <Button
-            className="w-full mt-4 bg-black text-gray-700 border border-white border-opacity-50 hover:bg-gray-800 rounded-xl font-light"
+            className="w-full mt-3 bg-black text-gray-700 border border-white border-opacity-50 hover:bg-gray-800 rounded-xl font-light"
             onClick={handleClose}
           >
             Cancel
