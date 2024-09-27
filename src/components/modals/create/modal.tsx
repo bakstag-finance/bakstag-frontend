@@ -175,18 +175,19 @@ const Modal = ({ buttonText, refetch }: Props) => {
                   srcAmountLD: _srcAmountLD,
                   exchangeRateSD: _exchangeRateSD,
                 }),
-              ),
-              false,
-            ],
-            chainId: srcToken.chainId as any,
-          },
-        ).catch((e) => {
+            ),
+            false,
+          ],
+          chainId: srcToken.chainId as any,
+          blockTag: "finalized",
+        }).catch((e) => {
           const errorMsg = handleContractError(
             e as ReadContractErrorType,
             otcMarketAbi,
           );
           throw new Error(errorMsg);
         });
+
         _lzFee = lzFee;
         _value =
           srcToken.tokenAddress == ethers.constants.AddressZero
