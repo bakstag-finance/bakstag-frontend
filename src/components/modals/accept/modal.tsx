@@ -397,7 +397,7 @@ const Modal = () => {
       </DialogTrigger>
       <DialogContent
         className={
-          "no-scrollbar w-full h-[90%] md:h-auto overflow-y-scroll max-w-[380px] rounded-3xl bg-black-800"
+          "no-scrollbar w-full  h-full max-h-[90%] md:h-auto overflow-y-scroll overflow-x-hidden max-w-[380px] rounded-3xl bg-black-800"
         }
       >
         <VisuallyHidden>

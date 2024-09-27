@@ -76,8 +76,11 @@ export function handleContractError<T>(error: T, abi: Abi): string {
   console.log("Result", res);
 
   if (!res.decodedError) {
-    if (res.error?.cause === "createOffer") {
-      return splitCamelCase(res.error.name);
+    if (
+      (res.error as any)?.functionName === "createOffer" ||
+      (res.error as any)?.functionName === "acceptOffer"
+    ) {
+      return splitCamelCase(res.error?.name || "");
     }
 
     return (res.error as any).shortMessage;

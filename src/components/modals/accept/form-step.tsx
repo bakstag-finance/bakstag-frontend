@@ -38,7 +38,7 @@ export const FormStep = ({
   const isValidDestinationWallet = isValidCryptoAddress(destinationWallet);
 
   return (
-    <div className="w-full flex flex-col text-white">
+    <div className="w-full max-w-[320px] flex flex-col text-white">
       <TokenAmountInput
         label="You Pay"
         token={dstToken}
