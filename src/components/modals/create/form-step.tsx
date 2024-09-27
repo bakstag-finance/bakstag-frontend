@@ -48,6 +48,11 @@ export const FormStep = ({ handleCreateSwap, handleClose }: FormStepProps) => {
   const isCorrectSrcTokenAmount = validateTokenAmount(srcTokenAmount);
   const isCorrectExchangeRate = validateTokenAmount(dstTokenAmount);
 
+  const walletAddressLabel = "Destination Wallet Address";
+  const addressNetwork = selectedSrcToken
+    ? ` | ${tokensData[selectedSrcToken].token} (${tokensData[selectedSrcToken].network})`
+    : "";
+
   return (
     <div className="max-w-[320px] w-full flex flex-col text-white">
       <TokenAmountInput
@@ -72,7 +77,7 @@ export const FormStep = ({ handleCreateSwap, handleClose }: FormStepProps) => {
         className={"mt-3"}
       />
       <AddressInput
-        label="Destination Wallet Address"
+        label={walletAddressLabel + addressNetwork}
         value={destinationWallet}
         setValue={setDestinationWallet}
         className={"mt-3"}
