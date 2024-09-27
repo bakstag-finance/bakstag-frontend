@@ -175,12 +175,13 @@ const Modal = ({ buttonText, refetch }: Props) => {
                   srcAmountLD: _srcAmountLD,
                   exchangeRateSD: _exchangeRateSD,
                 }),
-            ),
-            false,
-          ],
-          chainId: srcToken.chainId as any,
-          blockTag: "finalized",
-        }).catch((e) => {
+              ),
+              false,
+            ],
+            chainId: srcToken.chainId as any,
+            blockTag: "finalized",
+          },
+        ).catch((e) => {
           const errorMsg = handleContractError(
             e as ReadContractErrorType,
             otcMarketAbi,
