@@ -179,7 +179,6 @@ const Modal = ({ buttonText, refetch }: Props) => {
               false,
             ],
             chainId: srcToken.chainId as any,
-            blockTag: "finalized",
           },
         ).catch((e) => {
           const errorMsg = handleContractError(

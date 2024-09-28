@@ -19,6 +19,7 @@ import {
 import { Offer } from "@/types/offer";
 import axios from "axios";
 import { ArrowDown, ArrowDownUp, ArrowUp } from "lucide-react";
+import {isValidTokenAmount} from "@/lib/helpers";
 
 export const OffersTable = () => {
   const [tokenToBuy, setTokenToBuy] = useState("eth-opt");
@@ -33,11 +34,13 @@ export const OffersTable = () => {
   const [allOffers, setAllOffers] = useState<Offer[]>([]);
 
   const { invalidateQueries } = useQueryClient();
+
   const { data, isError, isLoading, isFetching, refetch } = useQuery<Offer[]>({
     queryKey: ["home-page-ads", tokenToBuy, tokenToSell, amountToBuy, page],
     queryFn: async () => {
+      const amountToQuery = isValidTokenAmount(amountToBuy) ? amountToBuy : "";
       const result = await axios.get(
-        `/api/offer/get_all?tokenToBuy=${tokenToBuy}&tokenToSell=${tokenToSell}&amountToBuy=${amountToBuy}&page=${page}&limit=15&showEmpty=${false}`,
+        `/api/offer/get_all?tokenToBuy=${tokenToBuy}&tokenToSell=${tokenToSell}&amountToBuy=${amountToQuery}&page=${page}&limit=15&showEmpty=${false}`,
       );
       void sideQueryPagination(result.data);
       return result.data.offers || [];
