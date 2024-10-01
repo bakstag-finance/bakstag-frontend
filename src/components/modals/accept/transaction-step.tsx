@@ -1,18 +1,23 @@
-import { Copy, StatusHeader } from "@/components/ui";
-import { addressFormat } from "@/lib/helpers";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { Dispatch, SetStateAction } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useAccount } from "wagmi";
+
+import axios from "axios";
+
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import { Copy, StatusHeader } from "@/components/ui";
+import { DetailRow, ActionButton } from "@/components/molecules";
+
+import { addressFormat, formatNumberWithCommas } from "@/lib/helpers";
+
 import { ChainIds, Status } from "@/types/contracts";
 import { LAYER_ZERO_SCAN } from "@/lib/constants";
+
 import { waitForTransaction } from "@wagmi/core";
 import { wagmiConfig } from "@/lib/wagmi/config";
+
 import { useAcceptModal } from "@/components/modals/accept/context";
-import { useAccount } from "wagmi";
-import { formatNumberWithCommas } from "@/lib/helpers/formating";
-import { DetailRow, ActionButton } from "@/components/molecules";
 
 interface Props {
   handleClose: () => void;
@@ -59,8 +64,8 @@ export const TransactionStep = ({ handleRetry, handleClose }: Props) => {
     infoForTransactionStep,
   } = useAcceptModal();
   const {
-    srcToken,
-    dstToken,
+    srcTokenNetwork,
+    dstTokenNetwork,
     srcAmountLD,
     srcEid,
     txHash,
@@ -70,7 +75,7 @@ export const TransactionStep = ({ handleRetry, handleClose }: Props) => {
 
   const { address } = useAccount();
 
-  const isMonochain = srcToken.network === dstToken.network;
+  const isMonochain = srcTokenNetwork === dstTokenNetwork;
 
   const { data, isLoading, isError, isSuccess } = useQuery({
     queryKey: ["create-offer", txHash],
@@ -145,9 +150,9 @@ const TransactionDetails = ({
       <DetailRow label="Amount to pay">
         <span>
           {formatNumberWithCommas(transactionData.srcTokenAmount)}{" "}
-          {transactionData.dstToken.ticker}{" "}
+          {transactionData.dstTokenTicker}{" "}
           <span className={"text-gray-700"}>
-            ({transactionData.dstToken.network})
+            ({transactionData.dstTokenNetwork})
           </span>
         </span>
       </DetailRow>
@@ -166,22 +171,22 @@ const TransactionDetails = ({
       <DetailRow label="Amount to receive">
         <span>
           {formatNumberWithCommas(transactionData.exchangeRate)}{" "}
-          {transactionData.srcToken.ticker}{" "}
+          {transactionData.srcTokenTicker}{" "}
           <span className={"text-gray-700"}>
-            ({transactionData.srcToken.network})
+            ({transactionData.srcTokenNetwork})
           </span>
         </span>
       </DetailRow>
       <DetailRow label="Exchange Rate">
         <span>
           {formatNumberWithCommas(transactionData.exchangeRate)}{" "}
-          {transactionData.dstToken.ticker}{" "}
+          {transactionData.dstTokenTicker}{" "}
           <span className={"text-gray-700"}>
-            ({transactionData.dstToken.network})
+            ({transactionData.dstTokenNetwork})
           </span>{" "}
-          = 1 {transactionData.srcToken.ticker}{" "}
+          = 1 {transactionData.srcTokenTicker}{" "}
           <span className={"text-gray-700"}>
-            ({transactionData.srcToken.network})
+            ({transactionData.srcTokenNetwork})
           </span>
         </span>
       </DetailRow>

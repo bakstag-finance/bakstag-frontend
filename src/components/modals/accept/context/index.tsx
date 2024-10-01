@@ -7,7 +7,7 @@ import {
   ReactNode,
 } from "react";
 import { Status } from "@/types/contracts";
-import { OfferProps } from "@/types/offer";
+import { Offer } from "@/types/offer";
 
 type ConnectModalStep = "main" | "transaction";
 
@@ -32,7 +32,7 @@ interface AcceptModalContextProps {
   setInfoForTransactionStep: Dispatch<SetStateAction<any>>;
   handleClose: () => void;
   handleResetState: () => void;
-  order: OfferProps;
+  offer: Offer | undefined;
   refetch: () => void;
 }
 
@@ -50,13 +50,13 @@ export const useAcceptModal = () => {
 
 interface AcceptModalProviderProps {
   children: ReactNode;
-  order: OfferProps;
+  offer: Offer;
   refetch: () => void;
 }
 
 const AcceptModalProvider = ({
   children,
-  order,
+  offer,
   refetch,
 }: AcceptModalProviderProps) => {
   const [openModal, setOpenModal] = useState(false);
@@ -77,14 +77,10 @@ const AcceptModalProvider = ({
     srcTokenAmount: "",
     exchangeRate: "",
     srcAmountLD: "",
-    srcToken: {
-      ticker: "",
-      network: "",
-    },
-    dstToken: {
-      ticker: "",
-      network: "",
-    },
+    srcTokenTicker: "",
+    srcTokenNetwork: "",
+    dstTokenNetwork: "",
+    dstTokenTicker: "",
   });
 
   const handleResetState = () => {
@@ -124,7 +120,7 @@ const AcceptModalProvider = ({
         setInfoForTransactionStep,
         handleClose,
         handleResetState,
-        order,
+        offer,
         refetch,
       }}
     >

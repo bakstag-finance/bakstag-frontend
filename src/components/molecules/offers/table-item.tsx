@@ -2,12 +2,13 @@ import { cn } from "@/lib/utils";
 import { AcceptModal } from "../../modals";
 import { addressFormat, getTokenField } from "@/lib/helpers";
 import { formatUnits } from "viem";
-import { OfferProps } from "@/types/offer";
+
 import { formatNumberWithCommas } from "@/lib/helpers/formating";
 import React from "react";
+import { Offer } from "@/types/offer";
 
 interface Props {
-  offer: OfferProps;
+  offer: Offer;
   refetch: () => void;
   isLast: boolean;
 }
@@ -18,14 +19,16 @@ export const TableItem = React.forwardRef<HTMLDivElement, Props>(
       dstSellerAddress,
       srcAmountLD,
       exchangeRateSD,
-      srcToken,
-      dstToken,
+      srcTokenTicker,
+      srcTokenNetwork,
+      dstTokenTicker,
+      dstTokenNetwork,
     } = offer;
     const formatedAddress = addressFormat(dstSellerAddress);
 
     const srcTokenDecimals = getTokenField(
-      srcToken.ticker,
-      srcToken.network,
+      srcTokenTicker,
+      srcTokenNetwork,
       "decimals",
     );
 
@@ -52,11 +55,11 @@ export const TableItem = React.forwardRef<HTMLDivElement, Props>(
               <span className="font-semibold w-full text-lg">
                 {formatedDstAmount}{" "}
                 <span className="text-gray-700">
-                  {dstToken.ticker} ({dstToken.network})
+                  {dstTokenTicker} ({dstTokenNetwork})
                 </span>{" "}
                 = 1{" "}
                 <span className={"text-gray-700"}>
-                  {srcToken.ticker} ({srcToken.network})
+                  {srcTokenTicker} ({srcTokenNetwork})
                 </span>
               </span>
               <div className="flex flex-col w-full font-normal">
@@ -64,12 +67,12 @@ export const TableItem = React.forwardRef<HTMLDivElement, Props>(
                 <span className="w-full">
                   {formatedSrcAmount}{" "}
                   <span className="text-gray-700">
-                    {srcToken.ticker} ({srcToken.network})
+                    {srcTokenTicker} ({srcTokenNetwork})
                   </span>
                 </span>
               </div>
             </div>
-            <AcceptModal order={offer} refetch={refetch} />
+            <AcceptModal offer={offer} refetch={refetch} isOpenedByBtn={true} />
           </div>
         </div>
 
@@ -85,21 +88,25 @@ export const TableItem = React.forwardRef<HTMLDivElement, Props>(
               <span className="w-full text-center ml-7">
                 {formatedDstAmount}{" "}
                 <span className="text-gray-700">
-                  {dstToken.ticker} ({dstToken.network})
+                  {dstTokenTicker} ({dstTokenNetwork})
                 </span>{" "}
                 = 1{" "}
                 <span className={"text-gray-700"}>
-                  {srcToken.ticker} ({srcToken.network})
+                  {srcTokenTicker} ({srcTokenNetwork})
                 </span>
               </span>
               <span className="w-full text-center mr-5">
                 {formatedSrcAmount}{" "}
                 <span className="text-gray-700">
-                  {srcToken.ticker} ({srcToken.network})
+                  {srcTokenTicker} ({srcTokenNetwork})
                 </span>
               </span>
               <div className="flex justify-end">
-                <AcceptModal order={offer} refetch={refetch} />
+                <AcceptModal
+                  offer={offer}
+                  refetch={refetch}
+                  isOpenedByBtn={true}
+                />
               </div>
             </div>
           </div>

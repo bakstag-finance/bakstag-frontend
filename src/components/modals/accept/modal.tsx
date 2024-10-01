@@ -1,6 +1,7 @@
 "use client";
 
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   Button,
   Dialog,
@@ -8,6 +9,7 @@ import {
   DialogDescription,
   DialogTitle,
   DialogTrigger,
+  Skeleton,
   VisuallyHidden,
 } from "@/components/ui";
 import {
@@ -21,7 +23,7 @@ import { useAccount, useSwitchChain } from "wagmi";
 import { FormStep } from "./form-step";
 import { TransactionStep } from "./transaction-step";
 import { Status } from "@/types/contracts";
-import { OfferProps } from "@/types/offer";
+import { Offer } from "@/types/offer";
 import { erc20Abi, formatUnits, parseUnits } from "viem";
 import {
   readContract,
@@ -33,12 +35,25 @@ import { wagmiConfig } from "@/lib/wagmi/config";
 import { ethers } from "ethers";
 import AcceptModalProvider, { useAcceptModal } from "./context";
 import { otcMarketAbi } from "@/lib/wagmi/contracts/abi";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { cn } from "@/lib/utils";
 
-const Modal = () => {
+const Modal = ({
+  openModal,
+  closeModalHandler,
+  openModalHandler,
+  isOpenedByBtn,
+  isOfferInfoLoading,
+}: {
+  openModal: boolean;
+  closeModalHandler: () => void;
+  openModalHandler: () => void;
+  isOpenedByBtn: boolean;
+  isOfferInfoLoading: boolean;
+}) => {
   const {
-    order,
-    openModal,
-    setOpenModal,
+    offer,
     step,
     setStep,
     srcTokenAmount,
@@ -58,18 +73,12 @@ const Modal = () => {
   const { switchChainAsync } = useSwitchChain();
   const isWalletConnected = !!address;
 
-  const closeModalHandler = () => {
-    setOpenModal(false);
-    setStep("main");
-    setSrcTokenAmount("0");
-    setDstTokenAmount("0");
-    setApprovingStatus("idle");
-  };
-
-  const prepareDataForContracts = () => {
+  const prepareDataForContracts = (order: Offer) => {
     const {
-      srcToken,
-      dstToken,
+      srcTokenTicker,
+      srcTokenNetwork,
+      dstTokenTicker,
+      dstTokenNetwork,
       srcTokenAddress,
       dstTokenAddress,
       offerId,
@@ -77,36 +86,36 @@ const Modal = () => {
     } = order;
 
     const _abiConfig = getTokenField(
-      srcToken.ticker,
-      srcToken.network,
+      srcTokenTicker,
+      srcTokenNetwork,
       "otcConfig",
     );
 
     const _dstTokenChainId = getTokenField(
-      dstToken.ticker,
-      dstToken.network,
+      dstTokenTicker,
+      dstTokenNetwork,
       "chainId",
     );
 
     const _srcTokenChainId = getTokenField(
-      srcToken.ticker,
-      srcToken.network,
+      srcTokenTicker,
+      srcTokenNetwork,
       "chainId",
     );
 
-    const _dstEid = getTokenField(dstToken.ticker, dstToken.network, "eid");
+    const _dstEid = getTokenField(dstTokenTicker, dstTokenNetwork, "eid");
 
     const _srcTokenAddress = hexZeroPadTo32(srcTokenAddress as any);
     const _dstTokenAddress = hexZeroPadTo32(dstTokenAddress as any);
 
     const _srcTokenDecimals = getTokenField(
-      srcToken.ticker,
-      srcToken.network,
+      srcTokenTicker,
+      srcTokenNetwork,
       "decimals",
     );
     const _dstTokenDecimals = getTokenField(
-      dstToken.ticker,
-      dstToken.network,
+      dstTokenTicker,
+      dstTokenNetwork,
       "decimals",
     );
 
@@ -134,7 +143,7 @@ const Modal = () => {
 
   const submitHandler = async () => {
     try {
-      if (!isWalletConnected || approvingStatus === "success") {
+      if (!isWalletConnected || approvingStatus === "success" || !offer) {
         return null;
       }
 
@@ -147,7 +156,7 @@ const Modal = () => {
         _dstTokenChainId,
         _dstEid,
         _dstTokenDecimals,
-      } = prepareDataForContracts();
+      } = prepareDataForContracts(offer);
 
       if (approvingStatus === "idle" || approvingStatus === "error") {
         setApprovingStatus("pending");
@@ -231,12 +240,12 @@ const Modal = () => {
 
         if (txHash) {
           const srcAmountLD = (
-            BigInt(order.srcAmountLD) -
+            BigInt(offer.srcAmountLD) -
             parseUnits(dstTokenAmount, _dstTokenDecimals)
           ).toString();
 
           const parseExchangeRate = formatUnits(
-            BigInt(order.exchangeRateSD),
+            BigInt(offer.exchangeRateSD),
             6,
           );
 
@@ -250,8 +259,10 @@ const Modal = () => {
             srcTokenAmount: srcTokenAmount,
             exchangeRate: parseExchangeRate,
             srcAmountLD: srcAmountLD,
-            srcToken: order.srcToken,
-            dstToken: order.dstToken,
+            srcTokenTicker: offer.srcTokenTicker,
+            srcTokenNetwork: offer.srcTokenNetwork,
+            dstTokenTicker: offer.dstTokenTicker,
+            dstTokenNetwork: offer.dstTokenNetwork,
           });
           setTransactionStatus("pending");
           setApprovingStatus("success");
@@ -271,11 +282,12 @@ const Modal = () => {
     setDestinationWallet("");
     setApprovingStatus("idle");
     setTransactionStatus("idle");
+    closeModalHandler();
   };
 
   const handleClose = () => {
-    setOpenModal(false);
     handleResetState();
+    closeModalHandler();
   };
 
   const handleMaxExceededAmount = (
@@ -299,6 +311,10 @@ const Modal = () => {
     inputField: "src" | "dst",
   ) => {
     try {
+      if (!offer) {
+        return null;
+      }
+
       if (!isValidTokenAmount(inputValue)) {
         inputField === "src"
           ? setSrcTokenAmount(inputValue)
@@ -325,7 +341,7 @@ const Modal = () => {
         ? setSrcTokenAmount(inputValue)
         : setDstTokenAmount(inputValue);
 
-      const exchangeRate = Number(formatUnits(BigInt(order.exchangeRateSD), 6));
+      const exchangeRate = Number(formatUnits(BigInt(offer.exchangeRateSD), 6));
 
       if (inputField === "src") {
         const newDstTokenAmount = (
@@ -335,7 +351,7 @@ const Modal = () => {
 
         handleMaxExceededAmount(
           inputValue,
-          order.srcAmountLD,
+          offer.srcAmountLD.toString(),
           setApprovingStatus,
           setApprovingErrorMsg,
         );
@@ -347,7 +363,7 @@ const Modal = () => {
 
         handleMaxExceededAmount(
           newSrcTokenAmount,
-          order.srcAmountLD,
+          offer?.srcAmountLD.toString(),
           setApprovingStatus,
           setApprovingErrorMsg,
         );
@@ -383,15 +399,19 @@ const Modal = () => {
         return;
       }
       handleResetState();
+    } else {
+      void openModalHandler();
     }
-
-    setOpenModal(_open);
   };
-
   return (
     <Dialog open={openModal} onOpenChange={onOpenChangeHandler}>
       <DialogTrigger asChild>
-        <Button className={"bg-white text-black rounded-xl font-extralight"}>
+        <Button
+          className={cn(
+            "bg-white text-black rounded-xl font-extralight",
+            !isOpenedByBtn && "hidden",
+          )}
+        >
           Accept
         </Button>
       </DialogTrigger>
@@ -407,13 +427,20 @@ const Modal = () => {
           <DialogDescription></DialogDescription>
         </VisuallyHidden>
         <div className={"w-full flex justify-center items-center flex-col"}>
-          {walletStepRender()}
-          <span className={"text-gray-700 text-xs mt-3 text-justify"}>
-            The advertiser&apos;s assets are locked. After the transaction is
-            successfully completed, the assets will be automatically sent to the
-            destination wallet address you provided. Verify all details before
-            confirming.
-          </span>
+          {isOfferInfoLoading ? (
+            <Skeleton className={"h-full w-full"} />
+          ) : (
+            <>
+              {" "}
+              {walletStepRender()}
+              <span className={"text-gray-700 text-xs mt-3 text-justify"}>
+                The advertiser&apos;s assets are locked. After the transaction
+                is successfully completed, the assets will be automatically sent
+                to the destination wallet address you provided. Verify all
+                details before confirming.
+              </span>
+            </>
+          )}
         </div>
       </DialogContent>
     </Dialog>
@@ -421,12 +448,60 @@ const Modal = () => {
 };
 
 interface Props {
-  order: OfferProps;
+  offer?: Offer;
   refetch: () => void;
+  isOpenedByBtn: boolean;
 }
 
-export const AcceptModal = ({ order, refetch }: Props) => (
-  <AcceptModalProvider order={order} refetch={refetch}>
-    <Modal />
-  </AcceptModalProvider>
-);
+export const AcceptModal = ({ offer, refetch, isOpenedByBtn }: Props) => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const modalType = searchParams.get("modalType");
+  const offerId = searchParams.get("offerId");
+  const state = searchParams.get("state");
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (
+      modalType === "accept" &&
+      state === "open" &&
+      offerId &&
+      !isOpenedByBtn
+    ) {
+      setIsModalOpen(true);
+    }
+  }, [modalType, state, offerId, isOpenedByBtn]);
+
+  const closeModalHandler = () => {
+    setIsModalOpen(false);
+    router.push(pathname);
+  };
+
+  const { data: fetchedOffer, isLoading } = useQuery({
+    queryKey: ["offer", offerId],
+    queryFn: async () => {
+      const res = await axios.get(`/api/offer/get_one?offerId=${offerId}`);
+      return res.data.object || {};
+    },
+    enabled: !!offerId && !offer,
+  });
+
+  const openModalHandler = () => {
+    setIsModalOpen(true);
+  };
+
+  return (
+      <AcceptModalProvider offer={offer || fetchedOffer} refetch={refetch}>
+        <Modal
+          openModal={isModalOpen}
+          closeModalHandler={closeModalHandler}
+          openModalHandler={openModalHandler}
+          isOpenedByBtn={isOpenedByBtn}
+          isOfferInfoLoading={isLoading}
+        />
+      </AcceptModalProvider>
+  );
+};

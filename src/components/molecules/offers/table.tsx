@@ -8,9 +8,9 @@ import {
   TokenInput,
 } from "@/components/ui";
 import { cn } from "@/lib/utils";
-import { ConnectModal } from "@/components/modals";
+import { AcceptModal, ConnectModal } from "@/components/modals";
 import { TableItem } from "@/components/molecules";
-import { useState, useEffect, useRef } from "react";
+import React, {useState, useEffect, useRef, Suspense} from "react";
 import {
   useQuery,
   keepPreviousData,
@@ -19,7 +19,7 @@ import {
 import { Offer } from "@/types/offer";
 import axios from "axios";
 import { ArrowDown, ArrowDownUp, ArrowUp } from "lucide-react";
-import {isValidTokenAmount} from "@/lib/helpers";
+import { isValidTokenAmount } from "@/lib/helpers";
 
 export const OffersTable = () => {
   const [tokenToBuy, setTokenToBuy] = useState("eth-opt");
@@ -139,7 +139,7 @@ export const OffersTable = () => {
   }, [isFetching, hasMore]);
 
   return (
-    <>
+    <Suspense>
       <div className="flex w-full lg:h-20 justify-between items-center lg:mb-0">
         <div className="flex flex-col-reverse lg:flex-row w-full justify-between">
           <div className="flex flex-col w-full mt-5 lg:mt-0">
@@ -227,22 +227,7 @@ export const OffersTable = () => {
             {sortedTableData.map((offer, idx) => (
               <TableItem
                 key={`offer-${offer?.offerId}`}
-                offer={{
-                  srcAmountLD: offer.srcAmountLD.toString(),
-                  srcToken: {
-                    ticker: offer.srcTokenTicker,
-                    network: offer.srcTokenNetwork,
-                  },
-                  dstToken: {
-                    ticker: offer.dstTokenTicker,
-                    network: offer.dstTokenNetwork,
-                  },
-                  offerId: offer.offerId,
-                  srcTokenAddress: offer.srcTokenAddress,
-                  dstTokenAddress: offer.dstTokenAddress,
-                  exchangeRateSD: offer.exchangeRateSD.toString(),
-                  dstSellerAddress: offer.dstSellerAddress,
-                }}
+                offer={offer}
                 refetch={refetch}
                 isLast={idx === sortedTableData.length - 1}
                 ref={
@@ -261,7 +246,8 @@ export const OffersTable = () => {
           </div>
         )}
       </div>
-    </>
+      <AcceptModal refetch={refetch} isOpenedByBtn={false} />
+    </Suspense>
   );
 };
 

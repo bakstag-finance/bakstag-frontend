@@ -2,6 +2,7 @@ import {
   addressFormat,
   calculateSrcAmountPerOneDst,
   splitCamelCase,
+  formatNumberWithCommas,
 } from "./formating";
 import {
   isEthAddress,
@@ -51,5 +52,6 @@ export {
   validateTokenAmount,
   splitCamelCase,
   handleContractError,
+  formatNumberWithCommas,
   decodeEvmTransactionErrorResult,
 };

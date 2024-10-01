@@ -1,4 +1,4 @@
-import { AddressInput, TokenInput } from "@/components/ui";
+import { AddressInput, Button, TokenInput } from "@/components/ui";
 import { isValidCryptoAddress, isValidTokenAmount } from "@/lib/helpers";
 import { formatUnits } from "viem";
 import { useAcceptModal } from "./context";
@@ -19,7 +19,7 @@ export const FormStep = ({
   handleInputChange,
 }: Props) => {
   const {
-    order,
+    offer,
     approvingStatus,
     approvingErrorMsg,
     srcTokenAmount,
@@ -28,20 +28,33 @@ export const FormStep = ({
     setDestinationWallet,
   } = useAcceptModal();
 
-  const { srcToken, dstToken } = order;
+  const { address } = useAccount();
+
+  if (!offer) {
+    return null;
+  }
+
+  const { srcTokenTicker, srcTokenNetwork, dstTokenTicker, dstTokenNetwork } =
+    offer;
 
   const isCorrectSrcTokenAmount = isValidTokenAmount(srcTokenAmount);
   const isCorrectExchangeRate = isValidTokenAmount(dstTokenAmount);
 
-  const { address } = useAccount();
-
   const isValidDestinationWallet = isValidCryptoAddress(destinationWallet);
+
+  const handleCopyLink = () => {
+    const offerLink = `http://localhost:3000?modalType=accept&offerId=${offer.offerId}&state=open`;
+    navigator.clipboard.writeText(offerLink);
+  };
 
   return (
     <div className="w-full max-w-[320px] flex flex-col text-white">
       <TokenAmountInput
         label="You Pay"
-        token={dstToken}
+        token={{
+          ticker: dstTokenTicker,
+          network: dstTokenNetwork,
+        }}
         amount={srcTokenAmount}
         inputLabel={"Amount to pay"}
         isCorrectAmount={isCorrectSrcTokenAmount}
@@ -49,26 +62,36 @@ export const FormStep = ({
       />
       <TokenAmountInput
         label="You receive"
-        token={srcToken}
+        token={{
+          ticker: srcTokenTicker,
+          network: srcTokenNetwork,
+        }}
         amount={dstTokenAmount}
         inputLabel={"Amount to receive"}
         isCorrectAmount={isCorrectExchangeRate}
         handleInputChange={(e) => handleInputChange(e, "dst")}
       />
       <AddressInput
-        label={`Destination Wallet Address | ${srcToken.ticker} (${srcToken.network})`}
+        label={`Destination Wallet Address | ${srcTokenTicker} (${srcTokenNetwork})`}
         value={destinationWallet}
         setValue={setDestinationWallet}
       />
       <Summary
-        srcToken={srcToken}
-        dstToken={dstToken}
+        srcToken={{
+          ticker: srcTokenTicker,
+          network: srcTokenNetwork,
+        }}
+        dstToken={{
+          ticker: dstTokenTicker,
+          network: dstTokenNetwork,
+        }}
         srcTokenAmount={srcTokenAmount}
         dstTokenAmount={dstTokenAmount}
         address={address || ""}
         destinationWallet={destinationWallet}
-        exchangeRate={order.exchangeRateSD}
+        exchangeRate={offer.exchangeRateSD.toString()}
       />
+      <Button onClick={handleCopyLink}>Share</Button>
       <ActionButton
         handleClick={submitHandler}
         handleClose={closeModalHandler}
