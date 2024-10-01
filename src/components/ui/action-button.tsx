@@ -1,10 +1,12 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import { useAccount } from "wagmi";
 import { Button, LoadingClock } from "@/components/ui/index";
-import { CircleCheck, Redo2 } from "lucide-react";
+import { CircleCheck, Redo2, Link, Share } from "lucide-react";
 import { WalletConnect } from "@/components/modals/wallet-connect";
 import { Status } from "@/types/contracts";
 import { Squircle } from "@squircle-js/react";
+import { cn } from "@/lib/utils";
+import { BASE_URL } from "@/lib/constants";
 
 interface ActionButtonProps {
   approvingStatus?: Status;
@@ -19,6 +21,8 @@ interface ActionButtonProps {
   defaultText?: string;
   isValidDestinationWallet?: boolean;
   isValidTokensInput?: boolean;
+  isCopy?: boolean;
+  offerId?: string;
 }
 
 export const ActionButton: FC<ActionButtonProps> = ({
@@ -34,36 +38,43 @@ export const ActionButton: FC<ActionButtonProps> = ({
   btnDisabled,
   isValidDestinationWallet,
   isValidTokensInput,
+  isCopy = false,
+  offerId,
 }) => {
   const { address } = useAccount();
   const isWalletConnected = !!address;
 
   return (
     <>
-      {!isWalletConnected ? (
-        <WalletConnect />
-      ) : (
-        <Squircle asChild cornerRadius={12} cornerSmoothing={1}>
-          <Button
-            className="w-full mt-4 rounded-xl font-light"
-            variant={getButtonVariant(approvingStatus, isLoading, isError)}
-            onClick={handleClick}
-            disabled={btnDisabled}
-          >
-            {getButtonContent(
-              isLoading,
-              loadingText,
-              isError,
-              isSuccess,
-              defaultText,
-              approvingStatus,
-              approvingErrorMsg,
-              isValidDestinationWallet,
-              isValidTokensInput,
-            )}
-          </Button>
-        </Squircle>
-      )}
+      <div className="relative max-w-full w-full flex justify-center items-center">
+        {!isWalletConnected ? (
+          <WalletConnect />
+        ) : (
+          <Squircle asChild cornerRadius={12} cornerSmoothing={1}>
+            <Button
+              className={
+                "w-full max-w-sm mt-2 rounded-xl font-light truncate line-clamp-1"
+              }
+              variant={getButtonVariant(approvingStatus, isLoading, isError)}
+              onClick={handleClick}
+              disabled={btnDisabled}
+            >
+              {getButtonContent(
+                isLoading,
+                loadingText,
+                isError,
+                isSuccess,
+                defaultText,
+                approvingStatus,
+                approvingErrorMsg,
+                isValidDestinationWallet,
+                isValidTokensInput,
+              )}
+            </Button>
+          </Squircle>
+        )}
+        {isCopy && <CopyButton offerId={offerId || ""} />}
+      </div>
 
       {handleClose && (
         <Squircle asChild cornerRadius={12} cornerSmoothing={1}>
@@ -92,9 +103,9 @@ const getButtonContent = (
 ) => {
   if (isLoading)
     return (
-      <span className={"flex flex-row items-center justify-center"}>
-        <LoadingClock className={"w-6 h-6"} />{" "}
-        <span className={"ml-1"}>{loadingText}</span>
+      <span className="flex flex-row items-center justify-center">
+        <LoadingClock className="w-6 h-6" />{" "}
+        <span className="ml-1">{loadingText}</span>
       </span>
     );
   if (isError)
@@ -124,4 +135,60 @@ const getButtonVariant = (
   if (approvingStatus === "pending" || isLoading) return "secondary";
   if (approvingStatus === "error" || isError) return "destructive";
   return "default";
+};
+
+interface CopyButtonProps {
+  offerId: string;
+}
+
+const CopyButton: FC<CopyButtonProps> = ({ offerId }) => {
+  const [isClicked, setIsClicked] = useState(false);
+
+  const handleCopyLink = () => {
+    const offerParams = new URLSearchParams({
+      modalType: "accept",
+      offerId: offerId,
+    });
+
+    const offerLink = `${new URL(`?${offerParams}`, BASE_URL).href}`;
+    navigator.clipboard.writeText(offerLink);
+
+    setIsClicked(true);
+
+    setTimeout(() => {
+      setIsClicked(false);
+    }, 1000);
+  };
+
+  return (
+    <Button
+      onClick={handleCopyLink}
+      className={cn(
+        "mt-2 ml-2 h-10 rounded-xl bg-black border border-white border-opacity-50 hover:bg-gray-800 flex justify-center items-center transition-all duration-300 ease-in-out",
+        isClicked ? "w-32" : "w-10",
+      )}
+    >
+      <span className="relative flex items-center justify-center">
+        {isClicked ? (
+          <span
+            className={cn(
+              "flex items-center transition-all delay-300 duration-300 ease-in",
+              isClicked ? "opacity-100" : "opacity-0",
+            )}
+          >
+            <Link className="ml-2 w-4 h-4 stroke-white" />
+            <span
+              className={
+                "ml-1 font-extralight text-white truncate text-ellipsis"
+              }
+            >
+              Copy Link
+            </span>
+          </span>
+        ) : (
+          <Share className="w-4 h-4 stroke-white" />
+        )}
+      </span>
+    </Button>
+  );
 };

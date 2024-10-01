@@ -10,7 +10,7 @@ import {
 import { cn } from "@/lib/utils";
 import { AcceptModal, ConnectModal } from "@/components/modals";
 import { TableItem } from "@/components/molecules";
-import React, {useState, useEffect, useRef, Suspense} from "react";
+import React, { useState, useEffect, useRef, Suspense } from "react";
 import {
   useQuery,
   keepPreviousData,

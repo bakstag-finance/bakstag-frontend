@@ -428,7 +428,7 @@ const Modal = ({
         </VisuallyHidden>
         <div className={"w-full flex justify-center items-center flex-col"}>
           {isOfferInfoLoading ? (
-            <Skeleton className={"h-full w-full"} />
+            <Skeleton className={"h-[50%] w-full"} />
           ) : (
             <>
               {" "}
@@ -460,20 +460,14 @@ export const AcceptModal = ({ offer, refetch, isOpenedByBtn }: Props) => {
 
   const modalType = searchParams.get("modalType");
   const offerId = searchParams.get("offerId");
-  const state = searchParams.get("state");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    if (
-      modalType === "accept" &&
-      state === "open" &&
-      offerId &&
-      !isOpenedByBtn
-    ) {
+    if (modalType === "accept" && offerId && !isOpenedByBtn) {
       setIsModalOpen(true);
     }
-  }, [modalType, state, offerId, isOpenedByBtn]);
+  }, [modalType, offerId, isOpenedByBtn]);
 
   const closeModalHandler = () => {
     setIsModalOpen(false);
@@ -494,14 +488,14 @@ export const AcceptModal = ({ offer, refetch, isOpenedByBtn }: Props) => {
   };
 
   return (
-      <AcceptModalProvider offer={offer || fetchedOffer} refetch={refetch}>
-        <Modal
-          openModal={isModalOpen}
-          closeModalHandler={closeModalHandler}
-          openModalHandler={openModalHandler}
-          isOpenedByBtn={isOpenedByBtn}
-          isOfferInfoLoading={isLoading}
-        />
-      </AcceptModalProvider>
+    <AcceptModalProvider offer={offer || fetchedOffer} refetch={refetch}>
+      <Modal
+        openModal={isModalOpen}
+        closeModalHandler={closeModalHandler}
+        openModalHandler={openModalHandler}
+        isOpenedByBtn={isOpenedByBtn}
+        isOfferInfoLoading={isLoading}
+      />
+    </AcceptModalProvider>
   );
 };

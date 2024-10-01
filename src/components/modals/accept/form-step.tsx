@@ -1,4 +1,4 @@
-import { AddressInput, Button, TokenInput } from "@/components/ui";
+import { AddressInput, TokenInput } from "@/components/ui";
 import { isValidCryptoAddress, isValidTokenAmount } from "@/lib/helpers";
 import { formatUnits } from "viem";
 import { useAcceptModal } from "./context";
@@ -41,11 +41,6 @@ export const FormStep = ({
   const isCorrectExchangeRate = isValidTokenAmount(dstTokenAmount);
 
   const isValidDestinationWallet = isValidCryptoAddress(destinationWallet);
-
-  const handleCopyLink = () => {
-    const offerLink = `http://localhost:3000?modalType=accept&offerId=${offer.offerId}&state=open`;
-    navigator.clipboard.writeText(offerLink);
-  };
 
   return (
     <div className="w-full max-w-[320px] flex flex-col text-white">
@@ -91,7 +86,6 @@ export const FormStep = ({
         destinationWallet={destinationWallet}
         exchangeRate={offer.exchangeRateSD.toString()}
       />
-      <Button onClick={handleCopyLink}>Share</Button>
       <ActionButton
         handleClick={submitHandler}
         handleClose={closeModalHandler}
@@ -105,6 +99,8 @@ export const FormStep = ({
         }
         isValidDestinationWallet={isValidDestinationWallet}
         isValidTokensInput={isCorrectSrcTokenAmount && isCorrectExchangeRate}
+        isCopy={true}
+        offerId={offer.offerId}
       />
     </div>
   );

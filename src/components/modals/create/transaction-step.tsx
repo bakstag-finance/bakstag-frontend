@@ -153,6 +153,8 @@ export const TransactionStep = ({
         isLoading={isLoading}
         isSuccess={isSuccess}
         loadingText={"Preparing Your Ad"}
+        isCopy={true}
+        offerId={transactionData.offerId}
       />
     </div>
   );
