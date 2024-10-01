@@ -46,14 +46,14 @@ export const ActionButton: FC<ActionButtonProps> = ({
 
   return (
     <>
-      <div className="relative max-w-full w-full flex justify-center items-center">
+      <div className="mt-5 relative max-w-full w-full flex justify-center items-center">
         {!isWalletConnected ? (
           <WalletConnect />
         ) : (
           <Squircle asChild cornerRadius={12} cornerSmoothing={1}>
             <Button
               className={
-                "w-full max-w-sm mt-2 rounded-xl font-light truncate line-clamp-1"
+                "w-full max-w-sm rounded-xl font-light truncate line-clamp-1"
               }
               variant={getButtonVariant(approvingStatus, isLoading, isError)}
               onClick={handleClick}
@@ -164,7 +164,7 @@ const CopyButton: FC<CopyButtonProps> = ({ offerId }) => {
     <Button
       onClick={handleCopyLink}
       className={cn(
-        "mt-2 ml-2 h-10 rounded-xl bg-black border border-white border-opacity-50 hover:bg-gray-800 flex justify-center items-center transition-all duration-300 ease-in-out",
+        "ml-2 h-10 rounded-xl bg-black border border-white border-opacity-50 hover:bg-gray-800 flex justify-center items-center transition-all duration-300 ease-in-out",
         isClicked ? "w-32" : "w-10",
       )}
     >

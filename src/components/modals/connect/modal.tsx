@@ -129,17 +129,25 @@ export const ConnectModal = ({ refetch }: Props) => {
                 isWalletConnected,
                 "Ethereum",
                 () => {
-                  setStep("wallet-choose");
-                  setWalletTabStep("ethereum");
+                  if (isWalletConnected) {
+                    disconnect();
+                  } else {
+                    setStep("wallet-choose");
+                    setWalletTabStep("ethereum");
+                  }
                 },
               )}
               {renderWalletButton(
                 solanaWallet.publicKey?.toString(),
                 isSolanaWalletConnected,
                 "Solana",
-                () => {
-                  setStep("wallet-choose");
-                  setWalletTabStep("solana");
+                async () => {
+                  if (isSolanaWalletConnected) {
+                    await solanaWallet.disconnect();
+                  } else {
+                    setStep("wallet-choose");
+                    setWalletTabStep("solana");
+                  }
                 },
               )}
             </div>
