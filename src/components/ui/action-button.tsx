@@ -172,15 +172,17 @@ const CopyButton: FC<CopyButtonProps> = ({ offerId }) => {
         {isClicked ? (
           <span
             className={cn(
-              "flex items-center transition-all delay-300 duration-300 ease-in",
-              isClicked ? "opacity-100" : "opacity-0",
+              "flex items-center",
+              isClicked ? "animate-expand" : "animate-collapse",
             )}
           >
             <Link className="ml-2 w-4 h-4 stroke-white" />
             <span
-              className={
-                "ml-1 font-extralight text-white truncate text-ellipsis"
-              }
+              className="ml-1 font-extralight text-white truncate text-ellipsis"
+              style={{
+                animationDuration: "300ms",
+                animationTimingFunction: "ease-in-out",
+              }}
             >
               Copy Link
             </span>

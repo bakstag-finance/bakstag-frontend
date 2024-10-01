@@ -94,4 +94,38 @@
     -webkit-backdrop-filter: blur(14px);
     backdrop-filter: blur(14px);
   }
+
+  @keyframes expand {
+    0% {
+      width: 0;
+      opacity: 0;
+      transform: scale(0);
+    }
+    100% {
+      width: 100%;
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes collapse {
+    0% {
+      width: 100%;
+      opacity: 1;
+      transform: scale(1);
+    }
+    100% {
+      width: 0;
+      opacity: 0.25;
+      transform: scale(0.5);
+    }
+  }
+
+  .animate-expand {
+    animation: expand 300ms ease-in-out forwards;
+  }
+
+  .animate-collapse {
+    animation: collapse 300ms ease-in-out forwards;
+  }
 }
