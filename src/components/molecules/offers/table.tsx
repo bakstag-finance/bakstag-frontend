@@ -111,7 +111,7 @@ export const OffersTable = () => {
 
   const isEmptyAdsList = sortedTableData && sortedTableData.length === 0;
   const heightOfTable =
-    isEmptyAdsList || isLoading || isError ? "h-[425px]" : "flex-grow";
+    isEmptyAdsList || isLoading || isError ? "h-[425px]" : "flex-grow-0";
 
   const observer = useRef<IntersectionObserver | null>(null);
   const lastOfferElementRef = useRef<HTMLDivElement | null>(null);

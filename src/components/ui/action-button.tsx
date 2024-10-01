@@ -110,15 +110,15 @@ const getButtonContent = (
     );
   if (isError)
     return (
-      <>
+      <span className="flex flex-row items-center justify-center">
         <Redo2 className="w-5 h-5 mr-2" /> Retry
-      </>
+      </span>
     );
   if (isSuccess)
     return (
-      <>
+      <span className="flex flex-row items-center justify-center">
         <CircleCheck className="w-5 h-5 mr-2" /> Done
-      </>
+      </span>
     );
   if (approvingStatus === "error") return approvingErrorMsg;
   if (!isValidDestinationWallet) return "Add Destination Wallet Address";
