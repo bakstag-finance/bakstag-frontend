@@ -25,8 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      {/* TODO: remove suppressHydrationWarning on prod */}
-      <body className={inter.className} suppressHydrationWarning={true}>
+      <body className={inter.className}>
         <RootProvider>{children}</RootProvider>
       </body>
     </html>

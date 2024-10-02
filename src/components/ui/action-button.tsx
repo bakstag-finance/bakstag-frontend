@@ -2,11 +2,11 @@ import { FC, useState } from "react";
 import { useAccount } from "wagmi";
 import { Button, LoadingClock } from "@/components/ui/index";
 import { CircleCheck, Redo2, Link, Share } from "lucide-react";
-import { WalletConnect } from "@/components/modals/wallet-connect";
 import { Status } from "@/types/contracts";
 import { Squircle } from "@squircle-js/react";
 import { cn } from "@/lib/utils";
 import { BASE_URL } from "@/lib/constants";
+import { ConnectModal } from "@/components/modals";
 
 interface ActionButtonProps {
   approvingStatus?: Status;
@@ -23,6 +23,7 @@ interface ActionButtonProps {
   isValidTokensInput?: boolean;
   isCopy?: boolean;
   offerId?: string;
+  refetch?: () => void;
 }
 
 export const ActionButton: FC<ActionButtonProps> = ({
@@ -40,6 +41,7 @@ export const ActionButton: FC<ActionButtonProps> = ({
   isValidTokensInput,
   isCopy = false,
   offerId,
+  refetch,
 }) => {
   const { address } = useAccount();
   const isWalletConnected = !!address;
@@ -48,7 +50,7 @@ export const ActionButton: FC<ActionButtonProps> = ({
     <>
       <div className="mt-5 relative max-w-full w-full flex justify-center items-center">
         {!isWalletConnected ? (
-          <WalletConnect />
+          <ConnectModal refetch={refetch!} />
         ) : (
           <Squircle asChild cornerRadius={12} cornerSmoothing={1}>
             <Button

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Button,
   Dialog,
@@ -13,24 +13,25 @@ import {
   TabsTrigger,
   VisuallyHidden,
 } from "@/components/ui";
-import { useConnect, useAccount, useDisconnect } from "wagmi";
-import { metaMask } from "wagmi/connectors";
 import { LogIn, X } from "lucide-react";
-import { addressFormat } from "@/lib/helpers";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { PhantomWalletName } from "@solana/wallet-adapter-wallets";
-import { DeletingStep } from "./delete-step";
 import { TableComponent } from "./table-ads";
-import { Offer } from "@/types/offer";
-import { cn } from "@/lib/utils";
+import { DeletingStep } from "./delete-step";
 import { Squircle } from "@squircle-js/react";
+
+import { Offer } from "@/types/offer";
+
+import { cn } from "@/lib/utils";
+import { addressFormat } from "@/lib/helpers";
+
+import { useWalletConnection } from "@/lib/hooks";
 
 type ConnectModalStep = "main" | "wallet-choose" | "delete";
 
 interface Props {
   refetch: () => void;
 }
-export const ConnectModal = ({ refetch }: Props) => {
+
+export const Modal = ({ refetch }: Props) => {
   const [openModal, setOpenModal] = useState(false);
   const [step, setStep] = useState<ConnectModalStep>("main");
 
@@ -53,52 +54,27 @@ export const ConnectModal = ({ refetch }: Props) => {
     createdAt: new Date(),
     updatedAt: new Date(),
   });
-  const solanaWallet = useWallet();
 
-  const { connect, status } = useConnect();
-
-  const { disconnect } = useDisconnect();
-
-  const account = useAccount();
-
-  const isWalletConnected = !!account.address;
-  const isSolanaWalletConnected = !!solanaWallet.publicKey;
-
-  useEffect(() => {
-    if (
-      status === "success" ||
-      (isWalletConnected && isSolanaWalletConnected)
-    ) {
-      setStep("main");
-    }
-  }, [isWalletConnected, status]);
-
-  const metamaskWalletHandler = async () => {
-    if (!account.address) {
-      await connect({
-        connector: metaMask({
-          extensionOnly: true,
-        }),
-      });
-    } else {
-      await disconnect();
-    }
-  };
-
-  const solanaWalletHandler = async () => {
-    if (solanaWallet.connected) {
-      await solanaWallet.disconnect();
-    } else {
-      await solanaWallet.select(PhantomWalletName);
-      await solanaWallet.connect();
-      setStep("main");
-    }
-  };
+  const {
+    tronWallet,
+    account,
+    disconnect,
+    connect,
+    status,
+    isWalletConnected,
+    metaMaskConnect,
+    tronLinkConnect,
+  } = useWalletConnection({
+    setStep,
+  });
 
   const cancelHandler = () => {
-    setStep("main");
-    setMainTabsStep("main");
-    setOpenModal(false);
+    if (step === "main") {
+      setOpenModal(false);
+    } else {
+      setStep("main");
+      setMainTabsStep("wallet");
+    }
   };
 
   const steps = {
@@ -138,15 +114,15 @@ export const ConnectModal = ({ refetch }: Props) => {
                 },
               )}
               {renderWalletButton(
-                solanaWallet.publicKey?.toString(),
-                isSolanaWalletConnected,
-                "Solana",
-                async () => {
-                  if (isSolanaWalletConnected) {
-                    await solanaWallet.disconnect();
+                tronWallet.address,
+                tronWallet.connected,
+                "Tron",
+                () => {
+                  if (tronWallet.connected) {
+                    void tronWallet.disconnect();
                   } else {
                     setStep("wallet-choose");
-                    setWalletTabStep("solana");
+                    setWalletTabStep("tron");
                   }
                 },
               )}
@@ -177,7 +153,7 @@ export const ConnectModal = ({ refetch }: Props) => {
             <TabsTrigger
               value="solana"
               className={"w-full"}
-              disabled={isSolanaWalletConnected || status === "pending"}
+              disabled={status === "pending"}
             >
               Solana
             </TabsTrigger>
@@ -204,7 +180,7 @@ export const ConnectModal = ({ refetch }: Props) => {
                 <>
                   <div
                     className="border border-gray-800 rounded-xl flex w-full p-3 mt-5 justify-between items-start px-5 cursor-pointer"
-                    onClick={metamaskWalletHandler}
+                    onClick={metaMaskConnect}
                   >
                     Metamask
                   </div>
@@ -219,21 +195,18 @@ export const ConnectModal = ({ refetch }: Props) => {
             </div>
           </TabsContent>
           <TabsContent value="solana" className="w-full">
-            <div
-              className="border border-gray-800 rounded-xl flex w-full p-3 mt-5 justify-between items-center px-5 cursor-pointer"
-              onClick={solanaWalletHandler}
-            >
-              Phantom Wallet
-            </div>
-            <div className="border border-gray-800 text-gray-800 rounded-xl flex w-full p-3 mt-5 justify-between items-center px-5 cursor-not-allowed">
-              More soon
-            </div>
+            <span className={"mt-5 text-gray-700"}>Currently unavailable</span>
           </TabsContent>
           <TabsContent value={"tron"} className={"w-full"}>
-            <span className={"mt-5 text-gray-800"}>
-              Tron and USDT (TRC-20) coming soon. <br /> Currently in
-              development
-            </span>
+            <div
+              className="border border-gray-800 rounded-xl flex w-full p-3 mt-5 justify-between items-center px-5 cursor-pointer"
+              onClick={tronLinkConnect}
+            >
+              Tron Link
+            </div>
+            <div className="border border-gray-800 rounded-xl flex w-full p-3 justify-between items-center px-5 cursor-not-allowed mt-5 text-gray-800">
+              More soon
+            </div>
           </TabsContent>
         </Tabs>
       </>
@@ -267,13 +240,11 @@ export const ConnectModal = ({ refetch }: Props) => {
       <DialogTrigger asChild>
         <Squircle asChild cornerRadius={12} cornerSmoothing={1}>
           <Button className={"bg-white text-black w-full font-extralight"}>
-            {isWalletConnected || isSolanaWalletConnected
-              ? "Profile"
-              : "+ Connect"}
+            {isWalletConnected ? "Profile" : "+ Connect"}
           </Button>
         </Squircle>
       </DialogTrigger>
-      <DialogContent className="no-scrollbar w-full max-w-[380px] bg-black-800 transition-all duration-1000 ease-linear">
+      <DialogContent className="bg-black-800 no-scrollbar w-full max-w-[380px] font-extralight transition-all duration-1000 ease-linear">
         <VisuallyHidden>
           <DialogTitle></DialogTitle>
         </VisuallyHidden>

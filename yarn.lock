@@ -2982,6 +2982,28 @@
     varuint-bitcoin "^1.1.2"
     wif "^4.0.0"
 
+"@tronweb3/tronwallet-abstract-adapter@^1.1.7":
+  version "1.1.7"
+  resolved "https://registry.yarnpkg.com/@tronweb3/tronwallet-abstract-adapter/-/tronwallet-abstract-adapter-1.1.7.tgz#0e41af17910373a2abaa69722f741b8f0672e841"
+  integrity sha512-N70hNFgArpiIXpbAnRShR3zdvnfD8MDM/2FVIyrRYAonYjenGCVBIuzUnc0zK+Rm7hFagOvStPrwIZMz9QmFoQ==
+  dependencies:
+    eventemitter3 "^4.0.0"
+
+"@tronweb3/tronwallet-adapter-react-hooks@^1.1.8":
+  version "1.1.8"
+  resolved "https://registry.yarnpkg.com/@tronweb3/tronwallet-adapter-react-hooks/-/tronwallet-adapter-react-hooks-1.1.8.tgz#915d4caf654f49b04df976e52e93739ee4a7a7e3"
+  integrity sha512-c0jnw3fZsaHcMWbvRM0jA1ve+7R2/TZyXsqZOpFQN3/yChdd92OI8ev7RFuy/Icj1ET0FtuTZMezwwpC+xBpOQ==
+  dependencies:
+    "@tronweb3/tronwallet-abstract-adapter" "^1.1.7"
+    "@tronweb3/tronwallet-adapter-tronlink" "^1.1.10"
+
+"@tronweb3/tronwallet-adapter-tronlink@^1.1.10":
+  version "1.1.10"
+  resolved "https://registry.yarnpkg.com/@tronweb3/tronwallet-adapter-tronlink/-/tronwallet-adapter-tronlink-1.1.10.tgz#563eb293c779c81f4dcbdc221f3c6cfe7b93564e"
+  integrity sha512-uatSQjT07V/fbPpoJaT/h3cxvVPtmzZzqmalST1PWez6P9SdxOWF7yJAbqnvczPFkRuBc56XQ9l7n39o27HE5w==
+  dependencies:
+    "@tronweb3/tronwallet-abstract-adapter" "^1.1.7"
+
 "@types/axios@^0.14.0":
   version "0.14.0"
   resolved "https://registry.npmjs.org/@types/axios/-/axios-0.14.0.tgz"
@@ -5497,7 +5519,7 @@ eventemitter3@5.0.1, eventemitter3@^5.0.1:
   resolved "https://registry.npmjs.org/eventemitter3/-/eventemitter3-5.0.1.tgz"
   integrity sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==
 
-eventemitter3@^4.0.7:
+eventemitter3@^4.0.0, eventemitter3@^4.0.7:
   version "4.0.7"
   resolved "https://registry.npmjs.org/eventemitter3/-/eventemitter3-4.0.7.tgz"
   integrity sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==
