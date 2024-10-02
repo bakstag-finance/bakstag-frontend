@@ -59,7 +59,7 @@ export const Modal = ({ refetch }: Props) => {
     tronWallet,
     account,
     disconnect,
-    connect,
+    isEVMConnected,
     status,
     isWalletConnected,
     metaMaskConnect,
@@ -102,10 +102,10 @@ export const Modal = ({ refetch }: Props) => {
             <div className="w-full flex flex-col">
               {renderWalletButton(
                 account.address,
-                isWalletConnected,
+                  isEVMConnected,
                 "Ethereum",
                 () => {
-                  if (isWalletConnected) {
+                  if (isEVMConnected) {
                     disconnect();
                   } else {
                     setStep("wallet-choose");

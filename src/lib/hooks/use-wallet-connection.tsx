@@ -14,9 +14,11 @@ const useWalletConnection = ({ setStep }: Props) => {
   const { connect, status } = useConnect();
   const { disconnect } = useDisconnect();
   const account = useAccount();
+
   const tronWallet = useWallet();
 
   const isWalletConnected = !!account.address || tronWallet.connected;
+  const isEVMConnected = !!account.address;
 
   useEffect(() => {
     if (status === "success" || isWalletConnected) {
@@ -43,6 +45,7 @@ const useWalletConnection = ({ setStep }: Props) => {
     account,
     tronWallet,
     isWalletConnected,
+    isEVMConnected,
     status,
     metaMaskConnect,
     tronLinkConnect,
