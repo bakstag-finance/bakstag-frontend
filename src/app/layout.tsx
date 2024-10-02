@@ -6,12 +6,12 @@ import { RootProvider } from "@/lib/providers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const viewport: Viewport = {
-  width: 'device-width',
+  width: "device-width",
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  interactiveWidget: 'resizes-visual',
-}
+  interactiveWidget: "resizes-visual",
+};
 
 export const metadata: Metadata = {
   title: "Bakstag",
