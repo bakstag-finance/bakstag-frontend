@@ -9,9 +9,16 @@ interface Props {
   value: string;
   setValue: Dispatch<SetStateAction<string>>;
   className?: string;
+  network: string;
 }
 
-export const AddressInput = ({ value, setValue, label, className }: Props) => {
+export const AddressInput = ({
+  value,
+  setValue,
+  label,
+  className,
+  network,
+}: Props) => {
   const [isChanged, setIsChanged] = useState(false);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -19,7 +26,7 @@ export const AddressInput = ({ value, setValue, label, className }: Props) => {
     setValue(e.target.value);
   };
 
-  const isValid = isValidCryptoAddress(value);
+  const isValid = isValidCryptoAddress(value, network);
 
   return (
     <div className={cn("w-full flex flex-col mt-5", className)}>

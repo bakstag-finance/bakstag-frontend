@@ -38,7 +38,10 @@ export const FormStep = ({ handleCreateSwap, handleClose }: FormStepProps) => {
     approvingErrorMsg,
   } = useCreateModal();
 
-  const isValidDestinationWallet = isValidCryptoAddress(destinationWallet);
+  const isValidDestinationWallet = isValidCryptoAddress(
+    destinationWallet,
+    selectedSrcToken ? tokensData[selectedSrcToken].network : "",
+  );
 
   const totalReceiveAmount = calculateTotalReceiveAmount(
     srcTokenAmount,
@@ -81,6 +84,7 @@ export const FormStep = ({ handleCreateSwap, handleClose }: FormStepProps) => {
         value={destinationWallet}
         setValue={setDestinationWallet}
         className={"mt-3"}
+        network={selectedSrcToken ? tokensData[selectedSrcToken].network : ""}
       />
       <Summary
         selectedDstToken={selectedDstToken}

@@ -86,4 +86,22 @@ export const tokensData: Record<string, TokenData> = {
     otcConfig: otcMarketConfig,
     decimals: 18, // TODO: replace to 6
   },
+  "trx-tron": {
+    token: "TRX",
+    network: "TRON",
+    tokenAddress: "0x21bFF5Cd1f61b59Cc2D908C050735b87cb780d2d",
+    eid: "",
+    chainId: undefined,
+    otcConfig: otcMarketConfig,
+    decimals: 18, // TODO: replace to 6
+  },
+  "usdt-tron": {
+    token: "USDT",
+    network: "TRON",
+    tokenAddress: "0x21bFF5Cd1f61b59Cc2D908C050735b87cb780d2d",
+    eid: "",
+    chainId: undefined,
+    otcConfig: otcMarketConfig,
+    decimals: 18, // TODO: replace to 6
+  },
 } as const;

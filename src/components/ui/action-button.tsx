@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import React, { FC, useState } from "react";
 import { useAccount } from "wagmi";
 import { Button, LoadingClock } from "@/components/ui/index";
 import { CircleCheck, Redo2, Link, Share } from "lucide-react";
@@ -7,6 +7,8 @@ import { Squircle } from "@squircle-js/react";
 import { cn } from "@/lib/utils";
 import { BASE_URL } from "@/lib/constants";
 import { ConnectModal } from "@/components/modals";
+import { useWalletConnection } from "@/lib/hooks";
+import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
 
 interface ActionButtonProps {
   approvingStatus?: Status;
@@ -44,7 +46,8 @@ export const ActionButton: FC<ActionButtonProps> = ({
   refetch,
 }) => {
   const { address } = useAccount();
-  const isWalletConnected = !!address;
+  const tronWallet = useWallet();
+  const isWalletConnected = !!address || !!tronWallet.address;
 
   return (
     <>

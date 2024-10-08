@@ -17,11 +17,13 @@ export const DetailRow = ({
 export const AddressDetailRow = ({
   label,
   value,
+  network,
 }: {
   label: string;
   value: string;
+  network: string;
 }) => {
-  const isValidAddress = isValidCryptoAddress(value);
+  const isValidAddress = isValidCryptoAddress(value, network);
   return (
     <div className="w-full flex flex-row justify-between items-center my-2">
       <span>{label}</span>

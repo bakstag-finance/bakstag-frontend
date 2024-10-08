@@ -8,9 +8,9 @@ import {
 } from "react";
 import { ChainIds, Status } from "@/types/contracts";
 
-type CreateModalStep = "main" | "transaction";
+export type CreateModalStep = "main" | "transaction";
 
-interface TransactionData {
+export interface TransactionData {
   txHash: string;
   srcEid: number;
   srcChainId: undefined | ChainIds;

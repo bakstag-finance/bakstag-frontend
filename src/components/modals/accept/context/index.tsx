@@ -9,7 +9,7 @@ import {
 import { Status } from "@/types/contracts";
 import { Offer } from "@/types/offer";
 
-type ConnectModalStep = "main" | "transaction";
+export type ConnectModalStep = "main" | "transaction";
 
 interface AcceptModalContextProps {
   openModal: boolean;

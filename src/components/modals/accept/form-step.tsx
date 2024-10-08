@@ -40,7 +40,10 @@ export const FormStep = ({
   const isCorrectSrcTokenAmount = isValidTokenAmount(srcTokenAmount);
   const isCorrectExchangeRate = isValidTokenAmount(dstTokenAmount);
 
-  const isValidDestinationWallet = isValidCryptoAddress(destinationWallet);
+  const isValidDestinationWallet = isValidCryptoAddress(
+    destinationWallet,
+    srcTokenNetwork,
+  );
 
   return (
     <div className="w-full max-w-[320px] flex flex-col text-white">
@@ -70,6 +73,7 @@ export const FormStep = ({
         label={`Destination Wallet Address | ${srcTokenTicker} (${srcTokenNetwork})`}
         value={destinationWallet}
         setValue={setDestinationWallet}
+        network={srcTokenNetwork}
       />
       <Summary
         srcToken={{
@@ -174,8 +178,16 @@ const Summary = ({
           <span className={"text-gray-700"}>Provide amount to pay</span>
         )}
       </DetailRow>
-      <AddressDetailRow label="to Wallet" value={destinationWallet} />
-      <AddressDetailRow label="from Wallet" value={address} />
+      <AddressDetailRow
+        label="to Wallet"
+        value={destinationWallet}
+        network={srcToken.network}
+      />
+      <AddressDetailRow
+        label="from Wallet"
+        value={address}
+        network={srcToken.network}
+      />
       <DetailRow label="Amount to receive">
         {isDstAmountExist ? (
           <span>

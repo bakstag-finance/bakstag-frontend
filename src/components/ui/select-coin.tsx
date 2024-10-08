@@ -83,6 +83,16 @@ export const SelectCoin = ({
             USDC <span className="text-gray-700">(Base)</span>
           </SelectItem>
         </SelectGroup>
+        <SelectSeparator className={"bg-gray-800"} />
+        <SelectGroup>
+          <SelectLabel className="text-gray-700">Tron Tokens</SelectLabel>
+          <SelectItem value="trx-tron">
+            TRX <span className="text-gray-700">(TRON)</span>
+          </SelectItem>
+          <SelectItem value="usdt-tron">
+            USDT <span className="text-gray-700">(TRON)</span>
+          </SelectItem>
+        </SelectGroup>
       </SelectContent>
     </Select>
   );

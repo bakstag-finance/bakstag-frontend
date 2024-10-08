@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   Button,
   Dialog,
@@ -102,7 +102,7 @@ export const Modal = ({ refetch }: Props) => {
             <div className="w-full flex flex-col">
               {renderWalletButton(
                 account.address,
-                  isEVMConnected,
+                isEVMConnected,
                 "Ethereum",
                 () => {
                   if (isEVMConnected) {
