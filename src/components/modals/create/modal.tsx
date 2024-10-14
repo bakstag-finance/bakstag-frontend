@@ -38,6 +38,8 @@ import { Dispatch, SetStateAction } from "react";
 import { SwitchChainMutateAsync } from "wagmi/query";
 import { tronWeb } from "@/lib/tron";
 import { tronOtcAbi } from "@/lib/tron/otc";
+import { useWalletConnection } from "@/lib/hooks";
+import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
 
 interface Props {
   buttonText: string;
@@ -72,6 +74,8 @@ const Modal = ({ buttonText, refetch }: Props) => {
   const isWalletConnected = !!address;
 
   const { switchChainAsync } = useSwitchChain();
+
+  const tronWallet = useWallet();
 
   const handleClose = () => {
     setOpenModal(false);
@@ -111,8 +115,59 @@ const Modal = ({ buttonText, refetch }: Props) => {
         setApprovingErrorMsg,
       });
     } else if (tokensData[selectedSrcToken].network === "TRON") {
-      setApprovingErrorMsg("No TRX are now avaliable");
-      setApprovingStatus("error");
+      // setApprovingErrorMsg("No TRX are now avaliable");
+      // setApprovingStatus("error");
+
+      // const _srcAmountLD = parseUnits(srcTokenAmount, 18).toString();
+      //
+      // const _exchangeRateSD = parseUnits(dstTokenAmount, 6).toString();
+      let contract = tronWeb.contract(
+        tronOtcAbi.abi,
+        "TPLfJpnPHxdAKkUZ1gTkHKFKN9UAUByfLx",
+      );
+      console.log("Contract", contract);
+
+      const params = [
+        {
+          eid: 40245,
+          msgType: 0,
+          options:
+            "0x0003010021010000000000000000000000000098968000000000000000000000000000e4e1c0",
+        },
+        {
+          eid: 40245,
+          msgType: 1,
+          options: "0x000301001101000000000000000000000000000186a001000104",
+        },
+        {
+          eid: 40245,
+          msgType: 2,
+          options: "0x0003010011010000000000000000000000000004a76801000104",
+        },
+        {
+          eid: 40245,
+          msgType: 3,
+          options: "0x000301001101000000000000000000000000000186a001000104",
+        },
+      ];
+
+      console.log("Params", params);
+      const sendOptions = await contract["setEnforcedOptions"](params).call();
+
+      console.log("SendOptions", sendOptions);
+
+      // const result = await contract.quoteCreateOffer(
+      //     tronWallet.address,
+      //     {
+      //       dstSellerAddress: "TMMmzgw3SfPzJ8c5wHmj1B89VzE36h47aR",
+      //       dstEid: "40420",
+      //       srcTokenAddress: tokensData[selectedSrcToken].tokenAddress,
+      //       dstTokenAddress: tokensData[selectedDstToken].tokenAddress,
+      //       srcAmountLD: _srcAmountLD,
+      //       exchangeRateSD: _exchangeRateSD,
+      //     },
+      //     false,
+      // ).call();
     }
   };
 

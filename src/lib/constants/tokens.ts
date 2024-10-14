@@ -90,7 +90,7 @@ export const tokensData: Record<string, TokenData> = {
     token: "TRX",
     network: "TRON",
     tokenAddress: "0x21bFF5Cd1f61b59Cc2D908C050735b87cb780d2d",
-    eid: "",
+    eid: "40420",
     chainId: undefined,
     otcConfig: otcMarketConfig,
     decimals: 18, // TODO: replace to 6
@@ -99,7 +99,7 @@ export const tokensData: Record<string, TokenData> = {
     token: "USDT",
     network: "TRON",
     tokenAddress: "0x21bFF5Cd1f61b59Cc2D908C050735b87cb780d2d",
-    eid: "",
+    eid: "40420",
     chainId: undefined,
     otcConfig: otcMarketConfig,
     decimals: 18, // TODO: replace to 6
