@@ -38,7 +38,7 @@ import { Dispatch, SetStateAction } from "react";
 import { SwitchChainMutateAsync } from "wagmi/query";
 import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
 import { tronOtcAbi } from "@/lib/tron/otc";
-import TronWeb from 'tronweb';
+import TronWeb from "tronweb";
 
 interface Props {
   buttonText: string;
