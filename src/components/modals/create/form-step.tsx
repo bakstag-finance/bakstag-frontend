@@ -40,7 +40,7 @@ export const FormStep = ({ handleCreateSwap, handleClose }: FormStepProps) => {
 
   const isValidDestinationWallet = isValidCryptoAddress(
     destinationWallet,
-    selectedSrcToken ? tokensData[selectedSrcToken].network : "",
+    selectedDstToken ? tokensData[selectedDstToken].network : "",
   );
 
   const totalReceiveAmount = calculateTotalReceiveAmount(
@@ -52,8 +52,8 @@ export const FormStep = ({ handleCreateSwap, handleClose }: FormStepProps) => {
   const isCorrectExchangeRate = validateTokenAmount(dstTokenAmount);
 
   const walletAddressLabel = "Destination Wallet Address";
-  const addressNetwork = selectedSrcToken
-    ? ` | ${tokensData[selectedSrcToken].token} (${tokensData[selectedSrcToken].network})`
+  const addressNetwork = selectedDstToken
+    ? ` | ${tokensData[selectedDstToken].token} (${tokensData[selectedDstToken].network})`
     : "";
 
   return (
@@ -84,7 +84,7 @@ export const FormStep = ({ handleCreateSwap, handleClose }: FormStepProps) => {
         value={destinationWallet}
         setValue={setDestinationWallet}
         className={"mt-3"}
-        network={selectedSrcToken ? tokensData[selectedSrcToken].network : ""}
+        network={selectedDstToken ? tokensData[selectedDstToken].network : ""}
       />
       <Summary
         selectedDstToken={selectedDstToken}
@@ -104,6 +104,9 @@ export const FormStep = ({ handleCreateSwap, handleClose }: FormStepProps) => {
         defaultText={"Publish Ad"}
         isValidDestinationWallet={isValidDestinationWallet}
         isValidTokensInput={isCorrectSrcTokenAmount && isCorrectExchangeRate}
+        srcTokenNetwork={
+          selectedSrcToken ? tokensData[selectedSrcToken].network : ""
+        }
       />
     </div>
   );
@@ -167,14 +170,14 @@ const TokenAmountInput = ({
                 }
               >
                 <span className={"text-[14px] font-light"}>
-                  {tokensData[selectedDstToken].token + " "}
+                  {tokensData[selectedSrcToken].token + " "}
                   <span className={"text-gray-700"}>
-                    ({tokensData[selectedDstToken].network}){" "}
+                    ({tokensData[selectedSrcToken].network}){" "}
                   </span>{" "}
-                  = 1 <span>{tokensData[selectedSrcToken].token}</span>{" "}
+                  = 1 <span>{tokensData[selectedDstToken].token}</span>{" "}
                   <span className={"text-gray-700"}>
                     {" "}
-                    ({tokensData[selectedSrcToken].network})
+                    ({tokensData[selectedDstToken].network})
                   </span>
                 </span>
               </span>

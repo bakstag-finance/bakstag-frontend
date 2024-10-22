@@ -29,9 +29,10 @@ type ConnectModalStep = "main" | "wallet-choose" | "delete";
 
 interface Props {
   refetch: () => void;
+  btnText?: string;
 }
 
-export const Modal = ({ refetch }: Props) => {
+export const Modal = ({ refetch, btnText }: Props) => {
   const [openModal, setOpenModal] = useState(false);
   const [step, setStep] = useState<ConnectModalStep>("main");
 
@@ -240,7 +241,7 @@ export const Modal = ({ refetch }: Props) => {
       <DialogTrigger asChild>
         <Squircle asChild cornerRadius={12} cornerSmoothing={1}>
           <Button className={"bg-white text-black w-full font-extralight"}>
-            {isWalletConnected ? "Profile" : "+ Connect"}
+            {btnText ? btnText : isWalletConnected ? "Profile" : "+ Connect"}
           </Button>
         </Squircle>
       </DialogTrigger>

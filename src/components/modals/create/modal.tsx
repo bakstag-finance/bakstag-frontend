@@ -36,10 +36,9 @@ import { Squircle } from "@squircle-js/react";
 import { otcMarketAbi } from "@/lib/wagmi/contracts/abi";
 import { Dispatch, SetStateAction } from "react";
 import { SwitchChainMutateAsync } from "wagmi/query";
-import { tronWeb } from "@/lib/tron";
-import { tronOtcAbi } from "@/lib/tron/otc";
-import { useWalletConnection } from "@/lib/hooks";
 import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
+import { tronOtcAbi } from "@/lib/tron/otc";
+import TronWeb from 'tronweb';
 
 interface Props {
   buttonText: string;
@@ -81,16 +80,17 @@ const Modal = ({ buttonText, refetch }: Props) => {
     setOpenModal(false);
     handleResetState();
   };
+
   const handleRetry = () => setCurrentStep("main");
 
   const handleResetState = () => {
-    handleRetry();
     setSelectedSrcToken("");
     setSrcTokenAmount("0");
     setDstTokenAmount("0");
     setSelectedDstToken("");
     setDestinationWallet("");
     setApprovingStatus("idle");
+    handleRetry();
   };
 
   const handleCreateSwap = async () => {
@@ -98,7 +98,7 @@ const Modal = ({ buttonText, refetch }: Props) => {
       tokensData[selectedSrcToken].network === "BASE" ||
       tokensData[selectedSrcToken].network === "OP"
     ) {
-      void handleEvmSwap({
+      void handleEvmCreate({
         isWalletConnected,
         approvingStatus,
         setApprovingStatus,
@@ -114,60 +114,27 @@ const Modal = ({ buttonText, refetch }: Props) => {
         setCurrentStep,
         setApprovingErrorMsg,
       });
-    } else if (tokensData[selectedSrcToken].network === "TRON") {
-      // setApprovingErrorMsg("No TRX are now avaliable");
-      // setApprovingStatus("error");
 
-      // const _srcAmountLD = parseUnits(srcTokenAmount, 18).toString();
-      //
-      // const _exchangeRateSD = parseUnits(dstTokenAmount, 6).toString();
-      let contract = tronWeb.contract(
-        tronOtcAbi.abi,
-        "TPLfJpnPHxdAKkUZ1gTkHKFKN9UAUByfLx",
-      );
-      console.log("Contract", contract);
+      return null;
+    }
 
-      const params = [
-        {
-          eid: 40245,
-          msgType: 0,
-          options:
-            "0x0003010021010000000000000000000000000098968000000000000000000000000000e4e1c0",
-        },
-        {
-          eid: 40245,
-          msgType: 1,
-          options: "0x000301001101000000000000000000000000000186a001000104",
-        },
-        {
-          eid: 40245,
-          msgType: 2,
-          options: "0x0003010011010000000000000000000000000004a76801000104",
-        },
-        {
-          eid: 40245,
-          msgType: 3,
-          options: "0x000301001101000000000000000000000000000186a001000104",
-        },
-      ];
+    if (tokensData[selectedSrcToken].network === "TRON") {
+      void handleTronCreate({
+        tronWallet,
+        approvingStatus,
+        setApprovingStatus,
+        selectedSrcToken,
+        selectedDstToken,
+        srcTokenAmount,
+        dstTokenAmount,
+        destinationWallet,
+        setTransactionData,
+        setTransactionStatus,
+        setCurrentStep,
+        setApprovingErrorMsg,
+      });
 
-      console.log("Params", params);
-      const sendOptions = await contract["setEnforcedOptions"](params).call();
-
-      console.log("SendOptions", sendOptions);
-
-      // const result = await contract.quoteCreateOffer(
-      //     tronWallet.address,
-      //     {
-      //       dstSellerAddress: "TMMmzgw3SfPzJ8c5wHmj1B89VzE36h47aR",
-      //       dstEid: "40420",
-      //       srcTokenAddress: tokensData[selectedSrcToken].tokenAddress,
-      //       dstTokenAddress: tokensData[selectedDstToken].tokenAddress,
-      //       srcAmountLD: _srcAmountLD,
-      //       exchangeRateSD: _exchangeRateSD,
-      //     },
-      //     false,
-      // ).call();
+      return null;
     }
   };
 
@@ -312,7 +279,7 @@ interface EVMSwapProps {
   setApprovingErrorMsg: Dispatch<SetStateAction<string>>;
 }
 
-const handleEvmSwap = async ({
+const handleEvmCreate = async ({
   isWalletConnected,
   setApprovingStatus,
   approvingStatus,
@@ -486,6 +453,158 @@ const handleEvmSwap = async ({
     }
   } catch (e: any) {
     setApprovingErrorMsg(e.message);
+    setApprovingStatus("error");
+  }
+};
+
+interface TronCreateProps {
+  tronWallet: ReturnType<typeof useWallet>;
+  approvingStatus: Status;
+  setApprovingStatus: Dispatch<SetStateAction<Status>>;
+  selectedSrcToken: string;
+  selectedDstToken: string;
+  srcTokenAmount: string;
+  dstTokenAmount: string;
+  destinationWallet: string;
+  setTransactionData: Dispatch<SetStateAction<TransactionData>>;
+  setTransactionStatus: Dispatch<SetStateAction<Status>>;
+  setCurrentStep: Dispatch<SetStateAction<CreateModalStep>>;
+  setApprovingErrorMsg: Dispatch<SetStateAction<string>>;
+}
+
+const handleTronCreate = async ({
+  tronWallet,
+  approvingStatus,
+  setApprovingStatus,
+  selectedSrcToken,
+  selectedDstToken,
+  srcTokenAmount,
+  dstTokenAmount,
+  destinationWallet,
+  setTransactionData,
+  setTransactionStatus,
+  setCurrentStep,
+  setApprovingErrorMsg,
+}: TronCreateProps) => {
+  try {
+    if (!tronWallet.address || approvingStatus === "success") {
+      return null;
+    }
+    const tronWeb = window.tronWeb as any;
+    if (!tronWeb) {
+      return null;
+    }
+
+    setApprovingStatus("pending");
+
+    let _lzFee: LzFee = {
+      nativeFee: BigInt(0),
+      lzTokenFee: BigInt(0),
+    };
+    let _value: bigint = BigInt(0);
+
+    const _srcAmountLD = parseUnits(srcTokenAmount, 6);
+    const _exchangeRateSD = parseUnits(dstTokenAmount, 6);
+
+    const contract_address = "TAhx7vRGHedwdEFhLYxk4L6VLo1XYmdSQz";
+
+    let contract = tronWeb.contract(tronOtcAbi.abi, contract_address);
+
+    const hexAddress = tronWeb.address.toHex(tronWallet.address);
+    const addressInBytes32 = hexZeroPadTo32(`0x${hexAddress}`);
+
+    const hexDstAddress = hexZeroPadTo32(
+      `0x${tronWeb.address.toHex(destinationWallet)}`,
+    );
+
+    const quoteCreateParams = [
+      hexDstAddress,
+      tokensData[selectedDstToken].eid,
+      hexZeroPadTo32(tokensData[selectedSrcToken].tokenAddress),
+      hexZeroPadTo32(tokensData[selectedDstToken].tokenAddress),
+      _srcAmountLD,
+      _exchangeRateSD,
+    ];
+
+    const [lzFee, { offerId, srcAmountLD }] = await contract[
+      "quoteCreateOffer"
+    ](addressInBytes32, quoteCreateParams, false).call();
+
+    _lzFee = lzFee;
+
+    _value =
+      tokensData[selectedSrcToken].tokenAddress == ethers.constants.AddressZero
+        ? BigInt(lzFee.nativeFee.toString()) + BigInt(srcAmountLD.toString())
+        : BigInt(lzFee.nativeFee.toString());
+
+    if (
+      tokensData[selectedSrcToken].tokenAddress != ethers.constants.AddressZero
+    ) {
+      const trc20ContractAddress = await tronWeb.address.fromHex(
+        tokensData[selectedSrcToken].tokenAddress,
+      );
+      void tronWeb.setAddress(trc20ContractAddress);
+
+      const functionSelector = "approve(address,uint256)";
+      const parameter = [
+        { type: "address", value: tronWallet.address! },
+        { type: "uint256", value: 100 },
+      ];
+      const tx = await tronWeb.transactionBuilder.triggerSmartContract(
+        trc20ContractAddress,
+        functionSelector,
+        {},
+        parameter,
+      );
+
+      const signedTx = await tronWeb.trx.sign(tx.transaction);
+      await tronWeb.trx.sendRawTransaction(signedTx);
+    }
+
+    setTransactionData((prevState) => {
+      return {
+        ...prevState,
+        offerId: offerId,
+      };
+    });
+
+    const createOfferData = [
+      hexDstAddress,
+      tokensData[selectedDstToken].eid,
+      hexZeroPadTo32(tokensData[selectedSrcToken].tokenAddress),
+      hexZeroPadTo32(tokensData[selectedDstToken].tokenAddress),
+      _srcAmountLD,
+      _exchangeRateSD,
+    ];
+
+    const txHash = await contract["createOffer"](createOfferData, _lzFee).send({
+      callValue: _value,
+    });
+
+    if (txHash) {
+      setTransactionData((prevState) => {
+        return {
+          ...prevState,
+          txHash: `0x${txHash}`,
+          srcEid: Number(tokensData[selectedSrcToken].eid),
+          srcChainId: Number(tokensData[selectedSrcToken].chainId) as ChainIds,
+          dstEid: Number(tokensData[selectedDstToken].eid),
+          srcSellerAddress: hexAddress,
+          dstSellerAddress: hexDstAddress,
+          srcTokenAddress: tokensData[selectedSrcToken].tokenAddress,
+          dstTokenAddress: tokensData[selectedDstToken].tokenAddress,
+          srcAmountLD: _srcAmountLD,
+          exchangeRateSD: _exchangeRateSD,
+        };
+      });
+
+      setApprovingStatus("success");
+      setTransactionStatus("pending");
+      setCurrentStep("transaction");
+    }
+  } catch (e) {
+    console.log(e);
+    setApprovingErrorMsg((e as Error).message);
     setApprovingStatus("error");
   }
 };

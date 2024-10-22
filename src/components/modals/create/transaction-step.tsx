@@ -10,7 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowUpRight } from "lucide-react";
 import axios from "axios";
 import { tokensData } from "@/lib/constants";
-import { waitForTransaction } from "@wagmi/core";
+import { waitForTransactionReceipt } from "@wagmi/core";
 import { wagmiConfig } from "@/lib/wagmi/config";
 import Link from "next/link";
 import { Dispatch, SetStateAction } from "react";
@@ -49,14 +49,41 @@ const handleTransaction = async (
   isMonochain: boolean,
   refetch: () => void,
 ) => {
-  if (isMonochain) {
-    const receipt = await waitForTransaction(wagmiConfig, {
-      hash: transactionData.txHash as `0x${string}`,
-      chainId: transactionData.srcChainId,
-    });
+  if (transactionData.txHash.length <= 0) {
+    throw new Error("No Tx Providerd");
+  }
 
-    if (receipt.status == "reverted") {
-      throw new Error("Reverted Transaction");
+  if (isMonochain) {
+    if (tokensData[selectedSrcToken].network === "TRON") {
+      const tronWeb = window.tronWeb as any;
+
+      if (!tronWeb) {
+        throw new Error("No tronWeb Provided");
+      }
+
+      const txId = transactionData.txHash.slice(2);
+
+      const txStatus = await tronWeb.trx.getTransaction(txId);
+      console.log(txStatus);
+      if (txStatus.ret[0].contractRet != "SUCCESS") {
+        throw new Error("Reverted Transaction");
+      }
+      const txReceipt = await tronWeb.trx.getTransactionInfo(txId);
+
+      console.log(txReceipt);
+
+      if (txReceipt.receipt.result !== "SUCCESS") {
+        throw new Error("Reverted Transaction");
+      }
+    } else {
+      const receipt = await waitForTransactionReceipt(wagmiConfig, {
+        hash: transactionData.txHash as `0x${string}`,
+        chainId: transactionData.srcChainId,
+      });
+
+      if (receipt.status == "reverted") {
+        throw new Error("Reverted Transaction");
+      }
     }
   } else {
     await axios.get(

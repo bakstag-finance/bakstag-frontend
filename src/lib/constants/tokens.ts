@@ -10,15 +10,6 @@ export type TokenData = {
   decimals: number;
 };
 
-/**
- * Optimism
- * sepolia chain id - 11155420
- * main chain id - 10
- *
- * Base
- * sepolia chain id - 84532
- * main chain id -  8453
- */
 export const tokensData: Record<string, TokenData> = {
   "eth-opt": {
     token: "ETH",
@@ -89,19 +80,19 @@ export const tokensData: Record<string, TokenData> = {
   "trx-tron": {
     token: "TRX",
     network: "TRON",
-    tokenAddress: "0x21bFF5Cd1f61b59Cc2D908C050735b87cb780d2d",
+    tokenAddress: "0x0000000000000000000000000000000000000000",
     eid: "40420",
     chainId: undefined,
     otcConfig: otcMarketConfig,
-    decimals: 18, // TODO: replace to 6
+    decimals: 6,
   },
   "usdt-tron": {
     token: "USDT",
     network: "TRON",
-    tokenAddress: "0x21bFF5Cd1f61b59Cc2D908C050735b87cb780d2d",
+    tokenAddress: "0x42a1e39aefA49290F2B3F9ed688D7cecf86CD6E0",
     eid: "40420",
     chainId: undefined,
     otcConfig: otcMarketConfig,
-    decimals: 18, // TODO: replace to 6
+    decimals: 6,
   },
 } as const;

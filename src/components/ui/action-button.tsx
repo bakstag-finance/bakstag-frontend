@@ -7,7 +7,6 @@ import { Squircle } from "@squircle-js/react";
 import { cn } from "@/lib/utils";
 import { BASE_URL } from "@/lib/constants";
 import { ConnectModal } from "@/components/modals";
-import { useWalletConnection } from "@/lib/hooks";
 import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
 
 interface ActionButtonProps {
@@ -26,6 +25,7 @@ interface ActionButtonProps {
   isCopy?: boolean;
   offerId?: string;
   refetch?: () => void;
+  srcTokenNetwork?: string;
 }
 
 export const ActionButton: FC<ActionButtonProps> = ({
@@ -44,16 +44,19 @@ export const ActionButton: FC<ActionButtonProps> = ({
   isCopy = false,
   offerId,
   refetch,
+  srcTokenNetwork,
 }) => {
   const { address } = useAccount();
   const tronWallet = useWallet();
-  const isWalletConnected = !!address || !!tronWallet.address;
+
+  const isWalletConnected =
+    srcTokenNetwork === "TRON" ? !!tronWallet.address : !!address;
 
   return (
     <>
       <div className="mt-5 relative max-w-full w-full flex justify-center items-center">
         {!isWalletConnected ? (
-          <ConnectModal refetch={refetch!} />
+          <ConnectModal refetch={refetch!} btnText={"Connect Wallet"} />
         ) : (
           <Squircle asChild cornerRadius={12} cornerSmoothing={1}>
             <Button
