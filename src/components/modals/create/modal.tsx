@@ -490,7 +490,7 @@ const handleTronCreate = async ({
     if (!tronWallet.address || approvingStatus === "success") {
       return null;
     }
-    const tronWeb = window.tronWeb as any;
+    const tronWeb = (window as any).tronWeb as any;
     if (!tronWeb) {
       return null;
     }

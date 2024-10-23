@@ -1,10 +1,10 @@
 import {
+  Abi,
   ContractFunctionExecutionError,
   ContractFunctionExecutionErrorType,
   ContractFunctionRevertedError,
   decodeErrorResult,
 } from "viem";
-import { Abi } from "abitype";
 import {
   SimulateContractErrorType,
   WriteContractErrorType,

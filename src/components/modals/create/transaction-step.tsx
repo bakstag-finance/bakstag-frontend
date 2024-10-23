@@ -55,7 +55,7 @@ const handleTransaction = async (
 
   if (isMonochain) {
     if (tokensData[selectedSrcToken].network === "TRON") {
-      const tronWeb = window.tronWeb as any;
+      const tronWeb = (window as any).tronWeb as any;
 
       if (!tronWeb) {
         throw new Error("No tronWeb Provided");

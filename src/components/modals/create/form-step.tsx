@@ -170,14 +170,14 @@ const TokenAmountInput = ({
                 }
               >
                 <span className={"text-[14px] font-light"}>
-                  {tokensData[selectedSrcToken].token + " "}
+                  {tokensData[selectedDstToken].token + " "}
                   <span className={"text-gray-700"}>
-                    ({tokensData[selectedSrcToken].network}){" "}
+                    ({tokensData[selectedDstToken].network}){" "}
                   </span>{" "}
-                  = 1 <span>{tokensData[selectedDstToken].token}</span>{" "}
+                  = 1 <span>{tokensData[selectedSrcToken].token}</span>{" "}
                   <span className={"text-gray-700"}>
                     {" "}
-                    ({tokensData[selectedDstToken].network})
+                    ({tokensData[selectedSrcToken].network})
                   </span>
                 </span>
               </span>
