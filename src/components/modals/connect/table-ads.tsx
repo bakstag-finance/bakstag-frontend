@@ -33,6 +33,7 @@ import { cn } from "@/lib/utils";
 import { formatNumberWithCommas } from "@/lib/helpers/formating";
 
 import { Trash } from "lucide-react";
+import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
 
 type ConnectModalStep = "main" | "wallet-choose" | "delete";
 
@@ -44,10 +45,12 @@ interface Props {
 type FilterType = "new" | "old";
 export const TableComponent = ({ setStep, setOrderData }: Props) => {
   const { address } = useAccount();
+  const tronWallet = useWallet();
+
   const [tokenToBuy, setTokenToBuy] = useState("");
   const [timeFilter, setTimeFilter] = useState<FilterType>("new");
 
-  const isWalletConnected = !!address;
+  const isWalletConnected = !!address || tronWallet.connected;
 
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -60,11 +63,37 @@ export const TableComponent = ({ setStep, setOrderData }: Props) => {
     isFetching,
     refetch,
   } = useQuery<Offer[]>({
-    queryKey: ["table-ads", tokenToBuy, address, timeFilter, page],
+    queryKey: [
+      "table-ads",
+      tokenToBuy,
+      address,
+      tronWallet.address,
+      timeFilter,
+      page,
+    ],
     queryFn: async () => {
-      const result = await axios.get(
-        `/api/offer/get_all?tokenToBuy=${tokenToBuy}&address=${address}&page=${page}&limit=5&amountToBuy=0&showEmpty=true`,
-      );
+      const params = new URLSearchParams();
+
+      if (address) {
+        params.append("address", encodeURIComponent(address));
+      }
+
+      if (tronWallet?.address) {
+        const tronWeb = (window as any).tronWeb as any;
+        const hexAddress = tronWeb.address.toHex(tronWallet.address);
+        params.append(
+          "tronWalletAddress",
+          encodeURIComponent(`0x${hexAddress}`),
+        );
+      }
+
+      params.append("tokenToBuy", tokenToBuy);
+      params.append("page", page.toString());
+      params.append("limit", "5");
+      params.append("amountToBuy", "0");
+      params.append("showEmpty", "true");
+
+      const result = await axios.get(`/api/offer/get_all?${params.toString()}`);
       let offers = result.data.offers || [];
 
       void sideQueryPagination(offers);
@@ -77,7 +106,7 @@ export const TableComponent = ({ setStep, setOrderData }: Props) => {
     setPage(1);
     setAllOffers([]);
     void refetch();
-  }, [tokenToBuy, address, timeFilter]);
+  }, [tokenToBuy, address, tronWallet.address, timeFilter]);
 
   const sortByTime = (data: Offer[]) => {
     let offers;

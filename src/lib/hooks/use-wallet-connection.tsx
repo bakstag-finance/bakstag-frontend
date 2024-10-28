@@ -18,6 +18,8 @@ const useWalletConnection = ({ setStep }: Props) => {
   const tronWallet = useWallet();
 
   const isWalletConnected = !!account.address || tronWallet.connected;
+  
+  const isTronConnected = tronWallet.connected;
   const isEVMConnected = !!account.address;
 
   useEffect(() => {
@@ -45,6 +47,7 @@ const useWalletConnection = ({ setStep }: Props) => {
     account,
     tronWallet,
     isWalletConnected,
+    isTronConnected,
     isEVMConnected,
     status,
     metaMaskConnect,

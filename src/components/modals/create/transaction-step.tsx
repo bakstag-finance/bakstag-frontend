@@ -64,15 +64,8 @@ const handleTransaction = async (
       const txId = transactionData.txHash.slice(2);
 
       const txStatus = await tronWeb.trx.getTransaction(txId);
-      console.log(txStatus);
+   
       if (txStatus.ret[0].contractRet != "SUCCESS") {
-        throw new Error("Reverted Transaction");
-      }
-      const txReceipt = await tronWeb.trx.getTransactionInfo(txId);
-
-      console.log(txReceipt);
-
-      if (txReceipt.receipt.result !== "SUCCESS") {
         throw new Error("Reverted Transaction");
       }
     } else {

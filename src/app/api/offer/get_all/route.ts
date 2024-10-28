@@ -14,6 +14,7 @@ export async function GET(req: Request) {
     const amountToBuy = searchParams.get("amountToBuy") || "";
     const tokenToSell = searchParams.get("tokenToSell") || "";
     const srcAddress = searchParams.get("address") || "";
+    const tronWalletAddress = searchParams.get("tronWalletAddress") || "";
     const showEmpty = searchParams.get("showEmpty") || "false";
 
     const page = parseInt(searchParams.get("page") || "1", 10);
@@ -23,8 +24,20 @@ export async function GET(req: Request) {
 
     const whereCondition: any = {};
 
+    const addresses: string[] = [];
+
     if (srcAddress && srcAddress.length > 0) {
-      whereCondition.srcSellerAddress = hexZeroPadTo32(srcAddress as any);
+      addresses.push(srcAddress);
+    }
+
+    if (tronWalletAddress && tronWalletAddress.length > 0) {
+      addresses.push(tronWalletAddress);
+    }
+
+    if (addresses.length > 0) {
+      whereCondition.srcSellerAddress = {
+        in: addresses,
+      };
     }
 
     if (tokenToBuy && tokensData[tokenToBuy]) {

@@ -38,7 +38,7 @@ import { Dispatch, SetStateAction } from "react";
 import { SwitchChainMutateAsync } from "wagmi/query";
 import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
 import { tronOtcAbi } from "@/lib/tron/otc";
-import TronWeb from "tronweb";
+import { toHexFromTron } from "@/lib/helpers/tron-converter";
 
 interface Props {
   buttonText: string;
@@ -510,7 +510,7 @@ const handleTronCreate = async ({
 
     let contract = tronWeb.contract(tronOtcAbi.abi, contract_address);
 
-    const hexAddress = tronWeb.address.toHex(tronWallet.address);
+    const hexAddress = tronWeb.address.toHex(tronWallet.address).slice(2);
     const addressInBytes32 = hexZeroPadTo32(`0x${hexAddress}`);
 
     const hexDstAddress = hexZeroPadTo32(
@@ -531,7 +531,6 @@ const handleTronCreate = async ({
     ](addressInBytes32, quoteCreateParams, false).call();
 
     _lzFee = lzFee;
-
     _value =
       tokensData[selectedSrcToken].tokenAddress == ethers.constants.AddressZero
         ? BigInt(lzFee.nativeFee.toString()) + BigInt(srcAmountLD.toString())
@@ -589,7 +588,7 @@ const handleTronCreate = async ({
           srcEid: Number(tokensData[selectedSrcToken].eid),
           srcChainId: Number(tokensData[selectedSrcToken].chainId) as ChainIds,
           dstEid: Number(tokensData[selectedDstToken].eid),
-          srcSellerAddress: hexAddress,
+          srcSellerAddress: `0x${hexAddress}`,
           dstSellerAddress: hexDstAddress,
           srcTokenAddress: tokensData[selectedSrcToken].tokenAddress,
           dstTokenAddress: tokensData[selectedDstToken].tokenAddress,
@@ -604,7 +603,7 @@ const handleTronCreate = async ({
     }
   } catch (e) {
     console.log(e);
-    setApprovingErrorMsg((e as Error).message);
+    setApprovingErrorMsg((e as any).toString());
     setApprovingStatus("error");
   }
 };

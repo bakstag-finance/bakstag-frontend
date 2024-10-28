@@ -15,6 +15,9 @@ export const isValidCryptoAddress = (
   network: string,
 ): boolean => {
   if (network === "TRON") {
+    if (address.startsWith("0x")) {
+      return isEthAddress(address);
+    }
     return tronWeb.isAddress(address);
   }
 
