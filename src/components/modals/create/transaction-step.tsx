@@ -20,6 +20,7 @@ import { formatNumberWithCommas } from "@/lib/helpers/formating";
 import { useCreateModal } from "@/components/modals/create/context";
 import { useAccount } from "wagmi";
 import { ActionButton } from "@/components/ui/";
+import { fromTronToHex } from "@/lib/helpers/tron-converter";
 
 interface TransactionData {
   txHash: string;
@@ -64,7 +65,7 @@ const handleTransaction = async (
       const txId = transactionData.txHash.slice(2);
 
       const txStatus = await tronWeb.trx.getTransaction(txId);
-   
+
       if (txStatus.ret[0].contractRet != "SUCCESS") {
         throw new Error("Reverted Transaction");
       }
@@ -211,6 +212,11 @@ const TransactionDetails = ({
     calculateTotalReceiveAmount(srcTokenAmount, dstTokenAmount),
   );
 
+  const formatedDstWallet =
+    tokensData[selectedSrcToken].network === "TRON"
+      ? fromTronToHex(destinationWallet)
+      : destinationWallet;
+
   return (
     <div className="w-full flex flex-col text-xs mt-5 text-white">
       <DetailRow label="TX ID">
@@ -229,10 +235,10 @@ const TransactionDetails = ({
         </span>
       </DetailRow>
       <DetailRow label="to Wallet">
-        {destinationWallet.length > 8 && (
+        {formatedDstWallet.length > 8 && (
           <div className="flex flex-row items-center text-gray-800">
-            {addressFormat(destinationWallet)}
-            <Copy textToCopy={destinationWallet} />
+            {addressFormat(formatedDstWallet)}
+            <Copy textToCopy={formatedDstWallet} />
           </div>
         )}
       </DetailRow>

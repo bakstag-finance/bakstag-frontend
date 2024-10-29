@@ -22,7 +22,7 @@ import {
 import { useAccount, useSwitchChain } from "wagmi";
 import { FormStep } from "./form-step";
 import { TransactionStep } from "./transaction-step";
-import { Status } from "@/types/contracts";
+import { LzFee, Status } from "@/types/contracts";
 import { Offer } from "@/types/offer";
 import { erc20Abi, formatUnits, parseUnits } from "viem";
 import {
@@ -43,6 +43,9 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { cn } from "@/lib/utils";
 import { SwitchChainMutateAsync } from "wagmi/query";
+import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
+import { tronOtcAbi } from "@/lib/tron/otc";
+import { constants } from "crypto";
 
 const Modal = ({
   openModal,
@@ -67,6 +70,7 @@ const Modal = ({
     setDstTokenAmount,
     setDestinationWallet,
     approvingStatus,
+    destinationWallet,
     setApprovingStatus,
     setApprovingErrorMsg,
     transactionStatus,
@@ -76,15 +80,23 @@ const Modal = ({
 
   const { address } = useAccount();
   const { switchChainAsync } = useSwitchChain();
-  const isWalletConnected = !!address;
+
+  const isEvmWalletConnected = !!address;
+
+  const tronWallet = useWallet();
+  const isTronConnected = tronWallet.connected;
 
   const submitHandler = async () => {
+    if (!offer) {
+      return null;
+    }
+
     if (
-      (offer?.srcTokenNetwork === "BASE" || offer?.srcTokenNetwork === "OP") &&
+      (offer.srcTokenNetwork === "BASE" || offer.srcTokenNetwork === "OP") &&
       address
     ) {
       void evmAcceptOffer({
-        isWalletConnected,
+        isWalletConnected: isEvmWalletConnected,
         offer,
         address,
         srcTokenAmount,
@@ -97,9 +109,153 @@ const Modal = ({
         setTransactionStatus,
         setStep,
       });
-    } else {
-      setApprovingErrorMsg("No TRX are now avaliable");
-      setApprovingStatus("error");
+      return null;
+    }
+
+    if (offer.srcTokenNetwork === "TRON") {
+      try {
+        if (!isTronConnected || approvingStatus === "success") {
+          return null;
+        }
+
+        if (approvingStatus === "idle" || approvingStatus === "error") {
+          setApprovingStatus("pending");
+
+          const tronWeb = (window as any).tronWeb as any;
+          if (!tronWeb) {
+            return null;
+          }
+
+          let _lzFee: LzFee = {
+            nativeFee: BigInt(0),
+            lzTokenFee: BigInt(0),
+          };
+
+          let _value: bigint = BigInt(0);
+
+          const contract_address = "TAhx7vRGHedwdEFhLYxk4L6VLo1XYmdSQz";
+          let contract = tronWeb.contract(tronOtcAbi.abi, contract_address);
+
+          const _srcAmountSD = parseUnits(srcTokenAmount, 6);
+
+          const hexSrcAddress: `0x${string}` = `0x${tronWeb.address.toHex(tronWallet.address).slice(2)}`;
+          const srcAddressBytes32 = hexZeroPadTo32(hexSrcAddress);
+
+          const hexDstAddress: `0x${string}` = `0x${tronWeb.address.toHex(destinationWallet).slice(2)}`;
+          const hexDstWallet = hexZeroPadTo32(hexDstAddress);
+
+          const quoteAcceptOffer = [
+            offer.offerId,
+            _srcAmountSD,
+            srcAddressBytes32,
+          ];
+
+          const res = await contract["quoteAcceptOffer"](
+            hexDstWallet,
+            quoteAcceptOffer,
+            false,
+          ).call();
+
+          const [lzFee, { dstAmountLD, feeLD }] = res;
+
+          console.log("Res", res);
+
+          _lzFee = lzFee;
+          _value =
+            offer.srcTokenAddress == ethers.constants.AddressZero
+              ? BigInt(lzFee.nativeFee.toString()) +
+                BigInt(dstAmountLD.toString())
+              : BigInt(lzFee.nativeFee.toString());
+
+          if (offer.srcTokenAddress != ethers.constants.AddressZero) {
+            console.log("Start Approve Method");
+
+            const trc20ContractAddress = getTokenField(
+              offer.srcTokenTicker,
+              offer.srcTokenNetwork,
+              "tokenAddress",
+            );
+
+            const functionSelector = "approve(address,uint256)";
+
+            const parameter = [
+              { type: "address", value: tronWallet.address! },
+              { type: "uint256", value: 100 },
+            ];
+            const tx = await tronWeb.transactionBuilder.triggerSmartContract(
+              trc20ContractAddress,
+              functionSelector,
+              {},
+              parameter,
+            );
+
+            console.log("TX", tx);
+            const signedTx = await tronWeb.trx.sign(tx.transaction);
+            await tronWeb.trx.sendRawTransaction(signedTx);
+          }
+
+          const acceptOfferData = [
+            offer.offerId,
+            _srcAmountSD,
+            srcAddressBytes32,
+          ];
+
+          const txHash = await contract["acceptOffer"](
+            acceptOfferData,
+            _lzFee,
+          ).send({
+            callValue: _value,
+          });
+
+          console.log("TxHash", txHash);
+
+          if (txHash) {
+            const _dstTokenDecimals = getTokenField(
+              offer.dstTokenTicker,
+              offer.dstTokenNetwork,
+              "decimals",
+            );
+            const _dstTokenChainId = getTokenField(
+              offer.dstTokenTicker,
+              offer.dstTokenNetwork,
+              "chainId",
+            );
+            const srcAmountLD = (
+              BigInt(offer.srcAmountLD) -
+              parseUnits(dstTokenAmount, _dstTokenDecimals)
+            ).toString();
+
+            const parseExchangeRate = formatUnits(
+              BigInt(offer.exchangeRateSD),
+              6,
+            );
+
+            setInfoForTransactionStep({
+              txHash,
+              offerId: offer.offerId,
+              srcChainId: _dstTokenChainId,
+              srcEid: offer.dstEid,
+              srcTokenAddress: offer.srcTokenAddress,
+              dstTokenAddress: offer.dstTokenAddress,
+              srcTokenAmount: srcTokenAmount,
+              exchangeRate: parseExchangeRate,
+              srcAmountLD: srcAmountLD,
+              srcTokenTicker: offer.srcTokenTicker,
+              srcTokenNetwork: offer.srcTokenNetwork,
+              dstTokenTicker: offer.dstTokenTicker,
+              dstTokenNetwork: offer.dstTokenNetwork,
+            });
+            setTransactionStatus("pending");
+            setApprovingStatus("success");
+            setStep("transaction");
+          }
+        }
+      } catch (e) {
+        console.log(e);
+        setApprovingErrorMsg("ERROR");
+        setApprovingStatus("error");
+      }
+      return null;
     }
   };
 
@@ -121,10 +277,13 @@ const Modal = ({
   const handleMaxExceededAmount = (
     inputValue: string,
     orderAmount: string,
+    orderAmountDecimals: number,
     setApprovingStatus: Dispatch<SetStateAction<Status>>,
     setApprovingErrorMessage: Dispatch<SetStateAction<string>>,
   ) => {
-    const MAX_VALUE = Number(formatUnits(BigInt(orderAmount), 18));
+    const MAX_VALUE = Number(
+      formatUnits(BigInt(orderAmount), orderAmountDecimals),
+    );
     const parsedValue = Number(inputValue);
 
     if (MAX_VALUE < parsedValue) {
@@ -172,14 +331,15 @@ const Modal = ({
       const exchangeRate = Number(formatUnits(BigInt(offer.exchangeRateSD), 6));
 
       if (inputField === "src") {
-        const newDstTokenAmount = (
-          parseFloat(inputValue) / exchangeRate
-        ).toString();
+        const newDstTokenAmount = (parseFloat(inputValue) / exchangeRate)
+          .toFixed(4)
+          .toString();
         setDstTokenAmount(newDstTokenAmount);
 
         handleMaxExceededAmount(
           inputValue,
           offer.srcAmountLD.toString(),
+          6,
           setApprovingStatus,
           setApprovingErrorMsg,
         );
@@ -189,9 +349,16 @@ const Modal = ({
         ).toString();
         setSrcTokenAmount(newSrcTokenAmount);
 
+        const srcTokenDecimals = getTokenField(
+          offer.srcTokenTicker,
+          offer.srcTokenNetwork,
+          "decimals",
+        );
+
         handleMaxExceededAmount(
           newSrcTokenAmount,
           offer?.srcAmountLD.toString(),
+          srcTokenDecimals,
           setApprovingStatus,
           setApprovingErrorMsg,
         );
@@ -471,8 +638,6 @@ const evmAcceptOffer = async ({
         );
         throw new Error(errorMsg);
       });
-
-      setInterval(() => {}, 1000);
 
       const hexAddressZero = hexZeroPadTo32(ethers.constants.AddressZero);
 

@@ -6,6 +6,7 @@ import { useAccount } from "wagmi";
 import { AddressDetailRow, DetailRow } from "@/components/molecules";
 import { ActionButton } from "@/components/ui/";
 import { formatNumberWithCommas } from "@/lib/helpers/formating";
+import { fromTronToHex } from "@/lib/helpers/tron-converter";
 
 interface Props {
   closeModalHandler: () => void;
@@ -105,6 +106,7 @@ export const FormStep = ({
         isValidTokensInput={isCorrectSrcTokenAmount && isCorrectExchangeRate}
         isCopy={true}
         offerId={offer.offerId}
+        srcTokenNetwork={srcTokenNetwork}
       />
     </div>
   );
@@ -166,6 +168,9 @@ const Summary = ({
     Number(formatUnits(BigInt(exchangeRate), 6)),
   );
 
+  const _address =
+    srcToken.network === "TRON" ? fromTronToHex(address) : address;
+
   return (
     <div className="w-full flex flex-col text-xs mt-3">
       <DetailRow label="Amount to pay">
@@ -180,12 +185,12 @@ const Summary = ({
       </DetailRow>
       <AddressDetailRow
         label="to Wallet"
-        value={destinationWallet}
+        value={_address}
         network={srcToken.network}
       />
       <AddressDetailRow
         label="from Wallet"
-        value={address}
+        value={destinationWallet}
         network={srcToken.network}
       />
       <DetailRow label="Amount to receive">
