@@ -13,6 +13,7 @@ import {
   VisuallyHidden,
 } from "@/components/ui";
 import {
+  formatNumberWithCommas,
   getTokenField,
   handleContractError,
   hexStripsAddr,
@@ -133,8 +134,10 @@ const Modal = ({
 
           let _value: bigint = BigInt(0);
 
-          const contract_address = "TAhx7vRGHedwdEFhLYxk4L6VLo1XYmdSQz";
-          let contract = tronWeb.contract(tronOtcAbi.abi, contract_address);
+          let contract = tronWeb.contract(
+            tronOtcAbi.abi,
+            tronOtcAbi.contractAddress,
+          );
 
           const _srcAmountSD = parseUnits(srcTokenAmount, 6);
 
@@ -331,9 +334,10 @@ const Modal = ({
       const exchangeRate = Number(formatUnits(BigInt(offer.exchangeRateSD), 6));
 
       if (inputField === "src") {
-        const newDstTokenAmount = (parseFloat(inputValue) / exchangeRate)
-          .toFixed(4)
-          .toString();
+        const newDstTokenAmount = formatNumberWithCommas(
+          parseFloat(inputValue) / exchangeRate,
+        ).toString();
+
         setDstTokenAmount(newDstTokenAmount);
 
         handleMaxExceededAmount(

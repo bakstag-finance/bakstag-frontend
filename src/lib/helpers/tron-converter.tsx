@@ -78,6 +78,8 @@ const sha256 = (msg: string) =>
   crypto.createHash("sha256").update(Buffer.from(msg, "hex")).digest("hex");
 
 export const fromTronToHex = (hex: string): string => {
+  if (!hex) return hex;
+
   const addr = `41${hex.substring(2)}`;
   const doubleSha256 = sha256(sha256(addr));
   const checkSum = doubleSha256.substring(0, 8);
@@ -86,7 +88,7 @@ export const fromTronToHex = (hex: string): string => {
   return encode58(address);
 };
 
-export const toHexFromTron = (base58Sting: string): string => {
+export const fromHexToTron = (base58Sting: string): string => {
   if (base58Sting.length <= 4) throw new Error("Invalid address provided");
 
   let address = Buffer.from(decode58(base58Sting)).toString("hex");
