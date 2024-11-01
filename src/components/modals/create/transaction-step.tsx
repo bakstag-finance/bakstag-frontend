@@ -212,11 +212,6 @@ const TransactionDetails = ({
     calculateTotalReceiveAmount(srcTokenAmount, dstTokenAmount),
   );
 
-  const formatedDstWallet =
-    tokensData[selectedSrcToken].network === "TRON"
-      ? fromTronToHex(destinationWallet)
-      : destinationWallet;
-
   return (
     <div className="w-full flex flex-col text-xs mt-5 text-white">
       <DetailRow label="TX ID">
@@ -235,10 +230,10 @@ const TransactionDetails = ({
         </span>
       </DetailRow>
       <DetailRow label="to Wallet">
-        {formatedDstWallet.length > 8 && (
+        {destinationWallet.length > 8 && (
           <div className="flex flex-row items-center text-gray-800">
-            {addressFormat(formatedDstWallet)}
-            <Copy textToCopy={formatedDstWallet} />
+            {addressFormat(destinationWallet)}
+            <Copy textToCopy={destinationWallet} />
           </div>
         )}
       </DetailRow>

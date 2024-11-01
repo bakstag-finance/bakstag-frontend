@@ -6,7 +6,7 @@ import { useAccount } from "wagmi";
 import { AddressDetailRow, DetailRow } from "@/components/molecules";
 import { ActionButton } from "@/components/ui/";
 import { formatNumberWithCommas } from "@/lib/helpers/formating";
-import { fromTronToHex } from "@/lib/helpers/tron-converter";
+import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
 
 interface Props {
   closeModalHandler: () => void;
@@ -30,6 +30,7 @@ export const FormStep = ({
   } = useAcceptModal();
 
   const { address } = useAccount();
+  const { address: tronAddress } = useWallet();
 
   if (!offer) {
     return null;
@@ -39,12 +40,16 @@ export const FormStep = ({
     offer;
 
   const isCorrectSrcTokenAmount = isValidTokenAmount(srcTokenAmount);
-  const isCorrectExchangeRate = isValidTokenAmount(dstTokenAmount);
+  const isCorrectDstTokenAmount = isValidTokenAmount(dstTokenAmount);
 
   const isValidDestinationWallet = isValidCryptoAddress(
     destinationWallet,
     srcTokenNetwork,
   );
+
+  const srcAddress = srcTokenNetwork === "TRON" 
+    ? tronAddress ?? ""
+    : address ?? "";
 
   return (
     <div className="w-full max-w-[320px] flex flex-col text-white">
@@ -54,10 +59,10 @@ export const FormStep = ({
           ticker: dstTokenTicker,
           network: dstTokenNetwork,
         }}
-        amount={srcTokenAmount}
+        amount={dstTokenAmount}
         inputLabel={"Amount to pay"}
-        isCorrectAmount={isCorrectSrcTokenAmount}
-        handleInputChange={(e) => handleInputChange(e, "src")}
+        isCorrectAmount={isCorrectDstTokenAmount}
+        handleInputChange={(e) => handleInputChange(e, "dst")}
       />
       <TokenAmountInput
         label="You receive"
@@ -65,10 +70,10 @@ export const FormStep = ({
           ticker: srcTokenTicker,
           network: srcTokenNetwork,
         }}
-        amount={dstTokenAmount}
+        amount={srcTokenAmount}
         inputLabel={"Amount to receive"}
-        isCorrectAmount={isCorrectExchangeRate}
-        handleInputChange={(e) => handleInputChange(e, "dst")}
+        isCorrectAmount={isCorrectSrcTokenAmount}
+        handleInputChange={(e) => handleInputChange(e, "src")}
       />
       <AddressInput
         label={`Destination Wallet Address | ${srcTokenTicker} (${srcTokenNetwork})`}
@@ -87,7 +92,7 @@ export const FormStep = ({
         }}
         srcTokenAmount={srcTokenAmount}
         dstTokenAmount={dstTokenAmount}
-        address={address || ""}
+        address={srcAddress}
         destinationWallet={destinationWallet}
         exchangeRate={offer.exchangeRateSD.toString()}
       />
@@ -100,10 +105,10 @@ export const FormStep = ({
         btnDisabled={
           !isValidDestinationWallet &&
           !isCorrectSrcTokenAmount &&
-          !isCorrectExchangeRate
+          !isCorrectDstTokenAmount
         }
         isValidDestinationWallet={isValidDestinationWallet}
-        isValidTokensInput={isCorrectSrcTokenAmount && isCorrectExchangeRate}
+        isValidTokensInput={isCorrectSrcTokenAmount && isCorrectDstTokenAmount}
         isCopy={true}
         offerId={offer.offerId}
         srcTokenNetwork={srcTokenNetwork}
@@ -168,9 +173,6 @@ const Summary = ({
     Number(formatUnits(BigInt(exchangeRate), 6)),
   );
 
-  const _address =
-    srcToken.network === "TRON" ? fromTronToHex(address) : address;
-
   return (
     <div className="w-full flex flex-col text-xs mt-3">
       <DetailRow label="Amount to pay">
@@ -185,7 +187,7 @@ const Summary = ({
       </DetailRow>
       <AddressDetailRow
         label="to Wallet"
-        value={_address}
+        value={address}
         network={srcToken.network}
       />
       <AddressDetailRow

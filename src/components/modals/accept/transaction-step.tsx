@@ -21,7 +21,7 @@ import { waitForTransaction } from "@wagmi/core";
 import { wagmiConfig } from "@/lib/wagmi/config";
 
 import { useAcceptModal } from "@/components/modals/accept/context";
-import { fromTronToHex } from "@/lib/helpers/tron-converter";
+import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
 
 interface Props {
   handleClose: () => void;
@@ -47,11 +47,10 @@ const handleTransaction = async (
         throw new Error("No tronWeb Provided");
       }
 
-      const txId = txHash.slice(2);
-
-      const txStatus = await tronWeb.trx.getTransaction(txId);
+      const txStatus = await tronWeb.trx.getTransaction(txHash);
 
       if (txStatus.ret[0].contractRet != "SUCCESS") {
+        setTransactionStatus("error");
         throw new Error("Reverted Transaction");
       }
     } else {
@@ -61,6 +60,7 @@ const handleTransaction = async (
       });
 
       if (receipt.status == "reverted") {
+        setTransactionStatus("error");
         throw new Error("Reverted Transaction");
       }
     }
@@ -89,8 +89,6 @@ export const TransactionStep = ({ handleRetry, handleClose }: Props) => {
     srcChainId,
     offerId,
   } = infoForTransactionStep;
-
-  const { address } = useAccount();
 
   const isMonochain = srcTokenNetwork === dstTokenNetwork;
 
@@ -131,7 +129,7 @@ export const TransactionStep = ({ handleRetry, handleClose }: Props) => {
           subtitle: "",
         }}
       />
-      <TransactionDetails srcWalletAddress={address || ""} />
+      <TransactionDetails />
       <ActionButton
         isLoading={isLoading}
         isError={isError}
@@ -143,12 +141,8 @@ export const TransactionStep = ({ handleRetry, handleClose }: Props) => {
   );
 };
 
-const TransactionDetails = ({
-  srcWalletAddress,
-}: {
-  srcWalletAddress: string;
-}) => {
-  const { infoForTransactionStep } = useAcceptModal();
+const TransactionDetails = () => {
+  const { infoForTransactionStep, destinationWallet } = useAcceptModal();
   const {
     srcTokenNetwork,
     dstTokenNetwork,
@@ -157,8 +151,14 @@ const TransactionDetails = ({
     exchangeRate,
     srcTokenAmount,
     dstTokenTicker,
-    destinationWallet,
   } = infoForTransactionStep;
+
+  const { address } = useAccount();
+  const { address: tronAddress } = useWallet();
+
+  const srcWalletAddress = srcTokenNetwork === "TRON" 
+    ? tronAddress ?? ""
+    : address ?? "";
 
   const isMonochain = srcTokenNetwork === dstTokenNetwork;
 
@@ -167,11 +167,6 @@ const TransactionDetails = ({
     srcNetwork: srcTokenNetwork,
     txHash: txHash,
   });
-
-  const formatedDstWallet =
-    srcTokenNetwork === "TRON"
-      ? fromTronToHex(destinationWallet)
-      : destinationWallet;
 
   return (
     <div className={"w-full flex flex-col text-xs mt-5 text-white"}>
@@ -192,8 +187,8 @@ const TransactionDetails = ({
       </DetailRow>
       <DetailRow label="to Wallet">
         <div className={"flex flex-row items-center justify-center"}>
-          {addressFormat(formatedDstWallet)}
-          <Copy textToCopy={formatedDstWallet} />
+          {addressFormat(destinationWallet)}
+          <Copy textToCopy={destinationWallet} />
         </div>
       </DetailRow>
       <DetailRow label="from Wallet">

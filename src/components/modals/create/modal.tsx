@@ -544,7 +544,7 @@ const handleTronCreate = async ({
       const functionSelector = "approve(address,uint256)";
       const parameter = [
         { type: "address", value: tronWallet.address! },
-        { type: "uint256", value: 100 },
+        { type: "uint256", value: srcAmountLD },
       ];
       const tx = await tronWeb.transactionBuilder.triggerSmartContract(
         trc20ContractAddress,
