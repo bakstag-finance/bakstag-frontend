@@ -38,7 +38,6 @@ import { Dispatch, SetStateAction } from "react";
 import { SwitchChainMutateAsync } from "wagmi/query";
 import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
 import { tronOtcAbi } from "@/lib/tron/otc";
-import { toHexFromTron } from "@/lib/helpers/tron-converter";
 
 interface Props {
   buttonText: string;
@@ -506,9 +505,7 @@ const handleTronCreate = async ({
     const _srcAmountLD = parseUnits(srcTokenAmount, 6);
     const _exchangeRateSD = parseUnits(dstTokenAmount, 6);
 
-    const contract_address = "TAhx7vRGHedwdEFhLYxk4L6VLo1XYmdSQz";
-
-    let contract = tronWeb.contract(tronOtcAbi.abi, contract_address);
+    let contract = tronWeb.contract(tronOtcAbi.abi, tronOtcAbi.contractAddress);
 
     const hexAddress = tronWeb.address.toHex(tronWallet.address).slice(2);
     const addressInBytes32 = hexZeroPadTo32(`0x${hexAddress}`);
@@ -547,7 +544,7 @@ const handleTronCreate = async ({
       const functionSelector = "approve(address,uint256)";
       const parameter = [
         { type: "address", value: tronWallet.address! },
-        { type: "uint256", value: 100 },
+        { type: "uint256", value: srcAmountLD },
       ];
       const tx = await tronWeb.transactionBuilder.triggerSmartContract(
         trc20ContractAddress,

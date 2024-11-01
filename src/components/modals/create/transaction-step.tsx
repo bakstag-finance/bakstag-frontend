@@ -20,6 +20,7 @@ import { formatNumberWithCommas } from "@/lib/helpers/formating";
 import { useCreateModal } from "@/components/modals/create/context";
 import { useAccount } from "wagmi";
 import { ActionButton } from "@/components/ui/";
+import { fromTronToHex } from "@/lib/helpers/tron-converter";
 
 interface TransactionData {
   txHash: string;
@@ -64,7 +65,7 @@ const handleTransaction = async (
       const txId = transactionData.txHash.slice(2);
 
       const txStatus = await tronWeb.trx.getTransaction(txId);
-   
+
       if (txStatus.ret[0].contractRet != "SUCCESS") {
         throw new Error("Reverted Transaction");
       }

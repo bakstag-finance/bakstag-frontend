@@ -9,15 +9,19 @@ import { ArrowUpRight } from "lucide-react";
 import { Copy, StatusHeader } from "@/components/ui";
 import { DetailRow, ActionButton } from "@/components/molecules";
 
-import { addressFormat, formatNumberWithCommas } from "@/lib/helpers";
+import {
+  addressFormat,
+  formatNumberWithCommas,
+  getScanLink,
+} from "@/lib/helpers";
 
 import { ChainIds, Status } from "@/types/contracts";
-import { LAYER_ZERO_SCAN } from "@/lib/constants";
 
 import { waitForTransaction } from "@wagmi/core";
 import { wagmiConfig } from "@/lib/wagmi/config";
 
 import { useAcceptModal } from "@/components/modals/accept/context";
+import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
 
 interface Props {
   handleClose: () => void;
@@ -30,18 +34,35 @@ const handleTransaction = async (
   offerId: string,
   srcChainId: ChainIds,
   srcAmountLD: string,
+  srcTokenNetwork: string,
   setTransactionStatus: Dispatch<SetStateAction<Status>>,
   isMonochain: boolean,
   refetch: () => void,
 ) => {
   if (isMonochain) {
-    const receipt = await waitForTransaction(wagmiConfig, {
-      hash: txHash as `0x${string}`,
-      chainId: srcChainId as any,
-    });
+    if (srcTokenNetwork === "TRON") {
+      const tronWeb = (window as any).tronWeb as any;
 
-    if (receipt.status == "reverted") {
-      throw new Error("Reverted Transaction");
+      if (!tronWeb) {
+        throw new Error("No tronWeb Provided");
+      }
+
+      const txStatus = await tronWeb.trx.getTransaction(txHash);
+
+      if (txStatus.ret[0].contractRet != "SUCCESS") {
+        setTransactionStatus("error");
+        throw new Error("Reverted Transaction");
+      }
+    } else {
+      const receipt = await waitForTransaction(wagmiConfig, {
+        hash: txHash as `0x${string}`,
+        chainId: srcChainId as any,
+      });
+
+      if (receipt.status == "reverted") {
+        setTransactionStatus("error");
+        throw new Error("Reverted Transaction");
+      }
     }
   } else {
     await axios.get(`/api/offer/info?txHash=${txHash}&srcEid=${srcEid}`);
@@ -57,12 +78,8 @@ const handleTransaction = async (
 };
 
 export const TransactionStep = ({ handleRetry, handleClose }: Props) => {
-  const {
-    destinationWallet,
-    refetch,
-    setTransactionStatus,
-    infoForTransactionStep,
-  } = useAcceptModal();
+  const { refetch, setTransactionStatus, infoForTransactionStep } =
+    useAcceptModal();
   const {
     srcTokenNetwork,
     dstTokenNetwork,
@@ -72,8 +89,6 @@ export const TransactionStep = ({ handleRetry, handleClose }: Props) => {
     srcChainId,
     offerId,
   } = infoForTransactionStep;
-
-  const { address } = useAccount();
 
   const isMonochain = srcTokenNetwork === dstTokenNetwork;
 
@@ -86,6 +101,7 @@ export const TransactionStep = ({ handleRetry, handleClose }: Props) => {
         offerId,
         srcChainId,
         srcAmountLD,
+        srcTokenNetwork,
         setTransactionStatus,
         isMonochain,
         refetch,
@@ -113,10 +129,7 @@ export const TransactionStep = ({ handleRetry, handleClose }: Props) => {
           subtitle: "",
         }}
       />
-      <TransactionDetails
-        srcWalletAddress={address || ""}
-        destinationWallet={destinationWallet}
-      />
+      <TransactionDetails />
       <ActionButton
         isLoading={isLoading}
         isError={isError}
@@ -128,32 +141,48 @@ export const TransactionStep = ({ handleRetry, handleClose }: Props) => {
   );
 };
 
-const TransactionDetails = ({
-  srcWalletAddress,
-  destinationWallet,
-}: {
-  srcWalletAddress: string;
-  destinationWallet: string;
-}) => {
-  const { infoForTransactionStep: transactionData } = useAcceptModal();
+const TransactionDetails = () => {
+  const { infoForTransactionStep, destinationWallet } = useAcceptModal();
+  const {
+    srcTokenNetwork,
+    dstTokenNetwork,
+    txHash,
+    srcTokenTicker,
+    exchangeRate,
+    srcTokenAmount,
+    dstTokenTicker,
+  } = infoForTransactionStep;
+
+  const { address } = useAccount();
+  const { address: tronAddress } = useWallet();
+
+  const srcWalletAddress = srcTokenNetwork === "TRON" 
+    ? tronAddress ?? ""
+    : address ?? "";
+
+  const isMonochain = srcTokenNetwork === dstTokenNetwork;
+
+  const link = getScanLink({
+    isMonochain,
+    srcNetwork: srcTokenNetwork,
+    txHash: txHash,
+  });
+
   return (
     <div className={"w-full flex flex-col text-xs mt-5 text-white"}>
       <DetailRow label="TX ID">
         <div className={"flex flex-row items-center justify-center"}>
-          {addressFormat(transactionData.txHash)}
-          <Copy textToCopy={transactionData.txHash} />
-          <Link href={LAYER_ZERO_SCAN + transactionData.txHash} target="_blank">
+          {addressFormat(txHash)}
+          <Copy textToCopy={txHash} />
+          <Link href={link} target="_blank">
             <ArrowUpRight className="w-5 h-5 ml-1 text-gray-700 cursor-pointer hover:text-white" />
           </Link>
         </div>
       </DetailRow>
       <DetailRow label="Amount to pay">
         <span>
-          {formatNumberWithCommas(transactionData.srcTokenAmount)}{" "}
-          {transactionData.dstTokenTicker}{" "}
-          <span className={"text-gray-700"}>
-            ({transactionData.dstTokenNetwork})
-          </span>
+          {formatNumberWithCommas(srcTokenAmount)} {dstTokenTicker}{" "}
+          <span className={"text-gray-700"}>({dstTokenNetwork})</span>
         </span>
       </DetailRow>
       <DetailRow label="to Wallet">
@@ -170,24 +199,16 @@ const TransactionDetails = ({
       </DetailRow>
       <DetailRow label="Amount to receive">
         <span>
-          {formatNumberWithCommas(transactionData.exchangeRate)}{" "}
-          {transactionData.srcTokenTicker}{" "}
-          <span className={"text-gray-700"}>
-            ({transactionData.srcTokenNetwork})
-          </span>
+          {formatNumberWithCommas(exchangeRate)} {srcTokenTicker}{" "}
+          <span className={"text-gray-700"}>({srcTokenNetwork})</span>
         </span>
       </DetailRow>
       <DetailRow label="Exchange Rate">
         <span>
-          {formatNumberWithCommas(transactionData.exchangeRate)}{" "}
-          {transactionData.dstTokenTicker}{" "}
-          <span className={"text-gray-700"}>
-            ({transactionData.dstTokenNetwork})
-          </span>{" "}
-          = 1 {transactionData.srcTokenTicker}{" "}
-          <span className={"text-gray-700"}>
-            ({transactionData.srcTokenNetwork})
-          </span>
+          {formatNumberWithCommas(exchangeRate)} {dstTokenTicker}{" "}
+          <span className={"text-gray-700"}>({dstTokenNetwork})</span> = 1{" "}
+          {srcTokenTicker}{" "}
+          <span className={"text-gray-700"}>({srcTokenNetwork})</span>
         </span>
       </DetailRow>
     </div>
