@@ -20,7 +20,6 @@ import { formatNumberWithCommas } from "@/lib/helpers/formating";
 import { useCreateModal } from "@/components/modals/create/context";
 import { useAccount } from "wagmi";
 import { ActionButton } from "@/components/ui/";
-import { fromTronToHex } from "@/lib/helpers/tron-converter";
 
 interface TransactionData {
   txHash: string;
@@ -174,6 +173,7 @@ export const TransactionStep = ({
         isLoading={isLoading}
         isSuccess={isSuccess}
         loadingText={"Preparing Your Ad"}
+        srcTokenNetwork={tokensData[selectedSrcToken].network}
         isCopy={true}
         offerId={transactionData.offerId}
       />

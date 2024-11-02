@@ -46,11 +46,12 @@ export const ActionButton: FC<ActionButtonProps> = ({
   refetch,
   srcTokenNetwork,
 }) => {
-  const { address } = useAccount();
+  const { address: evmAddress } = useAccount();
   const tronWallet = useWallet();
 
+  console.log("srcTokenNetwork", srcTokenNetwork)
   const isWalletConnected =
-    srcTokenNetwork === "TRON" ? !!tronWallet.address : !!address;
+    srcTokenNetwork === "TRON" ? tronWallet.connected : !!evmAddress;
 
   return (
     <>

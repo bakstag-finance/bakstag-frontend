@@ -135,6 +135,7 @@ export const TransactionStep = ({ handleRetry, handleClose }: Props) => {
         isError={isError}
         isSuccess={isSuccess}
         handleClick={buttonHandler}
+        srcTokenNetwork={srcTokenNetwork}
         loadingText={"Processing Transaction"}
       />
     </div>

@@ -23,7 +23,7 @@ import {
 import { useAccount, useSwitchChain } from "wagmi";
 import { FormStep } from "./form-step";
 import { TransactionStep } from "./transaction-step";
-import { LzFee, Status } from "@/types/contracts";
+import { Status } from "@/types/contracts";
 import { Offer } from "@/types/offer";
 import { erc20Abi, formatUnits, parseUnits } from "viem";
 import {
@@ -785,7 +785,7 @@ const tronAcceptOffer = async ({
     }
   } catch (e) {
     console.log(e);
-    setApprovingErrorMsg("ERROR");
+    setApprovingErrorMsg(e as string);
     setApprovingStatus("error");
   }
 };
