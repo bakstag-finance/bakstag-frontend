@@ -47,9 +47,8 @@ export const FormStep = ({
     srcTokenNetwork,
   );
 
-  const srcAddress = srcTokenNetwork === "TRON" 
-    ? tronAddress ?? ""
-    : address ?? "";
+  const srcAddress =
+    srcTokenNetwork === "TRON" ? tronAddress ?? "" : address ?? "";
 
   return (
     <div className="w-full max-w-[320px] flex flex-col text-white">

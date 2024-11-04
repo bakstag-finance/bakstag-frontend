@@ -49,7 +49,6 @@ export const ActionButton: FC<ActionButtonProps> = ({
   const { address: evmAddress } = useAccount();
   const tronWallet = useWallet();
 
-  console.log("srcTokenNetwork", srcTokenNetwork)
   const isWalletConnected =
     srcTokenNetwork === "TRON" ? tronWallet.connected : !!evmAddress;
 
