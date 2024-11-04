@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    console.log("SearchParams", searchParams)
+    console.log("SearchParams", searchParams);
     const tokenToBuy = searchParams.get("tokenToBuy") || "";
     const amountToBuy = searchParams.get("amountToBuy") || "";
     const tokenToSell = searchParams.get("tokenToSell") || "";

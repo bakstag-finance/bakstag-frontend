@@ -56,13 +56,7 @@ export const TableComponent = ({ setStep, setOrderData }: Props) => {
   const [hasMore, setHasMore] = useState(true);
   const [allOffers, setAllOffers] = useState<Offer[]>([]);
 
-  const {
-    data,
-    isLoading,
-    isError,
-    isFetching,
-    refetch,
-  } = useQuery<Offer[]>({
+  const { data, isLoading, isError, isFetching, refetch } = useQuery<Offer[]>({
     queryKey: [
       "table-ads",
       tokenToBuy,
@@ -80,7 +74,9 @@ export const TableComponent = ({ setStep, setOrderData }: Props) => {
 
       if (tronWallet?.address) {
         const tronWeb = (window as any).tronWeb as any;
-        const hexAddress = tronWeb.address.toHex(tronWallet.address).substring(2);
+        const hexAddress = tronWeb.address
+          .toHex(tronWallet.address)
+          .substring(2);
 
         params.append(
           "tronWalletAddress",
