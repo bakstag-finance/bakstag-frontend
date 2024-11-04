@@ -57,7 +57,7 @@ export const TableComponent = ({ setStep, setOrderData }: Props) => {
   const [allOffers, setAllOffers] = useState<Offer[]>([]);
 
   const {
-    data: tableData,
+    data,
     isLoading,
     isError,
     isFetching,
@@ -80,7 +80,8 @@ export const TableComponent = ({ setStep, setOrderData }: Props) => {
 
       if (tronWallet?.address) {
         const tronWeb = (window as any).tronWeb as any;
-        const hexAddress = tronWeb.address.toHex(tronWallet.address);
+        const hexAddress = tronWeb.address.toHex(tronWallet.address).substring(2);
+
         params.append(
           "tronWalletAddress",
           encodeURIComponent(`0x${hexAddress}`),
@@ -163,7 +164,7 @@ export const TableComponent = ({ setStep, setOrderData }: Props) => {
 
   return (
     <div className="w-full flex flex-col">
-      {isWalletConnected && sortedTableData && sortedTableData.length >= 2 && (
+      {isWalletConnected && sortedTableData && sortedTableData.length >= 0 && (
         <FilterSection
           tokenToBuy={tokenToBuy}
           setTokenToBuy={setTokenToBuy}
