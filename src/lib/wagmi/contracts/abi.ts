@@ -809,7 +809,7 @@ export const otcMarketAbi = [
 ] as const;
 
 export const otcMarketAddress =
-  "0x718D998514B2d09167398fa9477c3b3c6f2BBbd3" as const;
+  "0xC478298EF25aD3F41A9DA7a8F449D2c891F56e81" as const;
 
 export const otcMarketConfig = {
   address: otcMarketAddress,
