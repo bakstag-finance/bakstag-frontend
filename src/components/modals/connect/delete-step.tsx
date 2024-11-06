@@ -16,11 +16,7 @@ import {
 
 import { Offer } from "@/types/offer";
 
-import {
-  addressFormat,
-  getScanLink,
-  getTokenField,
-} from "@/lib/helpers";
+import { addressFormat, getScanLink, getTokenField } from "@/lib/helpers";
 import { formatUnits } from "viem";
 import { fromHexToTron } from "@/lib/helpers/tron-converter";
 import { formatNumberWithCommas } from "@/lib/helpers/formating";
@@ -61,7 +57,6 @@ const getButtonVariant = (status: Status): Variant => {
   };
   return (statusMapping[status] as Variant) || "default";
 };
-
 
 export const DeletingStep = ({ offer, setStep, refetch }: Props) => {
   const [txHash, setTxHash] = useState<string>("");
@@ -176,7 +171,10 @@ const InfoSection = ({ txId, walletAddress, offer }: InfoSectionProps) => {
 
   const isMonochain = offer.srcTokenNetwork === offer.dstTokenNetwork;
 
-  const _walletAddress = offer.srcTokenNetwork === "TRON" ? fromHexToTron(walletAddress) : walletAddress
+  const _walletAddress =
+    offer.srcTokenNetwork === "TRON"
+      ? fromHexToTron(walletAddress)
+      : walletAddress;
 
   const linkToScan = getScanLink({
     isMonochain,
@@ -222,6 +220,16 @@ const InfoSection = ({ txId, walletAddress, offer }: InfoSectionProps) => {
     </div>
   );
 };
-function deleteHandler(arg0: { offer: Offer; refetch: () => void; setStatus: Dispatch<SetStateAction<Status>>; setTxHash: Dispatch<SetStateAction<string>>; isTronConnected: boolean; switchChainAsync: import("wagmi/query").SwitchChainMutateAsync<import("wagmi").Config, unknown>; }) {
+function deleteHandler(arg0: {
+  offer: Offer;
+  refetch: () => void;
+  setStatus: Dispatch<SetStateAction<Status>>;
+  setTxHash: Dispatch<SetStateAction<string>>;
+  isTronConnected: boolean;
+  switchChainAsync: import("wagmi/query").SwitchChainMutateAsync<
+    import("wagmi").Config,
+    unknown
+  >;
+}) {
   throw new Error("Function not implemented.");
 }
