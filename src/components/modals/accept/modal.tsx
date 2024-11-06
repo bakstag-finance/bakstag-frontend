@@ -149,13 +149,13 @@ const Modal = ({
 
   const handleMaxExceededAmount = (
     inputValue: string,
-    orderAmount: string,
-    orderAmountDecimals: number,
+    offerAmount: string,
+    offerAmountDecimals: number,
     setApprovingStatus: Dispatch<SetStateAction<Status>>,
     setApprovingErrorMessage: Dispatch<SetStateAction<string>>,
   ) => {
     const MAX_VALUE = Number(
-      formatUnits(BigInt(orderAmount), orderAmountDecimals),
+      formatUnits(BigInt(offerAmount), offerAmountDecimals),
     );
 
     const parsedValue = Number(inputValue.replace(/,/g, ""));
@@ -370,7 +370,7 @@ export const AcceptModal = ({ offer, refetch, isOpenedByBtn }: Props) => {
   );
 };
 
-const prepareDataForContracts = (order: Offer, dstTokenAmount: string) => {
+const prepareDataForContracts = (offer: Offer, dstTokenAmount: string) => {
   const {
     srcTokenTicker,
     srcTokenNetwork,
@@ -380,7 +380,7 @@ const prepareDataForContracts = (order: Offer, dstTokenAmount: string) => {
     dstTokenAddress,
     offerId,
     srcAmountLD,
-  } = order;
+  } = offer;
 
   const _abiConfig = getTokenField(
     srcTokenTicker,

@@ -39,7 +39,7 @@ export const Modal = ({ refetch, btnText }: Props) => {
   const [mainTabsStep, setMainTabsStep] = useState("wallet");
   const [walletTabStep, setWalletTabStep] = useState("ethereum");
 
-  const [orderData, setOrderData] = useState<Offer>({
+  const [offerData, setOfferData] = useState<Offer>({
     offerId: "",
     dstSellerAddress: "",
     dstEid: 0,
@@ -130,7 +130,7 @@ export const Modal = ({ refetch, btnText }: Props) => {
             </div>
           </TabsContent>
           <TabsContent value="ads" className="w-full">
-            <TableComponent setStep={setStep} setOrderData={setOrderData} />
+            <TableComponent setStep={setStep} setOrderData={setOfferData} />
           </TabsContent>
         </Tabs>
       </>
@@ -213,7 +213,7 @@ export const Modal = ({ refetch, btnText }: Props) => {
       </>
     ),
     delete: (
-      <DeletingStep order={orderData} setStep={setStep} refetch={refetch} />
+      <DeletingStep offer={offerData} setStep={setStep} refetch={refetch} />
     ),
   };
 

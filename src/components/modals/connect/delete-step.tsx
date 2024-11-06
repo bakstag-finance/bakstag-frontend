@@ -1,4 +1,10 @@
+import Link from "next/link";
+
+import { useAccount, useSwitchChain } from "wagmi";
 import { Dispatch, SetStateAction, useState } from "react";
+import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
+
+import { DetailRow } from "@/components/molecules";
 import { Copy, Button, LoadingClock } from "@/components/ui";
 import {
   Trash,
@@ -7,32 +13,13 @@ import {
   CircleCheck,
   FileWarning,
 } from "lucide-react";
-import { Options } from "@layerzerolabs/lz-v2-utilities";
+
 import { Offer } from "@/types/offer";
-import {
-  addressFormat,
-  getScanLink,
-  getTokenField,
-  handleContractError,
-  hexZeroPadTo32,
-} from "@/lib/helpers";
-import {
-  getTransactionReceipt,
-  readContract,
-  ReadContractErrorType,
-  waitForTransaction,
-  writeContract,
-  WriteContractErrorType,
-} from "@wagmi/core";
-import { wagmiConfig } from "@/lib/wagmi/config";
-import { otcMarketAbi, otcMarketAddress } from "@/lib/wagmi/contracts/abi";
-import { useAccount, useSwitchChain } from "wagmi";
-import axios from "axios";
+
+import { addressFormat, getScanLink, getTokenField } from "@/lib/helpers";
 import { formatUnits } from "viem";
-import Link from "next/link";
-import { DetailRow } from "@/components/molecules";
+import { fromHexToTron } from "@/lib/helpers/tron-converter";
 import { formatNumberWithCommas } from "@/lib/helpers/formating";
-import { ChainIds } from "@/types/contracts";
 
 type Status =
   | "loading"
@@ -44,7 +31,7 @@ type Status =
 type ConnectModalStep = "main" | "wallet-choose" | "delete";
 
 interface Props {
-  order: Offer;
+  offer: Offer;
   setStep: Dispatch<SetStateAction<ConnectModalStep>>;
   refetch: () => void;
 }
@@ -71,182 +58,15 @@ const getButtonVariant = (status: Status): Variant => {
   return (statusMapping[status] as Variant) || "default";
 };
 
-export const DeletingStep = ({ order, setStep, refetch }: Props) => {
+export const DeletingStep = ({ offer, setStep, refetch }: Props) => {
   const [txHash, setTxHash] = useState<string>("");
   const [status, setStatus] = useState<Status>("idle");
 
   const { switchChainAsync } = useSwitchChain();
   const { address } = useAccount();
 
-  const deleteQuery = async () => {
-    try {
-      const response = await axios.post(`/api/offer/delete`, {
-        offerId: order.offerId,
-      });
-
-      if (response.status === 200) {
-        setStatus("success");
-      }
-    } catch (e) {
-      console.error(e);
-      setStatus("deleting-error");
-    }
-  };
-
-  const executeTransaction = async (args: any, chainId: ChainIds) => {
-    try {
-      const _txHash = await writeContract(wagmiConfig, {
-        abi: otcMarketAbi,
-        address: otcMarketAddress,
-        functionName: "cancelOffer",
-        args,
-        value: args[1].nativeFee || BigInt(0),
-        chainId,
-      }).catch((e) => {
-        const errorMsg = handleContractError(
-          e as WriteContractErrorType,
-          otcMarketAbi,
-        );
-        throw new Error(errorMsg);
-      });
-
-      setTxHash(_txHash);
-      setStatus("loading");
-
-      const data = await waitForTransaction(wagmiConfig, { hash: _txHash });
-
-      if (data.status === "reverted") throw new Error("Reverted transaction");
-
-      const txReceipt = await getTransactionReceipt(wagmiConfig, {
-        hash: _txHash,
-        chainId,
-      });
-
-      if (txReceipt.status === "reverted")
-        throw new Error("Reverted Transaction");
-
-      return _txHash;
-    } catch (e) {
-      console.error(e);
-      setStatus("error");
-      throw e;
-    }
-  };
-
-  const processMonochain = async (srcChainId: ChainIds) => {
-    const args = [
-      order.offerId as `0x${string}`,
-      { nativeFee: BigInt(0), lzTokenFee: BigInt(0) },
-      "" as `0x${string}`,
-    ];
-
-    const _txHash = await executeTransaction(args, srcChainId);
-
-    if (_txHash) {
-      setStatus("deleting");
-      await deleteQuery();
-      refetch();
-      setStatus("success");
-    }
-  };
-
-  const processCrossChain = async (
-    srcChainId: ChainIds,
-    dstChainId: ChainIds,
-  ) => {
-    const quoteCancelOffer = await readContract(wagmiConfig, {
-      abi: otcMarketAbi,
-      address: otcMarketAddress,
-      functionName: "quoteCancelOffer",
-      args: [order.offerId as `0x${string}`],
-      chainId: dstChainId,
-    }).catch((e) => {
-      const errorMsg = handleContractError(
-        e as ReadContractErrorType,
-        otcMarketAbi,
-      );
-      throw new Error(errorMsg);
-    });
-
-    const _srcAddress = hexZeroPadTo32(order.srcSellerAddress as `0x${string}`);
-    const _options = Options.newOptions().addExecutorLzReceiveOption(
-      quoteCancelOffer!.lzTokenFee,
-      quoteCancelOffer!.nativeFee,
-    );
-
-    const quoteCancelOfferFee = await readContract(wagmiConfig, {
-      abi: otcMarketAbi,
-      address: otcMarketAddress,
-      functionName: "quoteCancelOfferOrder",
-      args: [
-        _srcAddress,
-        order.offerId as `0x${string}`,
-        _options.toHex() as `0x${string}`,
-        false,
-      ],
-      chainId: srcChainId,
-    }).catch((e) => {
-      const errorMsg = handleContractError(
-        e as ReadContractErrorType,
-        otcMarketAbi,
-      );
-      throw new Error(errorMsg);
-    });
-
-    await switchChainAsync({ chainId: srcChainId! });
-
-    const args = [
-      order.offerId as `0x${string}`,
-      quoteCancelOfferFee!,
-      _options.toHex() as `0x${string}`,
-    ];
-
-    const _txHash = await executeTransaction(args, srcChainId);
-
-    if (_txHash) {
-      const receipt = await axios.get(
-        `/api/offer/info?txHash=${_txHash}&srcEid=${order.dstEid}`,
-      );
-      if (receipt) {
-        setStatus("deleting");
-        await deleteQuery();
-        refetch();
-        setStatus("success");
-      }
-    }
-  };
-
-  const deleteHandler = async () => {
-    try {
-      if (!order.offerId) {
-        console.log("No order details");
-        return;
-      }
-
-      setStatus("loading");
-
-      const isMonochain = order.dstTokenNetwork === order.srcTokenNetwork;
-      const dstChainId = getTokenField(
-        order.dstTokenTicker,
-        order.dstTokenNetwork,
-        "chainId",
-      );
-      const srcChainId = getTokenField(
-        order.srcTokenTicker,
-        order.srcTokenNetwork,
-        "chainId",
-      );
-
-      if (isMonochain) {
-        await processMonochain(srcChainId);
-      } else {
-        await processCrossChain(srcChainId, dstChainId);
-      }
-    } catch (e) {
-      console.error(e);
-      setStatus("error");
-    }
-  };
+  const tronWallet = useWallet();
+  const isTronConnected = tronWallet.connected;
 
   const isPending = ["loading", "deleting"].includes(status);
   const isError = ["error", "deleting-error"].includes(status);
@@ -254,17 +74,29 @@ export const DeletingStep = ({ order, setStep, refetch }: Props) => {
   const buttonHandler = () => {
     if (isPending) {
       return null;
-    } else if (["idle", "error", "deleting-error"].includes(status)) {
-      void deleteHandler();
-    } else if (status === "success") {
+    }
+    if (["idle", "error", "deleting-error"].includes(status)) {
+      void deleteHandler({
+        offer,
+        refetch,
+        setStatus,
+        setTxHash,
+        isTronConnected,
+        switchChainAsync,
+      });
+      return null;
+    }
+
+    if (status === "success") {
       setStep("main");
+      return null;
     }
   };
 
   return (
     <div className="w-full flex flex-col justify-start items-center text-sm text-white">
       <ConfirmationSection status={status} />
-      <InfoSection txId={txHash} walletAddress={address || ""} order={order} />
+      <InfoSection txId={txHash} walletAddress={address || ""} offer={offer} />
       <Button
         className="w-full mt-5 font-light rounded-xl"
         variant={getButtonVariant(status)}
@@ -321,26 +153,32 @@ const ConfirmationSection = ({ status }: { status: Status }) => {
 interface InfoSectionProps {
   txId: string;
   walletAddress: string;
-  order: Offer;
+  offer: Offer;
 }
 
-const InfoSection = ({ txId, walletAddress, order }: InfoSectionProps) => {
+const InfoSection = ({ txId, walletAddress, offer }: InfoSectionProps) => {
   const srcTokenDecimals = getTokenField(
-    order.srcTokenTicker,
-    order.srcTokenNetwork,
+    offer.srcTokenTicker,
+    offer.srcTokenNetwork,
     "decimals",
   );
   const formattedSrcAmount = formatNumberWithCommas(
-    Number(formatUnits(BigInt(order.srcAmountLD), srcTokenDecimals)),
+    Number(formatUnits(BigInt(offer.srcAmountLD), srcTokenDecimals)),
   );
   const exchangeRate = formatNumberWithCommas(
-    Number(formatUnits(BigInt(order.exchangeRateSD), 6)),
+    Number(formatUnits(BigInt(offer.exchangeRateSD), 6)),
   );
-  const isMonochain = order.srcTokenNetwork === order.dstTokenNetwork;
+
+  const isMonochain = offer.srcTokenNetwork === offer.dstTokenNetwork;
+
+  const _walletAddress =
+    offer.srcTokenNetwork === "TRON"
+      ? fromHexToTron(walletAddress)
+      : walletAddress;
 
   const linkToScan = getScanLink({
     isMonochain,
-    srcNetwork: order.srcTokenNetwork,
+    srcNetwork: offer.srcTokenNetwork,
     txHash: txId,
   });
 
@@ -361,24 +199,37 @@ const InfoSection = ({ txId, walletAddress, order }: InfoSectionProps) => {
       </DetailRow>
       <DetailRow label="Amount to Unlock">
         <span>
-          {formattedSrcAmount} {order.srcTokenTicker}{" "}
-          <span className="text-gray-700">({order.srcTokenNetwork})</span>
+          {formattedSrcAmount} {offer.srcTokenTicker}{" "}
+          <span className="text-gray-700">({offer.srcTokenNetwork})</span>
         </span>
       </DetailRow>
       <DetailRow label="From Wallet">
         <div className="flex flex-row items-center justify-center">
-          <span className="text-gray-700">{addressFormat(walletAddress)}</span>
-          <Copy textToCopy={walletAddress} />
+          <span className="text-gray-700">{addressFormat(_walletAddress)}</span>
+          <Copy textToCopy={_walletAddress} />
         </div>
       </DetailRow>
       <DetailRow label="Exchange Rate">
         <span>
-          {exchangeRate} {order.dstTokenTicker}{" "}
-          <span className="text-gray-700">({order.dstTokenNetwork})</span>
+          {exchangeRate} {offer.dstTokenTicker}{" "}
+          <span className="text-gray-700">({offer.dstTokenNetwork})</span>
         </span>{" "}
-        = 1 {order.srcTokenTicker}{" "}
-        <span className="text-gray-700">({order.srcTokenNetwork})</span>
+        = 1 {offer.srcTokenTicker}{" "}
+        <span className="text-gray-700">({offer.srcTokenNetwork})</span>
       </DetailRow>
     </div>
   );
 };
+function deleteHandler(arg0: {
+  offer: Offer;
+  refetch: () => void;
+  setStatus: Dispatch<SetStateAction<Status>>;
+  setTxHash: Dispatch<SetStateAction<string>>;
+  isTronConnected: boolean;
+  switchChainAsync: import("wagmi/query").SwitchChainMutateAsync<
+    import("wagmi").Config,
+    unknown
+  >;
+}) {
+  throw new Error("Function not implemented.");
+}
