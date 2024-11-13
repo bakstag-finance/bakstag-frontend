@@ -21,6 +21,7 @@ import { FormStep } from "./form-step";
 import { TransactionStep } from "./transaction-step";
 
 import {
+  decodeParams,
   formatNumberWithCommas,
   getTokenField,
   isValidTokenAmount,
@@ -301,7 +302,7 @@ export const AcceptModal = ({ offer, refetch, isOpenedByBtn }: Props) => {
   const searchParams = useSearchParams();
 
   const modalType = searchParams.get("modalType");
-  const offerId = searchParams.get("offerId");
+  const offerId = decodeParams(searchParams.get("offerId") || "");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 

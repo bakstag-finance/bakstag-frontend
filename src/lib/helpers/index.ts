@@ -32,6 +32,8 @@ import {
   handleContractError,
 } from "./decode-error";
 
+import { encodeParams, decodeParams } from "./decode-params";
+
 export {
   toSD,
   addressFormat,
@@ -54,4 +56,6 @@ export {
   handleContractError,
   formatNumberWithCommas,
   decodeEvmTransactionErrorResult,
+  encodeParams,
+  decodeParams
 };

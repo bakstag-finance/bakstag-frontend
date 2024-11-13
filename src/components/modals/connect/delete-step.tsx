@@ -16,7 +16,7 @@ import {
 
 import { Offer } from "@/types/offer";
 
-import { addressFormat, getScanLink, getTokenField } from "@/lib/helpers";
+import { addressFormat, getScanLink } from "@/lib/helpers";
 import { formatUnits } from "viem";
 import { formatNumberWithCommas } from "@/lib/helpers/formating";
 import { deleteHandler } from "@/lib/contracts/delete";
@@ -158,13 +158,8 @@ interface InfoSectionProps {
 }
 
 const InfoSection = ({ txId, walletAddress, offer }: InfoSectionProps) => {
-  const srcTokenDecimals = getTokenField(
-    offer.srcTokenTicker,
-    offer.srcTokenNetwork,
-    "decimals",
-  );
   const formattedSrcAmount = formatNumberWithCommas(
-    Number(formatUnits(BigInt(offer.srcAmountLD), srcTokenDecimals)),
+    Number(formatUnits(BigInt(offer.srcAmountLD), SHARED_SYSTEM_DECIMAL)),
   );
   const exchangeRate = formatNumberWithCommas(
     Number(formatUnits(BigInt(offer.exchangeRateSD), SHARED_SYSTEM_DECIMAL)),

@@ -1,13 +1,18 @@
-import React, { FC, useState } from "react";
-import { useAccount } from "wagmi";
-import { Button, LoadingClock } from "@/components/ui/index";
-import { CircleCheck, Redo2, Link, Share } from "lucide-react";
-import { Status } from "@/types/contracts";
-import { Squircle } from "@squircle-js/react";
 import { cn } from "@/lib/utils";
-import { BASE_URL } from "@/lib/constants";
-import { ConnectModal } from "@/components/modals";
+import { FC, useState } from "react";
+
+import { useAccount } from "wagmi";
 import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
+
+import { Squircle } from "@squircle-js/react";
+import { ConnectModal } from "@/components/modals";
+import { Button, LoadingClock } from "@/components/ui";
+import { CircleCheck, Redo2, Link, Share } from "lucide-react";
+
+import { BASE_URL } from "@/lib/constants";
+
+import { Status } from "@/types/contracts";
+import { encodeParams } from "@/lib/helpers";
 
 interface ActionButtonProps {
   mode?: "create" | "accept";
@@ -174,11 +179,12 @@ const CopyButton: FC<CopyButtonProps> = ({ offerId }) => {
   const [isClicked, setIsClicked] = useState(false);
 
   const handleCopyLink = () => {
+    const encodeOfferId = encodeParams(offerId);
+    
     const offerParams = new URLSearchParams({
       modalType: "accept",
-      offerId: offerId,
+      offerId: encodeOfferId,
     });
-
     const offerLink = `${new URL(`?${offerParams}`, BASE_URL).href}`;
     navigator.clipboard.writeText(offerLink);
 
