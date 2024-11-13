@@ -9,12 +9,14 @@ export const dynamic = "force-dynamic";
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    console.log("SearchParams", searchParams);
+
     const tokenToBuy = searchParams.get("tokenToBuy") || "";
     const amountToBuy = searchParams.get("amountToBuy") || "";
     const tokenToSell = searchParams.get("tokenToSell") || "";
+
     const srcAddress = searchParams.get("address") || "";
     const tronWalletAddress = searchParams.get("tronWalletAddress") || "";
+
     const showEmpty = searchParams.get("showEmpty") || "false";
 
     const page = parseInt(searchParams.get("page") || "1", 10);
@@ -27,11 +29,11 @@ export async function GET(req: Request) {
     const addresses: string[] = [];
 
     if (srcAddress && srcAddress.length > 0) {
-      addresses.push(srcAddress);
+      addresses.push(hexZeroPadTo32(srcAddress as `0x${string}`));
     }
 
     if (tronWalletAddress && tronWalletAddress.length > 0) {
-      addresses.push(tronWalletAddress);
+      addresses.push(hexZeroPadTo32(tronWalletAddress as `0x${string}`));
     }
 
     if (addresses.length > 0) {
