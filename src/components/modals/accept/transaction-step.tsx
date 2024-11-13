@@ -158,7 +158,7 @@ const TransactionDetails = () => {
   const { address: tronAddress } = useWallet();
 
   const srcWalletAddress =
-    srcTokenNetwork === "TRON" ? tronAddress ?? "" : address ?? "";
+    dstTokenNetwork === "TRON" ? tronAddress ?? "" : address ?? "";
 
   const isMonochain = srcTokenNetwork === dstTokenNetwork;
 

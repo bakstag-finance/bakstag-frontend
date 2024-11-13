@@ -10,6 +10,7 @@ import { ConnectModal } from "@/components/modals";
 import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
 
 interface ActionButtonProps {
+  mode?: "create" | "accept";
   approvingStatus?: Status;
   approvingErrorMsg?: string;
   btnDisabled?: boolean;
@@ -28,6 +29,21 @@ interface ActionButtonProps {
   srcTokenNetwork?: string;
 }
 
+const checkIsWalletConnected = (
+  mode: "create" | "accept",
+  srcTokenNetwork: string,
+  isTronConnected: boolean,
+  isEvmConnected: boolean,
+) => {
+  return mode === "create"
+    ? srcTokenNetwork === "TRON"
+      ? isTronConnected
+      : isEvmConnected
+    : srcTokenNetwork === "TRON"
+      ? isEvmConnected
+      : isTronConnected;
+};
+
 export const ActionButton: FC<ActionButtonProps> = ({
   handleClose,
   approvingStatus,
@@ -44,13 +60,18 @@ export const ActionButton: FC<ActionButtonProps> = ({
   isCopy = false,
   offerId,
   refetch,
+  mode = "create",
   srcTokenNetwork,
 }) => {
   const { address: evmAddress } = useAccount();
   const tronWallet = useWallet();
 
-  const isWalletConnected =
-    srcTokenNetwork === "TRON" ? tronWallet.connected : !!evmAddress;
+  const isWalletConnected = checkIsWalletConnected(
+    mode,
+    srcTokenNetwork || "",
+    tronWallet.connected,
+    !!evmAddress,
+  );
 
   return (
     <>

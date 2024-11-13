@@ -1,11 +1,14 @@
+import { forwardRef } from "react";
+
 import { cn } from "@/lib/utils";
 import { AcceptModal } from "../../modals";
-import { addressFormat, getTokenField } from "@/lib/helpers";
+import { addressFormat } from "@/lib/helpers";
 import { formatUnits } from "viem";
 
 import { formatNumberWithCommas } from "@/lib/helpers/formating";
-import React from "react";
+
 import { Offer } from "@/types/offer";
+import { SHARED_SYSTEM_DECIMAL } from "@/lib/constants";
 
 interface Props {
   offer: Offer;
@@ -13,7 +16,7 @@ interface Props {
   isLast: boolean;
 }
 
-export const TableItem = React.forwardRef<HTMLDivElement, Props>(
+export const TableItem = forwardRef<HTMLDivElement, Props>(
   ({ offer, refetch, isLast }, ref) => {
     const {
       dstSellerAddress,
@@ -26,17 +29,11 @@ export const TableItem = React.forwardRef<HTMLDivElement, Props>(
     } = offer;
     const formatedAddress = addressFormat(dstSellerAddress);
 
-    const srcTokenDecimals = getTokenField(
-      srcTokenTicker,
-      srcTokenNetwork,
-      "decimals",
-    );
-
     const formatedSrcAmount = formatNumberWithCommas(
-      Number(formatUnits(BigInt(srcAmountLD), srcTokenDecimals)),
+      Number(formatUnits(srcAmountLD, SHARED_SYSTEM_DECIMAL)),
     );
     const formatedDstAmount = formatNumberWithCommas(
-      Number(formatUnits(BigInt(exchangeRateSD), 6)),
+      Number(formatUnits(BigInt(exchangeRateSD), SHARED_SYSTEM_DECIMAL)),
     );
 
     return (

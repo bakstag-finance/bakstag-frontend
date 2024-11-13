@@ -1,6 +1,7 @@
 import { ethers, utils } from "ethers";
 import { isSolanaAddress } from "./address-validation";
 import { parseUnits } from "viem";
+import { SHARED_SYSTEM_DECIMAL } from "../constants";
 
 export function hexZeroPadTo32(addr: `0x${string}`): `0x${string}` {
   return ethers.utils.hexZeroPad(addr, 32) as `0x${string}`;
@@ -30,8 +31,6 @@ export function addressToBytes32(address: `0x${string}`): Uint8Array {
   }
   throw new Error("Invalid address");
 }
-
-const SHARED_SYSTEM_DECIMAL = 6;
 
 export function toSD(amount: string): bigint {
   return parseUnits(amount.toString(), SHARED_SYSTEM_DECIMAL);
