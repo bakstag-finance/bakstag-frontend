@@ -7,7 +7,11 @@ import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
 import { AddressDetailRow, DetailRow } from "@/components/molecules";
 import { AddressInput, TokenInput, ActionButton } from "@/components/ui";
 
-import { isValidCryptoAddress, isValidTokenAmount, formatNumberWithCommas} from "@/lib/helpers";
+import {
+  isValidCryptoAddress,
+  isValidTokenAmount,
+  formatNumberWithCommas,
+} from "@/lib/helpers";
 
 import { SHARED_SYSTEM_DECIMAL } from "@/lib/constants";
 

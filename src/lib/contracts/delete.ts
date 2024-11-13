@@ -403,7 +403,7 @@ export const deleteHandler = async ({
         ).send({
           callValue: quoteCancelOfferFee[0].nativeFee,
         });
-        
+
         setTxHash(`0x${_txHash}`);
         setStatus("loading");
         if (_txHash) {

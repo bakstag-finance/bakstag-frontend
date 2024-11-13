@@ -295,7 +295,6 @@ const TableRow = forwardRef<
     isLast: boolean;
   }
 >(({ item, setStep, setOrderData, isLast }, ref) => {
-
   const formattedSrcAmount = formatNumberWithCommas(
     Number(formatUnits(BigInt(item.srcAmountLD), SHARED_SYSTEM_DECIMAL)),
   );
