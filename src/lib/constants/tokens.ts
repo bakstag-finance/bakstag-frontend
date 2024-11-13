@@ -47,18 +47,6 @@ export const tokensData: Record<string, TokenData> = {
     otcConfig: otcMarketConfig,
     decimals: 18, // TODO: replace to 6
   },
-  // "sol-sol": {
-  //   token: "SOL",
-  //   network: "SOL",
-  // },
-  // "usdc-sol": {
-  //   token: "USDC",
-  //   network: "SOL",
-  // },
-  // "usdt-sol": {
-  //   token: "USDT",
-  //   network: "SOL",
-  // },
   "eth-base": {
     token: "ETH",
     network: "BASE",
