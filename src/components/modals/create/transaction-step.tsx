@@ -20,6 +20,8 @@ import { formatNumberWithCommas } from "@/lib/helpers/formating";
 import { useCreateModal } from "@/components/modals/create/context";
 import { useAccount } from "wagmi";
 import { ActionButton } from "@/components/ui/";
+import { fromHexToTron } from "@/lib/helpers/tron-converter";
+import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
 
 interface TransactionData {
   txHash: string;
@@ -165,7 +167,11 @@ export const TransactionStep = ({
         }}
       />
 
-      <TransactionDetails isMonochain={isMonochain} srcNetwork={srcNetwork} />
+      <TransactionDetails
+        isMonochain={isMonochain}
+        srcNetwork={srcNetwork}
+        dstNetwork={dstNetwork}
+      />
 
       <ActionButton
         handleClick={buttonHandler}
@@ -184,11 +190,13 @@ export const TransactionStep = ({
 interface TransactionDetailsProps {
   isMonochain: boolean;
   srcNetwork: string;
+  dstNetwork: string;
 }
 
 const TransactionDetails = ({
   isMonochain,
   srcNetwork,
+  dstNetwork,
 }: TransactionDetailsProps) => {
   const {
     transactionData,
@@ -199,6 +207,7 @@ const TransactionDetails = ({
     dstTokenAmount,
   } = useCreateModal();
 
+  const tronWallet = useWallet();
   const { address: srcAddress } = useAccount();
 
   const link = getScanLink({
@@ -210,6 +219,15 @@ const TransactionDetails = ({
   const exchangeRate = formatNumberWithCommas(Number(dstTokenAmount));
   const totatReceiveAmount = formatNumberWithCommas(
     calculateTotalReceiveAmount(srcTokenAmount, dstTokenAmount),
+  );
+
+  const formatedSrc = addressFormat(
+    srcNetwork === "TRON" ? srcAddress! : tronWallet.address!,
+  );
+  const formatedDst = addressFormat(
+    dstNetwork === "TRON"
+      ? fromHexToTron(destinationWallet)
+      : destinationWallet,
   );
 
   return (
@@ -232,7 +250,7 @@ const TransactionDetails = ({
       <DetailRow label="to Wallet">
         {destinationWallet.length > 8 && (
           <div className="flex flex-row items-center text-gray-800">
-            {addressFormat(destinationWallet)}
+            {formatedDst}
             <Copy textToCopy={destinationWallet} />
           </div>
         )}
@@ -240,8 +258,8 @@ const TransactionDetails = ({
       <DetailRow label="from Wallet">
         {srcAddress && (
           <div className="flex flex-row text-gray-800">
-            {addressFormat(srcAddress)}
-            <Copy textToCopy={srcAddress} />
+            {formatedSrc}
+            <Copy textToCopy={srcAddress!} />
           </div>
         )}
       </DetailRow>

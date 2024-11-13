@@ -1,12 +1,15 @@
-import { AddressInput, TokenInput } from "@/components/ui";
-import { isValidCryptoAddress, isValidTokenAmount } from "@/lib/helpers";
-import { formatUnits } from "viem";
 import { useAcceptModal } from "./context";
+
 import { useAccount } from "wagmi";
-import { AddressDetailRow, DetailRow } from "@/components/molecules";
-import { ActionButton } from "@/components/ui/";
-import { formatNumberWithCommas } from "@/lib/helpers/formating";
+import { formatUnits } from "viem";
 import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
+
+import { AddressDetailRow, DetailRow } from "@/components/molecules";
+import { AddressInput, TokenInput, ActionButton } from "@/components/ui";
+
+import { isValidCryptoAddress, isValidTokenAmount, formatNumberWithCommas} from "@/lib/helpers";
+
+import { SHARED_SYSTEM_DECIMAL } from "@/lib/constants";
 
 interface Props {
   closeModalHandler: () => void;
@@ -48,7 +51,7 @@ export const FormStep = ({
   );
 
   const srcAddress =
-    srcTokenNetwork === "TRON" ? tronAddress ?? "" : address ?? "";
+    dstTokenNetwork === "TRON" ? tronAddress ?? "" : address ?? "";
 
   return (
     <div className="w-full max-w-[320px] flex flex-col text-white">
@@ -110,6 +113,7 @@ export const FormStep = ({
         isValidTokensInput={isCorrectSrcTokenAmount && isCorrectDstTokenAmount}
         isCopy={true}
         offerId={offer.offerId}
+        mode={"accept"}
         srcTokenNetwork={srcTokenNetwork}
       />
     </div>
@@ -169,7 +173,7 @@ const Summary = ({
   const isDstAmountExist = dstTokenAmount.length > 0;
 
   const parseExchangeRate = formatNumberWithCommas(
-    Number(formatUnits(BigInt(exchangeRate), 6)),
+    Number(formatUnits(BigInt(exchangeRate), SHARED_SYSTEM_DECIMAL)),
   );
 
   return (
@@ -186,12 +190,12 @@ const Summary = ({
       </DetailRow>
       <AddressDetailRow
         label="to Wallet"
-        value={address}
-        network={srcToken.network}
+        value={destinationWallet}
+        network={dstToken.network}
       />
       <AddressDetailRow
         label="from Wallet"
-        value={destinationWallet}
+        value={address}
         network={srcToken.network}
       />
       <DetailRow label="Amount to receive">

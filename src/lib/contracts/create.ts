@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction } from "react";
 
 import { ethers } from "ethers";
 
-import { tokensData } from "../constants";
+import { SHARED_SYSTEM_DECIMAL, tokensData } from "../constants";
 
 import { tronOtcAbi } from "../tron/otc";
 import { wagmiConfig } from "../wagmi/config";
@@ -17,6 +17,8 @@ import {
   Config,
   readContract,
   ReadContractErrorType,
+  simulateContract,
+  waitForTransaction,
   writeContract,
   WriteContractErrorType,
 } from "@wagmi/core";
@@ -27,6 +29,7 @@ import {
 } from "@/components/modals/create/context";
 
 import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
+import { fromTronToHex } from "../helpers/tron-converter";
 
 interface PrepareProps {
   selectedSrcToken: string;
@@ -47,19 +50,32 @@ const prepareDataForContracts = ({
 }: PrepareProps) => {
   const abiConfig = tokensData[selectedSrcToken].otcConfig;
 
-  const _srcSellerAddress = hexZeroPadTo32(srcAddress!);
-  const _dstSellerAddress = hexZeroPadTo32(destinationWallet as `0x${string}`);
-
   const srcToken = tokensData[selectedSrcToken];
   const dstToken = tokensData[selectedDstToken];
+
+  const tronWeb = (window as any).tronWeb as any;
+
+  const _dstAddress =
+    dstToken.network === "TRON"
+      ? tronWeb
+        ? `0x${tronWeb.address.toHex(destinationWallet).slice(2)}`
+        : fromTronToHex(destinationWallet)
+      : destinationWallet;
+
+  const _srcSellerAddress = hexZeroPadTo32(srcAddress!);
+  const _dstSellerAddress = hexZeroPadTo32(_dstAddress as `0x${string}`);
 
   const _dstEid = dstToken.eid as any;
   const _srcTokenAddress = hexZeroPadTo32(srcToken.tokenAddress);
   const _dstTokenAddress = hexZeroPadTo32(dstToken.tokenAddress);
 
   const _srcAmountLD = parseUnits(srcTokenAmount, srcToken.decimals).toString();
+  const _srcAmountSD = toSD(srcTokenAmount);
 
-  const _exchangeRateSD = parseUnits(dstTokenAmount, 6).toString();
+  const _exchangeRateSD = parseUnits(
+    dstTokenAmount,
+    SHARED_SYSTEM_DECIMAL,
+  ).toString();
 
   return {
     srcToken,
@@ -71,6 +87,7 @@ const prepareDataForContracts = ({
     _srcTokenAddress,
     _dstTokenAddress,
     _srcAmountLD,
+    _srcAmountSD,
     _exchangeRateSD,
   };
 };
@@ -123,6 +140,7 @@ export const handleEvmCreate = async ({
       _srcTokenAddress,
       _dstTokenAddress,
       _srcAmountLD,
+      _srcAmountSD,
       _exchangeRateSD,
     } = prepareDataForContracts({
       selectedSrcToken,
@@ -139,11 +157,12 @@ export const handleEvmCreate = async ({
     };
 
     let _value: bigint = BigInt(0);
-    const srcAmountSD = toSD(_srcAmountLD);
-    const dstDecimalConversionRate = BigInt(10 ** (dstToken.decimals - 6));
+    const dstDecimalConversionRate = BigInt(
+      10 ** (dstToken.decimals - SHARED_SYSTEM_DECIMAL),
+    );
 
     const isOrderAcceptible =
-      srcAmountSD * BigInt(_exchangeRateSD) * dstDecimalConversionRate >=
+      _srcAmountSD * BigInt(_exchangeRateSD) * dstDecimalConversionRate >=
       10 ** 8;
 
     if (
@@ -193,18 +212,24 @@ export const handleEvmCreate = async ({
           : _lzFee.nativeFee;
 
       if (srcToken.tokenAddress != ethers.constants.AddressZero) {
-        await writeContract(wagmiConfig, {
+        const { request } = await simulateContract(wagmiConfig, {
           abi: erc20Abi,
           address: srcToken.tokenAddress,
           functionName: "approve",
           args: [abiConfig.address, srcAmountLD],
           chainId: srcToken.chainId,
-        }).catch((e) => {
+        });
+
+        const hash = await writeContract(wagmiConfig, request).catch((e) => {
           const errorMsg = handleContractError(
             e as WriteContractErrorType,
             otcMarketAbi,
           );
           throw new Error(errorMsg);
+        });
+
+        await waitForTransaction(wagmiConfig, {
+          hash,
         });
       }
 
@@ -254,7 +279,7 @@ export const handleEvmCreate = async ({
             dstSellerAddress: _dstSellerAddress,
             srcTokenAddress: _srcTokenAddress,
             dstTokenAddress: _dstTokenAddress,
-            srcAmountLD: BigInt(_srcAmountLD),
+            srcAmountLD: BigInt(_srcAmountSD),
             exchangeRateSD: BigInt(_exchangeRateSD),
           };
         });
@@ -316,8 +341,8 @@ export const handleTronCreate = async ({
     };
     let _value: bigint = BigInt(0);
 
-    const _srcAmountLD = parseUnits(srcTokenAmount, 6);
-    const _exchangeRateSD = parseUnits(dstTokenAmount, 6);
+    const _srcAmountLD = parseUnits(srcTokenAmount, SHARED_SYSTEM_DECIMAL);
+    const _exchangeRateSD = parseUnits(dstTokenAmount, SHARED_SYSTEM_DECIMAL);
 
     let contract = tronWeb.contract(tronOtcAbi.abi, tronOtcAbi.contractAddress);
 
@@ -401,8 +426,12 @@ export const handleTronCreate = async ({
           dstEid: Number(tokensData[selectedDstToken].eid),
           srcSellerAddress: `0x${hexAddress}`,
           dstSellerAddress: hexDstAddress,
-          srcTokenAddress: tokensData[selectedSrcToken].tokenAddress,
-          dstTokenAddress: tokensData[selectedDstToken].tokenAddress,
+          srcTokenAddress: hexZeroPadTo32(
+            tokensData[selectedSrcToken].tokenAddress,
+          ),
+          dstTokenAddress: hexZeroPadTo32(
+            tokensData[selectedDstToken].tokenAddress,
+          ),
           srcAmountLD: _srcAmountLD,
           exchangeRateSD: _exchangeRateSD,
         };

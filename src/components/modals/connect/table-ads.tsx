@@ -34,6 +34,8 @@ import { formatNumberWithCommas } from "@/lib/helpers/formating";
 
 import { Trash } from "lucide-react";
 import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
+import { SHARED_SYSTEM_DECIMAL, tokensData } from "@/lib/constants";
+import { getTokenField } from "@/lib/helpers";
 
 type ConnectModalStep = "main" | "wallet-choose" | "delete";
 
@@ -293,11 +295,12 @@ const TableRow = forwardRef<
     isLast: boolean;
   }
 >(({ item, setStep, setOrderData, isLast }, ref) => {
+
   const formattedSrcAmount = formatNumberWithCommas(
-    Number(formatUnits(BigInt(item.srcAmountLD), 18)),
+    Number(formatUnits(BigInt(item.srcAmountLD), SHARED_SYSTEM_DECIMAL)),
   );
   const formattedDstAmount = formatNumberWithCommas(
-    Number(formatUnits(BigInt(item.exchangeRateSD), 6)),
+    Number(formatUnits(BigInt(item.exchangeRateSD), SHARED_SYSTEM_DECIMAL)),
   );
 
   return (

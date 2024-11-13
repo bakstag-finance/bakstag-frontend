@@ -18,8 +18,9 @@ import { Offer } from "@/types/offer";
 
 import { addressFormat, getScanLink, getTokenField } from "@/lib/helpers";
 import { formatUnits } from "viem";
-import { fromHexToTron } from "@/lib/helpers/tron-converter";
 import { formatNumberWithCommas } from "@/lib/helpers/formating";
+import { deleteHandler } from "@/lib/contracts/delete";
+import { SHARED_SYSTEM_DECIMAL } from "@/lib/constants";
 
 type Status =
   | "loading"
@@ -166,15 +167,13 @@ const InfoSection = ({ txId, walletAddress, offer }: InfoSectionProps) => {
     Number(formatUnits(BigInt(offer.srcAmountLD), srcTokenDecimals)),
   );
   const exchangeRate = formatNumberWithCommas(
-    Number(formatUnits(BigInt(offer.exchangeRateSD), 6)),
+    Number(formatUnits(BigInt(offer.exchangeRateSD), SHARED_SYSTEM_DECIMAL)),
   );
 
   const isMonochain = offer.srcTokenNetwork === offer.dstTokenNetwork;
 
   const _walletAddress =
-    offer.srcTokenNetwork === "TRON"
-      ? fromHexToTron(walletAddress)
-      : walletAddress;
+    offer.srcTokenNetwork === "TRON" ? walletAddress : walletAddress;
 
   const linkToScan = getScanLink({
     isMonochain,
@@ -220,16 +219,3 @@ const InfoSection = ({ txId, walletAddress, offer }: InfoSectionProps) => {
     </div>
   );
 };
-function deleteHandler(arg0: {
-  offer: Offer;
-  refetch: () => void;
-  setStatus: Dispatch<SetStateAction<Status>>;
-  setTxHash: Dispatch<SetStateAction<string>>;
-  isTronConnected: boolean;
-  switchChainAsync: import("wagmi/query").SwitchChainMutateAsync<
-    import("wagmi").Config,
-    unknown
-  >;
-}) {
-  throw new Error("Function not implemented.");
-}

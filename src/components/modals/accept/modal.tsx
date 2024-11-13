@@ -30,12 +30,13 @@ import { formatUnits } from "viem";
 
 import { useAccount, useSwitchChain } from "wagmi";
 
-import { evmAcceptOffer, tronAcceptOffer } from "@/lib/contracts/accept";
+import { acceptOffer } from "@/lib/contracts/accept";
 
 import { Status } from "@/types/contracts";
 import { Offer } from "@/types/offer";
 
 import AcceptModalProvider, { useAcceptModal } from "./context";
+import { SHARED_SYSTEM_DECIMAL } from "@/lib/constants";
 
 const Modal = ({
   openModal,
@@ -80,46 +81,26 @@ const Modal = ({
     if (!offer) {
       return null;
     }
-
-    if (
-      (offer.srcTokenNetwork === "BASE" || offer.srcTokenNetwork === "OP") &&
-      address
-    ) {
-      void evmAcceptOffer({
-        isWalletConnected: isEvmWalletConnected,
-        offer,
-        address,
-        srcTokenAmount,
-        dstTokenAmount,
-        approvingStatus,
-        setApprovingStatus,
-        setApprovingErrorMsg,
-        switchChainAsync,
-        setInfoForTransactionStep,
-        setTransactionStatus,
-        setStep,
-      });
-      return null;
-    }
-
-    if (offer.srcTokenNetwork === "TRON") {
-      void tronAcceptOffer({
-        isTronConnected,
-        offer,
-        tronWallet,
-        srcTokenAmount,
-        dstTokenAmount,
-        destinationWallet,
-        approvingStatus,
-        transactionStatus,
-        setApprovingStatus,
-        setApprovingErrorMsg,
-        setInfoForTransactionStep,
-        setTransactionStatus,
-        setStep,
-      });
-      return null;
-    }
+    void acceptOffer({
+      isWalletConnected:
+        offer.srcTokenAddress === "TRON"
+          ? isEvmWalletConnected
+          : isTronConnected,
+      offer,
+      tronWallet,
+      srcTokenAmount,
+      dstTokenAmount,
+      evmWalletAddress: address as `0x${string}`,
+      destinationWallet,
+      approvingStatus,
+      transactionStatus,
+      switchChainAsync,
+      setApprovingStatus,
+      setApprovingErrorMsg,
+      setInfoForTransactionStep,
+      setTransactionStatus,
+      setStep,
+    });
   };
 
   const handleResetState = () => {
@@ -192,7 +173,9 @@ const Modal = ({
         ? setSrcTokenAmount(inputValue)
         : setDstTokenAmount(inputValue);
 
-      const exchangeRate = Number(formatUnits(BigInt(offer.exchangeRateSD), 6));
+      const exchangeRate = Number(
+        formatUnits(BigInt(offer.exchangeRateSD), SHARED_SYSTEM_DECIMAL),
+      );
 
       if (inputField === "src") {
         const newDstTokenAmount = formatNumberWithCommas(
@@ -223,7 +206,7 @@ const Modal = ({
         handleMaxExceededAmount(
           newSrcTokenAmount,
           offer?.srcAmountLD.toString(),
-          6,
+          SHARED_SYSTEM_DECIMAL,
           setApprovingStatus,
           setApprovingErrorMsg,
         );

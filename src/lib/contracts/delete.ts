@@ -191,10 +191,11 @@ const processEvmCrosschain = async ({
     const tronWeb = (window as any).tronWeb as any;
     let contract = tronWeb.contract(tronOtcAbi.abi, tronOtcAbi.contractAddress);
 
-    const quoteRes = await contract["quoteCancelOffer"](offerId).call();
+    const [lzFee, fee] = await contract["quoteCancelOffer"](offerId).call();
+
     quoteCancelOffer = {
-      lzTokenFee: quoteRes.lzTokenFee,
-      nativeFee: quoteRes.nativeFee,
+      lzTokenFee: lzFee.lzTokenFee,
+      nativeFee: lzFee.nativeFee,
     };
   } else {
     console.log("Not Implemented yet");
@@ -257,7 +258,8 @@ interface DeleteHandlerParams {
   setTxHash: Dispatch<SetStateAction<string>>;
   switchChainAsync: SwitchChainMutateAsync<Config, unknown>;
 }
-const deleteHandler = async ({
+
+export const deleteHandler = async ({
   offer,
   refetch,
   setStatus,
@@ -401,9 +403,7 @@ const deleteHandler = async ({
         ).send({
           callValue: quoteCancelOfferFee[0].nativeFee,
         });
-
-        console.log("_txHash", _txHash);
-
+        
         setTxHash(`0x${_txHash}`);
         setStatus("loading");
         if (_txHash) {
