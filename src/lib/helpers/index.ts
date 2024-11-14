@@ -57,5 +57,5 @@ export {
   formatNumberWithCommas,
   decodeEvmTransactionErrorResult,
   encodeParams,
-  decodeParams
+  decodeParams,
 };

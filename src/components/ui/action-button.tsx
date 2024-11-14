@@ -180,7 +180,7 @@ const CopyButton: FC<CopyButtonProps> = ({ offerId }) => {
 
   const handleCopyLink = () => {
     const encodeOfferId = encodeParams(offerId);
-    
+
     const offerParams = new URLSearchParams({
       modalType: "accept",
       offerId: encodeOfferId,
