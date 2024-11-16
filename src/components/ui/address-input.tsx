@@ -1,3 +1,4 @@
+"use client";
 import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Input } from "./input";

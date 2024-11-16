@@ -36,6 +36,8 @@ import { TokenInput } from "./token-input";
 
 import { Squircle } from "./squircle";
 
+import { LoadingSpinner } from "./loading-spinner";
+
 import {
   Table,
   TableHeader,
@@ -101,4 +103,5 @@ export {
   EmptyComponent,
   ActionButton,
   Squircle,
+  LoadingSpinner,
 };
