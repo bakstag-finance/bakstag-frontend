@@ -1,8 +1,9 @@
+"use client";
 import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Input } from "./input";
 import { isValidCryptoAddress } from "@/lib/helpers";
-import { Squircle } from "@squircle-js/react";
+import { Squircle } from "./squircle";
 
 interface Props {
   label: string;

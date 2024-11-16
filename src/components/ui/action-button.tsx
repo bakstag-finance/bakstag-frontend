@@ -1,12 +1,13 @@
+"use client";
+
 import { cn } from "@/lib/utils";
 import { FC, useState } from "react";
 
 import { useAccount } from "wagmi";
 import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
 
-import { Squircle } from "@squircle-js/react";
 import { ConnectModal } from "@/components/modals";
-import { Button, LoadingClock } from "@/components/ui";
+import { Button, LoadingClock, Squircle } from "@/components/ui";
 import { CircleCheck, Redo2, Link, Share } from "lucide-react";
 
 import { BASE_URL } from "@/lib/constants";

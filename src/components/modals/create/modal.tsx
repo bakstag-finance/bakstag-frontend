@@ -9,8 +9,8 @@ import {
   DialogTitle,
   DialogTrigger,
   VisuallyHidden,
+  Squircle,
 } from "@/components/ui";
-import { Squircle } from "@squircle-js/react";
 
 import { useAccount, useSwitchChain } from "wagmi";
 import { tokensData } from "@/lib/constants";

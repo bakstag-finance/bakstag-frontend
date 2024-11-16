@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { LoadingClock } from "@/components/ui/loading-clock";
 import { CreateModal } from "@/components/modals";
 import { Clock, Ghost } from "lucide-react";
-import { Squircle } from "@squircle-js/react";
+import { Squircle } from "./squircle";
 import { Suspense } from "react";
 
 interface Props {
