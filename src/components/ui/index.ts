@@ -34,6 +34,8 @@ import { AddressInput } from "./address-input";
 import { StatusHeader } from "./status-header";
 import { TokenInput } from "./token-input";
 
+import { Squircle } from "./squircle";
+
 import {
   Table,
   TableHeader,
@@ -98,4 +100,5 @@ export {
   ErrorComponent,
   EmptyComponent,
   ActionButton,
+  Squircle,
 };

@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "./select";
 import { cn } from "@/lib/utils";
-import { Squircle } from "@squircle-js/react";
+import { Squircle } from "./squircle";
 
 interface Props {
   placeholder: string;

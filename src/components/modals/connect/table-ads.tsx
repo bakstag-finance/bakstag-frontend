@@ -22,8 +22,8 @@ import {
   LoadingComponent,
   ErrorComponent,
   EmptyComponent,
+  Squircle,
 } from "@/components/ui";
-import { Squircle } from "@squircle-js/react";
 
 import { useAccount } from "wagmi";
 import { formatUnits } from "viem";

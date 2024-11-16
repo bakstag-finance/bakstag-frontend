@@ -12,11 +12,11 @@ import {
   TabsList,
   TabsTrigger,
   VisuallyHidden,
+  Squircle,
 } from "@/components/ui";
 import { LogIn, X } from "lucide-react";
 import { TableComponent } from "./table-ads";
 import { DeletingStep } from "./delete-step";
-import { Squircle } from "@squircle-js/react";
 
 import { Offer } from "@/types/offer";
 
