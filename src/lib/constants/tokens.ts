@@ -1,9 +1,10 @@
+import { ChainIds } from "@/types/contracts";
 import { otcMarketConfig } from "../wagmi/contracts/abi";
 
 export type TokenData = {
   token: string;
   network: string;
-  chainId: 1 | 11155111 | 84532 | 4002 | 11155420 | 421614 | undefined;
+  chainId: ChainIds | undefined;
   tokenAddress: `0x${string}`;
   eid: string;
   otcConfig: typeof otcMarketConfig;
@@ -11,6 +12,7 @@ export type TokenData = {
 };
 
 export const tokensData: Record<string, TokenData> = {
+  // Optimism
   "eth-opt": {
     token: "ETH",
     network: "OP",
@@ -20,33 +22,26 @@ export const tokensData: Record<string, TokenData> = {
     otcConfig: otcMarketConfig,
     decimals: 18,
   },
-  "op-opt": {
-    token: "OPT",
-    network: "OP",
-    chainId: 11155420,
-    eid: "40232",
-    tokenAddress: "0x8B3bcfa4680e8a16215e587DfCcD1730A453CeaD",
-    otcConfig: otcMarketConfig,
-    decimals: 18, // TODO: replace to 6
-  },
-  "usdc-opt": {
-    token: "USDC",
-    network: "OP",
-    chainId: 11155420,
-    eid: "40232",
-    tokenAddress: "0x8B3bcfa4680e8a16215e587DfCcD1730A453CeaD",
-    otcConfig: otcMarketConfig,
-    decimals: 18, // TODO: replace to 6
-  },
   "usdt-opt": {
     token: "USDT",
     network: "OP",
     chainId: 11155420,
     eid: "40232",
-    tokenAddress: "0x8B3bcfa4680e8a16215e587DfCcD1730A453CeaD",
+    tokenAddress: "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58", // mainnet
     otcConfig: otcMarketConfig,
-    decimals: 18, // TODO: replace to 6
+    decimals: 6,
   },
+  "wbtc-opt": {
+    token: "WBTC",
+    network: "OP",
+    chainId: 11155420,
+    eid: "40232",
+    tokenAddress: "0x68f180fcCe6836688e9084f035309E29Bf0A2095", // Mainnet
+    otcConfig: otcMarketConfig,
+    decimals: 8,
+  },
+
+  // Base
   "eth-base": {
     token: "ETH",
     network: "BASE",
@@ -56,15 +51,26 @@ export const tokensData: Record<string, TokenData> = {
     otcConfig: otcMarketConfig,
     decimals: 18,
   },
-  "usdc-base": {
-    token: "USDC",
+  "usdt-base": {
+    token: "USDT",
     network: "BASE",
-    tokenAddress: "0x21bFF5Cd1f61b59Cc2D908C050735b87cb780d2d",
+    tokenAddress: "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2",
     eid: "40245",
     chainId: 84532,
     otcConfig: otcMarketConfig,
-    decimals: 18, // TODO: replace to 6
+    decimals: 6,
   },
+  "wbtc-base": {
+    token: "WBTC",
+    network: "BASE",
+    tokenAddress: "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c",
+    eid: "40245",
+    chainId: 84532,
+    otcConfig: otcMarketConfig,
+    decimals: 8,
+  },
+
+  // Tron
   "trx-tron": {
     token: "TRX",
     network: "TRON",
@@ -82,5 +88,14 @@ export const tokensData: Record<string, TokenData> = {
     chainId: undefined,
     otcConfig: otcMarketConfig,
     decimals: 6,
+  },
+  "wbtc-tron": {
+    token: "WBTC",
+    network: "TRON",
+    tokenAddress: "0x84716914C0fDf7110A44030d04D0C4923504D9CC",
+    eid: "40420",
+    chainId: undefined,
+    otcConfig: otcMarketConfig,
+    decimals: 8,
   },
 } as const;

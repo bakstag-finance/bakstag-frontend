@@ -16,6 +16,9 @@ export const wagmiConfig = createConfig({
   chains: [
     mainnet,
     sepolia,
+    base,
+    optimism,
+    arbitrum,
     baseSepolia,
     fantomTestnet,
     optimismSepolia,
